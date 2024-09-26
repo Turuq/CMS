@@ -1,0 +1,28 @@
+{
+  "name": "server",
+  "version": "0.0.1",
+  "private": true,
+  "module": "src/index.ts",
+  "type": "module",
+  "scripts": {
+    "dev": "bun --watch src/index.ts",
+    "build": "bun build src/index.ts",
+    "start": "bun src/index.ts"
+  },
+  "devDependencies": {
+    "@types/bun": "latest"
+  },
+  "peerDependencies": {
+    "typescript": "^5.0.0"
+  },
+  "dependencies": {
+    "@clerk/backend": "^1.13.2",
+    "@hono/clerk-auth": "^2.0.0",
+    "@hono/zod-validator": "^0.2.2",
+    "@supabase/supabase-js": "^2.45.4",
+    "hono": "^4.6.2",
+    "mongodb": "^6.9.0",
+    "mongoose": "^8.6.3",
+    "zod": "^3.23.8"
+  }
+}
