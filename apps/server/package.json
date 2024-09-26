@@ -6,7 +6,7 @@
   "type": "module",
   "scripts": {
     "dev": "bun --watch src/index.ts",
-    "build": "bun build src/index.ts",
+    "build": "bun build src/index.ts --target=bun --prod --outdir ./build",
     "start": "bun src/index.ts"
   },
   "devDependencies": {
