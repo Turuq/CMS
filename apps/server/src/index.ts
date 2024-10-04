@@ -7,7 +7,7 @@ import { logger } from 'hono/logger';
 import authRouter from './routes/auth';
 
 // Auth
-import { clerkMiddleware } from '@hono/clerk-auth';
+import { cors } from 'hono/cors';
 import mongoClient from './lib/db/mongoClient';
 import assignmentOfficerRouter from './routes/assignment-officer';
 import courierRouter from './routes/courier';
@@ -15,7 +15,9 @@ import handoverOfficerRouter from './routes/handover-officer';
 import inspectorRouter from './routes/inspector';
 import orderRouter from './routes/order';
 
-const app = new Hono()
+const app = new Hono();
+
+const apiRoutes = app
   .basePath('/api')
   .route('/auth', authRouter)
   .route('/courier', courierRouter)
@@ -24,7 +26,13 @@ const app = new Hono()
   .route('/order', orderRouter)
   .route('/inspector', inspectorRouter);
 
-app.use(logger());
+app.use('*', logger());
+app.use(
+  '/api/*',
+  cors({
+    origin: 'http://localhost:3000',
+  })
+);
 
 // Connect to Database
 mongoClient()
@@ -41,9 +49,7 @@ mongoClient()
     });
   });
 
-app.use('*', clerkMiddleware());
-
-app.get('/', (c) => {
+app.get('/api', (c) => {
   c.status(200);
   return c.json({
     message: 'Welcome to Courier Management API',
@@ -51,7 +57,7 @@ app.get('/', (c) => {
 });
 
 // Hono RPC
-export type AppType = typeof app;
+export type AppType = typeof apiRoutes;
 
 export default {
   port: process.env.PORT || 8080,

@@ -1,0 +1,315 @@
+{
+  "dashboard": "لوحة تحكم ضابط الباركود",
+  "greetingOp": "{name} ,صباح الخير",
+  "LocaleSwitcher": {
+    "label": "تغيير اللغة",
+    "locale": "{locale, select, ar {العربية} en {English} other {غير معروف}}"
+  },
+
+  "courierManager": {
+    "tabs": {
+      "home": {
+        "header": "الرئيسية",
+        "orderStatistics": {
+          "header": "إحصائيات الطلبات",
+          "cards": {
+            "delivered": "تم تسليمها",
+            "totalOrders": "إجمالي الطلبات",
+            "processing": "يتم تجهيزها",
+            "reshipped": "يعاد شحنها",
+            "collected": "تم تحصيلها",
+            "cancelled": "أُلغيت",
+            "outForDelivery": "يتم شحنها",
+            "postponed": "مؤجلة",
+            "pending": "في انتظار المعالجة",
+            "returned": "مرتجع",
+            "unreachable": "تعثر تسليمها",
+            "outOfStock": "بضائع غير متوفرة",
+            "invalidAddress": "عنوان خاطئ"
+          }
+        }
+      },
+      "orders": {
+        "header": "الطلبات",
+        "tabs": {
+          "turuq": "طرق",
+          "integrations": "التكاملات",
+          "imported": "مستوردة"
+        },
+        "ordersTable": {
+          "columns": {
+            "OID": "رقم الطلب",
+            "companyName": "اسم الشركة",
+            "customerName": "اسم العميل",
+            "phoneNumber": "رقم الهاتف",
+            "products": "# المنتجات",
+            "status": "الحالة",
+            "type": "النوع",
+            "subtotal": "المجموع الفرعي",
+            "shippingFees": "رسوم الشحن",
+            "total": "المجموع",
+            "createdAt": "تاريخ الإنشاء"
+          },
+          "filters": {
+            "courier": {
+              "placeholder": "تصفية حسب الرائد"
+            },
+            "status": {
+              "placeholder": "تصفية حسب الحالة",
+              "values": {
+                "delivered": "تم تسليمها",
+                "processing": "يتم تجهيزها",
+                "reshipped": "يعاد شحنها",
+                "cancelled": "أُلغيت",
+                "outForDelivery": "يتم شحنها",
+                "postponed": "مؤجلة",
+                "pending": "في انتظار المعالجة",
+                "returned": "مرتجع",
+                "unreachable": "تعثر تسليمها",
+                "outOfStock": "بضائع غير متوفرة",
+                "invalidAddress": "عنوان خاطئ"
+              }
+            },
+            "type": {
+              "placeholder": "تصفية حسب النوع"
+            },
+            "governorate": {
+              "placeholder": "تصفية حسب المحافظة"
+            },
+            "company": {
+              "placeholder": "تصفية حسب الشركة"
+            },
+            "otherFilters": {
+              "placeholder": "فلاتر أخري"
+            },
+            "buttons": {
+              "apply": "تطبيق الفلاتر",
+              "reset": "إعادة تعيين الفلاتر"
+            }
+          },
+          "search": {
+            "placeholder": "ابحث برقم الطلب",
+            "buttons": {
+              "clear": "امسح"
+            }
+          },
+          "categories": {
+            "reshipped": "إعادة الشحن",
+            "instaPay": "إنستا باي",
+            "gotGhosted": "تم تجاهلها",
+            "returnedItems": "العناصر المرتجعة"
+          },
+          "dataResults": {
+            "noResults": "لا توجد نتائج"
+          },
+          "pagination": {
+            "header": {
+              "showing": "عرض",
+              "of": "من",
+              "results": "نتائج"
+            },
+            "footer": {
+              "page": "صفحة",
+              "of": "من"
+            }
+          }
+        }
+      },
+      "assign": {
+        "header": "تعيين",
+        "courierAssignPage": {
+          "tabs": {
+            "turuq": "طرق",
+            "integrations": "التكاملات",
+            "imported": "مستوردة"
+          },
+          "ordersTable": {
+            "headers": {
+              "processingOrders": "طلبات قيد المعالجة",
+              "assignedOrders": "طلبات معينة"
+            },
+            "columns": {
+              "OID": "رقم الطلب",
+              "companyName": "اسم الشركة",
+              "customerName": "اسم العميل",
+              "phoneNumber": "رقم الهاتف",
+              "products": "# المنتجات",
+              "status": "الحالة",
+              "type": "النوع",
+              "subtotal": "المجموع الفرعي",
+              "shippingFees": "رسوم الشحن",
+              "total": "المجموع",
+              "createdAt": "تاريخ الإنشاء",
+              "actions": "الإجراءات"
+            },
+            "buttons": {
+              "assignSelected": "تعيين المحدد",
+              "finish": "إنهاء",
+              "remove": "حذف"
+            },
+            "search": {
+              "placeholder": "ابحث برقم الطلب",
+              "buttons": {
+                "clear": "امسح"
+              }
+            },
+            "dataResults": {
+              "noProcessingOrders": "لا توجد طلبات قيد المعالجة.",
+              "noAssignedOrders": "لا توجد طلبات معينة. "
+            },
+            "pagination": {
+              "header": {
+                "showing": "عرض",
+                "of": "من",
+                "results": "نتائج"
+              },
+              "footer": {
+                "page": "صفحة",
+                "of": "من"
+              }
+            }
+          },
+          "toast": {
+            "success": {
+              "header": "تم تعيين الطلبات بنجاح",
+              "description": "تم تعيين الطلبات بنجاح للمندوب"
+            },
+            "error": {
+              "header": "حدث خطأ أثناء تعيين الطلبات",
+              "description": "حدث خطأ أثناء تعيين الطلبات للمندوب"
+            }
+          }
+        }
+      },
+      "inspect": {
+        "header": "مراقبة"
+      },
+      "manage": {
+        "header": "إدارة",
+        "tabs": {
+          "handoverOfficers": "ضباط التسليم",
+          "assignmentOfficers": "ضباط التعيين",
+          "couriers": "الرواد"
+        },
+        "table": {
+          "columns": {
+            "name": "الاسم",
+            "username": "اسم المستخدم",
+            "nationalID": "الرقم القومي",
+            "joinedAt": "تاريخ الانضمام",
+            "actions": "الإجراءات"
+          },
+          "buttons": {
+            "addHandoverOfficer": "إضافة ضابط تسليم",
+            "addAssignmentOfficer": "إضافة ضابط تعيين",
+            "addCourier": "إضافة رائد"
+          },
+          "dataResults": {
+            "noHandoverOfficers": "لا يوجد ضباط تسليم.",
+            "noAssignmentOfficers": "لا يوجد ضباط تعيين.",
+            "noCouriers": "لا يوجد رواد."
+          },
+          "pagination": {
+            "header": {
+              "showing": "عرض",
+              "of": "من",
+              "results": "نتائج"
+            },
+            "footer": {
+              "page": "صفحة",
+              "of": "من"
+            }
+          }
+        },
+        "form": {
+          "couriers": {
+            "headers": {
+              "addCourier": "إضافة رائد جديد",
+              "editCourier": "تعديل الرائد"
+            },
+            "fields": {
+              "name": "الاسم",
+              "phoneNumber": "رقم الهاتف",
+              "username": "اسم المستخدم",
+              "salary": "الراتب",
+              "zone": "المنطقة",
+              "commissionPerOrder": "عمولة لكل طلب",
+              "nationalIDImage": "صورة البطاقة",
+              "licenseImage": "صورة الرخصة",
+              "criminalRecord": "السجل الجنائي"
+            }
+          },
+          "handoverOfficers": {
+            "headers": {
+              "addHandoverOfficer": "إضافة ضابط تسليم جديد",
+              "editHandoverOfficer": "تعديل ضابط التسليم"
+            },
+            "fields": {
+              "name": "الاسم",
+              "phoneNumber": "رقم الهاتف",
+              "salary": "الراتب",
+              "zone": "المنطقة",
+              "commissionPerOrder": "عمولة لكل طلب",
+              "nationalIDImage": "صورة البطاقة",
+              "criminalRecord": "السجل الجنائي"
+            }
+          },
+          "assignmentOfficers": {
+            "headers": {
+              "addAssignmentOfficer": "إضافة ضابط تعيين جديد",
+              "editAssignmentOfficer": "تعديل ضابط التعيين"
+            },
+            "fields": {
+              "name": "الاسم",
+              "phoneNumber": "رقم الهاتف",
+              "salary": "الراتب",
+              "zone": "المنطقة",
+              "commissionPerOrder": "عمولة لكل طلب",
+              "nationalIDImage": "صورة البطاقة",
+              "criminalRecord": "السجل الجنائي"
+            }
+          }
+        }
+      }
+    }
+  },
+  "assignmentOfficer": {
+    "tabs": {
+      "home": {
+        "header": "الرئيسية",
+        "processingOrdersStatistics": {
+          "header": "الطلبات قيد المعالجة",
+          "governorate": {
+            "cairo": "القاهرة",
+            "giza": "الجيزة",
+            "alexandria": "الإسكندرية",
+            "luxor": "الأقصر",
+            "aswan": "أسوان",
+            "dakahlia": "الدقهلية",
+            "sharqia": "الشرقية",
+            "beheira": "البحيرة",
+            "gharbia": "الغربية"
+          }
+        },
+        "outForDeliveryOrdersStatistics": {
+          "header": "الطلبات التي تم شحنها",
+          "zone": {
+            "cairo": "القاهرة",
+            "giza": "الجيزة",
+            "alexandria": "الإسكندرية",
+            "luxor": "الأقصر",
+            "aswan": "أسوان",
+            "dakahlia": "الدقهلية",
+            "sharqia": "الشرقية",
+            "beheira": "البحيرة",
+            "gharbia": "الغربية"
+          }
+        }
+      },
+
+      "assign": {
+        "header": "تعيين"
+      }
+    }
+  }
+}

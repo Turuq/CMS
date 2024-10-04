@@ -1,10 +1,9 @@
-import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
 import { authSignInSchema, authSignUpSchema } from '../validation/auth';
-import { clerkClient } from '../lib/clerk/clerkClient';
-import supabase from '../lib/supabase/auth';
+import supabase from '../lib/supabase/supabaseClient';
 import { staffMemberModel } from '../models/staff';
+import { zValidator } from '@hono/zod-validator';
 
 const authRouter = new Hono()
   // .post('/sign-up', zValidator('json', authSignUpSchema), async (c) => {

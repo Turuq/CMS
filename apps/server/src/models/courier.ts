@@ -1,6 +1,7 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, type ObjectId } from 'mongoose';
+import type { Courier } from '../validation/courier';
 
-const courierSchema = new Schema(
+const courierSchema = new Schema<Courier>(
   {
     username: {
       type: String,
@@ -66,4 +67,4 @@ const courierSchema = new Schema(
   { timestamps: true }
 );
 
-export const courierModel = model('Courier', courierSchema);
+export const CourierModel = model<Courier>('Courier', courierSchema);

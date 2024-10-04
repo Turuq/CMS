@@ -30,7 +30,7 @@ const inspectorRouter = new Hono().get('/dashboard', async (c) => {
   if (!ids) {
     return c.json(
       {
-        message: 'No orders found',
+        error: 'No orders found',
       },
       404
     );

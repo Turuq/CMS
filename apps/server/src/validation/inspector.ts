@@ -13,27 +13,18 @@ const courierDailyOrdersResponse = z.array(
   })
 );
 
-// "totalShippingFees": 1400,
-// "totalToBeReceived": 0,
-// "totalDelivered": 12,
-// "totalOutForDelivery": 12,
-// "totalToBeReshipped": 3,
-// "totalProcessingAssigned": 1,
-// "totalProcessingUnassigned": 0,
-// "uniqueCouriers": 8
+const orderMetrics = z.object({
+  totalShippingFees: z.number().positive(),
+  totalToBeReceived: z.number().positive(),
+  totalDelivered: z.number().positive(),
+  totalOutForDelivery: z.number().positive(),
+  totalToBeReshipped: z.number().positive(),
+  totalProcessingAssigned: z.number().positive(),
+  totalProcessingUnassigned: z.number().positive(),
+  uniqueCouriers: z.number().positive(),
+});
 
-const dailyOrderStatisticsResponse = z.array(
-  z.object({
-    totalShippingFees: z.number().positive(),
-    totalToBeReceived: z.number().positive(),
-    totalDelivered: z.number().positive(),
-    totalOutForDelivery: z.number().positive(),
-    totalToBeReshipped: z.number().positive(),
-    totalProcessingAssigned: z.number().positive(),
-    totalProcessingUnassigned: z.number().positive(),
-    uniqueCouriers: z.number().positive(),
-  })
-);
+const dailyOrderStatisticsResponse = z.array(orderMetrics);
 
 export type CourierDailyOrdersResponse = z.infer<
   typeof courierDailyOrdersResponse
@@ -42,3 +33,4 @@ export type CourierDailyOrdersResponse = z.infer<
 export type ObjectIdArray = z.infer<typeof objectIdArraySchema>;
 
 export type DailyOrderMetrics = z.infer<typeof dailyOrderStatisticsResponse>;
+export type OrderMetrics = z.infer<typeof orderMetrics>;

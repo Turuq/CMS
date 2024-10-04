@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { courierModel } from '../models/courier';
+import { CourierModel } from '../models/courier';
 import {
   validateObjectId,
   validateObjectIdArray,
@@ -8,6 +8,9 @@ import {
 } from '../utils/validation';
 import { orderModel } from '../models/order';
 import { integrationOrderModel } from '../models/integration-order';
+import prisma from '../../prisma/prismaClient';
+import { ClientModel } from '../models/client';
+import type { orders } from '@prisma/client';
 
 const orderRouter = new Hono()
   // FIXME: Merge the following two endpoints into a single endpoint after the restructuring phase
@@ -20,18 +23,22 @@ const orderRouter = new Hono()
       try {
         const orders = await orderModel
           .find()
-          .select(
-            'OID client customer products status type subtotal shippingFees total createdAt'
-          )
-          .skip((+page - 1) * +pageSize)
+          .populate({
+            path: 'client',
+            model: ClientModel,
+            select: '_id companyName',
+          })
+          .populate({
+            path: 'courier',
+            select: '_id name',
+          })
           .limit(+pageSize)
+          .skip((+page - 1) * +pageSize)
           .sort({ createdAt: -1 });
 
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
@@ -39,9 +46,7 @@ const orderRouter = new Hono()
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -54,18 +59,22 @@ const orderRouter = new Hono()
       try {
         const integrationOrders = await integrationOrderModel
           .find()
-          .select(
-            'OID client customer products status type subtotal shippingFees total createdAt'
-          )
-          .skip((+page - 1) * +pageSize)
+          .populate({
+            path: 'client',
+            model: ClientModel,
+            select: '_id companyName',
+          })
+          .populate({
+            path: 'courier',
+            select: '_id name',
+          })
           .limit(+pageSize)
+          .skip((+page - 1) * +pageSize)
           .sort({ createdAt: -1 });
 
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No integration orders found',
-          });
+          throw new Error('No integration orders found');
         }
 
         c.status(200);
@@ -73,9 +82,7 @@ const orderRouter = new Hono()
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get integration orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get integration orders: ${error.message}`);
       }
     }
   )
@@ -87,24 +94,31 @@ const orderRouter = new Hono()
       // Validate request params
       const { id } = c.req.valid('param');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
-          return c.json({
-            message: 'Courier not found',
-          });
+          throw new Error('Courier not found');
         }
+
         // Find Processing Orders Assigned to Courier
-        const orders = await orderModel.find({
-          courier: id,
-          status: 'processing',
+        const orders = await prisma.orders.findMany({
+          where: {
+            courier: id,
+            status: 'processing',
+          },
+          include: {
+            client: {
+              select: {
+                companyName: true,
+                name: true,
+              },
+            },
+          },
         });
 
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
@@ -112,9 +126,7 @@ const orderRouter = new Hono()
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -125,25 +137,31 @@ const orderRouter = new Hono()
       // Validate request params
       const { id } = c.req.valid('param');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
-          return c.json({
-            message: 'Courier not found',
-          });
+          throw new Error('Courier not found');
         }
 
         // Find Processing Integration Orders Assigned to Courier
-        const integrationOrders = await integrationOrderModel.find({
-          courier: id,
-          status: 'processing',
+        const integrationOrders = await prisma.shopifyorders.findMany({
+          where: {
+            courier: id,
+            status: 'processing',
+          },
+          include: {
+            client: {
+              select: {
+                companyName: true,
+                name: true,
+              },
+            },
+          },
         });
 
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
@@ -151,9 +169,7 @@ const orderRouter = new Hono()
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -175,6 +191,10 @@ const orderRouter = new Hono()
               { $or: [{ courier: { $exists: false } }, { courier: null }] },
             ],
           })
+          .populate({
+            path: 'client',
+            select: 'companyName',
+          })
           .select(
             'OID client customer products status type subtotal shippingFees total createdAt'
           )
@@ -184,19 +204,21 @@ const orderRouter = new Hono()
 
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
+        // TODO: create order type
+        const response: { len: number; orders: any[] } = {
+          len: orders.length,
+          orders,
+        };
+
         c.status(200);
-        return c.json({ len: orders.length, orders });
+        return c.json(response);
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -216,6 +238,10 @@ const orderRouter = new Hono()
               { $or: [{ courier: { $exists: false } }, { courier: null }] },
             ],
           })
+          .populate({
+            path: 'client',
+            select: 'companyName',
+          })
           .select(
             'OID client customer products status type subtotal shippingFees total createdAt'
           )
@@ -225,19 +251,20 @@ const orderRouter = new Hono()
 
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No integration orders found',
-          });
+          throw new Error('No integration orders found');
         }
 
+        const response: { len: number; integrationOrders: any[] } = {
+          len: integrationOrders.length,
+          integrationOrders,
+        };
+
         c.status(200);
-        return c.json({ len: integrationOrders.length, integrationOrders });
+        return c.json(response);
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get integration orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get integration orders: ${error.message}`);
       }
     }
   )
@@ -346,7 +373,7 @@ const orderRouter = new Hono()
       // Validate request body
       const data = c.req.valid('json');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
           return c.json({
@@ -392,7 +419,7 @@ const orderRouter = new Hono()
       // Validate request body
       const data = c.req.valid('json');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
           return c.json({

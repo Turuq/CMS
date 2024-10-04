@@ -1,8 +1,7 @@
-import { ObjectId } from 'mongodb';
 import { z } from 'zod';
 
 export const courierSchema = z.object({
-  _id: z.instanceof(ObjectId),
+  _id: z.string(),
   username: z.string(),
   password: z.string(),
   name: z.string(),
@@ -10,7 +9,7 @@ export const courierSchema = z.object({
   nationalId: z.string().min(14).max(14),
   phone: z.string().min(11).max(11),
   salary: z.number().positive().min(0),
-  zone: z.string(),
+  zone: z.string().nullable(),
   reshippedOrders: z.number().positive().min(0),
   commissionPerOrder: z.number().positive().min(0),
   active: z.boolean(),
@@ -43,4 +42,28 @@ export const courierUpdateSchema = z.object({
   criminalRecord: z.string().url().optional(),
 });
 
-export type Courier = Omit<z.infer<typeof courierSchema>, 'password'>;
+export const statisticsSchema = z.object({
+  cancelled: z.number().positive(),
+  courierCollected: z.number().positive(),
+  delivered: z.number().positive(),
+  gotGhosted: z.number().positive(),
+  instapay: z.number().positive(),
+  maxPossibleDelivered: z.number().positive(),
+  outForDelivery: z.number().positive(),
+  paidShippingOnly: z.number().positive(),
+  postponed: z.number().positive(),
+  returned: z.number().positive(),
+  toBeReshipped: z.number().positive(),
+  totalDelivered: z.number().positive(),
+  unreachable: z.number().positive(),
+});
+
+export type Courier = z.infer<typeof courierSchema>;
+export type CourierCardType = Pick<
+  Courier,
+  'username' | 'email' | 'name' | 'phone' | 'zone'
+> & { id: string };
+
+export type CourierWithStatistics = Courier & {
+  statistics: z.infer<typeof statisticsSchema>[];
+};

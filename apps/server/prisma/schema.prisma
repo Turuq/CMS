@@ -1,0 +1,892 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "mongodb"
+  url      = env("DATABASE_URL")
+}
+
+type ClientorderstatisticsIntegrationOrders {
+  shopify     ClientorderstatisticsIntegrationOrdersShopify
+  woocommerce ClientorderstatisticsIntegrationOrdersWoocommerce
+}
+
+type ClientorderstatisticsIntegrationOrdersShopify {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientorderstatisticsIntegrationOrdersWoocommerce {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientorderstatisticsTuruqOrders {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientsOrderStatistics {
+  id                String?                                 @map("_id") @db.ObjectId
+  integrationOrders ClientsOrderStatisticsIntegrationOrders
+  turuqOrders       ClientsOrderStatisticsTuruqOrders
+}
+
+type ClientsOrderStatisticsIntegrationOrders {
+  shopify     ClientsOrderStatisticsIntegrationOrdersShopify
+  woocommerce ClientsOrderStatisticsIntegrationOrdersWoocommerce
+}
+
+type ClientsOrderStatisticsIntegrationOrdersShopify {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientsOrderStatisticsIntegrationOrdersWoocommerce {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientsOrderStatisticsTuruqOrders {
+  id             String @map("_id") @db.ObjectId
+  cancelled      Int
+  collected      Int
+  delivered      Int
+  outForDelivery Int
+  outOfStock     Int
+  pending        Int
+  postponed      Int
+  processing     Int
+  returned       Int
+  total          Int
+  unreachable    Int
+}
+
+type ClientsShippingFees {
+  th_of_October  Int    @map("6th of October")
+  Alexandria     Int
+  Aswan          Int
+  Asyut          Int
+  Beheira        Int
+  Beni_Suef      Int    @map("Beni Suef")
+  Cairo          Int
+  Dakahlia       Int
+  Damietta       Int
+  Fayed          Int
+  Fayoum         Int
+  Gharbeya       Int
+  Giza           Int
+  Helwan         Int
+  Ismailia       Int
+  Kafr_El_Sheikh Int    @map("Kafr El Sheikh")
+  Luxor          Int
+  Matrouh        Int
+  Menoufia       Int
+  Minya          Int
+  New_Valley     Int    @map("New Valley")
+  North_Sinai    Int    @map("North Sinai")
+  Port_Said      Int    @map("Port Said")
+  Qalyubia       Int
+  Qena           Int
+  Red_Sea        Int    @map("Red Sea")
+  Sharkeya       Int
+  Sohag          Int
+  South_Sinai    Int    @map("South Sinai")
+  Suez           Int
+  id             String @map("_id") @db.ObjectId
+}
+
+type ClientsWoocommerceKeys {
+  id                    String? @map("_id") @db.ObjectId
+  apiConsumerKey        String?
+  apiConsumerSecret     String?
+  creationWebhookSecret String
+  updateWebhookSecret   String?
+}
+
+type ClientshippingfeesShippingFees {
+  th_of_October  Int    @map("6th of October")
+  Alexandria     Int
+  Aswan          Int
+  Asyut          Int
+  Beheira        Int
+  Beni_Suef      Int    @map("Beni Suef")
+  Cairo          Int
+  Dakahlia       Int
+  Damietta       Int
+  Fayed          Int
+  Fayoum         Int
+  Gharbeya       Int
+  Giza           Int
+  Helwan         Int
+  Ismailia       Int
+  Kafr_El_Sheikh Int    @map("Kafr El Sheikh")
+  Luxor          Int
+  Matrouh        Int
+  Menoufia       Int
+  Minya          Int
+  New_Valley     Int    @map("New Valley")
+  North_Sinai    Int    @map("North Sinai")
+  Port_Said      Int    @map("Port Said")
+  Qalyubia       Int
+  Qena           Int
+  Red_Sea        Int    @map("Red Sea")
+  Sharkeya       Int
+  Sohag          Int
+  South_Sinai    Int    @map("South Sinai")
+  Suez           Int
+  id             String @map("_id") @db.ObjectId
+}
+
+type CourierorderssnapshotsOrders {
+  OID                String?
+  v                  Int                                        @map("__v")
+  id                 String                                     @map("_id") @db.ObjectId
+  cancellationReason String?
+  client             String                                     @db.ObjectId
+  courier            String?                                    @db.ObjectId
+  courierAssignedAt  DateTime?                                  @db.Date
+  courierCOD         Int?
+  courierNotes       String?
+  createdAt          DateTime                                   @db.Date
+  customer           CourierorderssnapshotsOrdersCustomer
+  gotGhosted         Boolean
+  hasReturnedItems   Boolean
+  isOutstanding      Boolean
+  missedOpportunity  Boolean
+  notes              String?
+  orderImages        CourierorderssnapshotsOrdersOrderImages?
+  paidShippingOnly   Boolean
+  paymentMethod      String?
+  postponedDate      DateTime?                                  @db.Date
+  products           CourierorderssnapshotsOrdersProducts[]
+  reshipped          Boolean
+  shippingFees       Int
+  status             String
+  statusHistory      CourierorderssnapshotsOrdersStatusHistory?
+  subtotal           Int
+  toBeReshipped      Boolean
+  total              Int
+  type               String
+  updatedAt          DateTime                                   @db.Date
+}
+
+type CourierorderssnapshotsOrdersCustomer {
+  id          String @map("_id") @db.ObjectId
+  address     String
+  governorate String
+  name        String
+  phone       String
+}
+
+type CourierorderssnapshotsOrdersOrderImages {
+  instapayReceipt     String?
+  proofOfContact      String
+  proofOfGhosting     String?
+  proofOfPostponement String?
+  proofOfUnreachable  String?
+}
+
+type CourierorderssnapshotsOrdersProducts {
+  UID      String
+  id       String  @map("_id") @db.ObjectId
+  price    Int
+  quantity Int
+  returned Int
+  type     String?
+}
+
+type CourierorderssnapshotsOrdersStatusHistory {
+  id             String    @map("_id") @db.ObjectId
+  cancelled      DateTime? @db.Date
+  delivered      DateTime? @db.Date
+  outForDelivery DateTime  @db.Date
+  outOfStock     DateTime? @db.Date
+  postponed      DateTime? @db.Date
+  processing     DateTime? @db.Date
+  unreachable    DateTime? @db.Date
+}
+
+type CourierorderssnapshotsShopifyOrders {
+  OID                String
+  v                  Int                                              @map("__v")
+  id                 String                                           @map("_id") @db.ObjectId
+  cancellationReason String?
+  client             String                                           @db.ObjectId
+  courier            String                                           @db.ObjectId
+  courierCOD         Int?
+  courierNotes       String?
+  createdAt          DateTime                                         @db.Date
+  customer           CourierorderssnapshotsShopifyOrdersCustomer
+  gotGhosted         Boolean
+  hasReturnedItems   Boolean
+  id_                String                                           @map("id")
+  integratorId       Int?
+  isOutstanding      Boolean
+  missedOpportunity  Boolean
+  notes              String?
+  orderImages        CourierorderssnapshotsShopifyOrdersOrderImages?
+  paidShippingOnly   Boolean
+  paymentMethod      String?
+  paymentStatus      String?
+  products           CourierorderssnapshotsShopifyOrdersProducts[]
+  provider           String
+  reshipped          Boolean
+  status             String
+  statusHistory      CourierorderssnapshotsShopifyOrdersStatusHistory
+  toBeReshipped      Boolean
+  total              Float
+  updatedAt          DateTime                                         @db.Date
+}
+
+type CourierorderssnapshotsShopifyOrdersCustomer {
+  id          String  @map("_id") @db.ObjectId
+  address     String
+  first_name  String?
+  governorate String
+  last_name   String
+  phone       String?
+}
+
+type CourierorderssnapshotsShopifyOrdersOrderImages {
+  instapayReceipt     String?
+  proofOfContact      String
+  proofOfGhosting     String?
+  proofOfPostponement String?
+  proofOfUnreachable  String?
+}
+
+type CourierorderssnapshotsShopifyOrdersProducts {
+  id         String                                                  @map("_id") @db.ObjectId
+  discount   String
+  id_        String                                                  @map("id")
+  name       String
+  price      String
+  properties CourierorderssnapshotsShopifyOrdersProductsProperties[]
+  quantity   Int
+  returned   Int
+  variant    String?
+  variant_id String
+}
+
+type CourierorderssnapshotsShopifyOrdersProductsProperties {
+  name  String
+  value String
+}
+
+type CourierorderssnapshotsShopifyOrdersStatusHistory {
+  id             String    @map("_id") @db.ObjectId
+  cancelled      DateTime? @db.Date
+  collected      DateTime? @db.Date
+  delivered      DateTime? @db.Date
+  invalidAddress DateTime? @db.Date
+  outForDelivery DateTime? @db.Date
+  outOfStock     DateTime? @db.Date
+  pending        DateTime? @db.Date
+  postponed      DateTime? @db.Date
+  processing     DateTime? @db.Date
+  returned       DateTime? @db.Date
+  unreachable    DateTime? @db.Date
+}
+
+type CourierorderssnapshotsStatistics {
+  id                   String @map("_id") @db.ObjectId
+  cancelled            Int
+  courierCollected     Int
+  delivered            Int
+  gotGhosted           Int
+  instapay             Int
+  maxPossibleDelivered Int
+  outForDelivery       Int
+  paidShippingOnly     Int
+  postponed            Int
+  returned             Int
+  toBeReshipped        Int
+  totalDelivered       Int
+  unreachable          Int
+}
+
+type CourierstatisticsStatistics {
+  id                   String? @map("_id") @db.ObjectId
+  cancelled            Int
+  courierCollected     Int
+  delivered            Int
+  gotGhosted           Int
+  instapay             Int
+  maxPossibleDelivered Int
+  outForDelivery       Int
+  paidShippingOnly     Int
+  postponed            Int
+  returned             Int
+  toBeReshipped        Int
+  totalDelivered       Int
+  unreachable          Int
+}
+
+type IntegrationordersCustomer {
+  id          String  @map("_id") @db.ObjectId
+  address     String
+  first_name  String
+  governorate String
+  last_name   String
+  phone       String?
+}
+
+type IntegrationordersProducts {
+  id         String  @map("_id") @db.ObjectId
+  discount   String?
+  id_        String  @map("id")
+  name       String
+  price      String
+  properties Json?
+  quantity   Int
+  returned   Int
+  variant    String?
+  variant_id String
+}
+
+type IntegrationordersStatusHistory {
+  id             String    @map("_id") @db.ObjectId
+  cancelled      DateTime? @db.Date
+  collected      DateTime? @db.Date
+  delivered      DateTime? @db.Date
+  outForDelivery DateTime? @db.Date
+  outOfStock     DateTime? @db.Date
+  processing     DateTime? @db.Date
+  returned       DateTime? @db.Date
+}
+
+type OrdersCustomer {
+  id          String @map("_id") @db.ObjectId
+  address     String
+  governorate String
+  name        String
+  phone       String
+}
+
+type OrdersOrderImages {
+  instapayReceipt     String?
+  proofOfContact      String
+  proofOfGhosting     String?
+  proofOfPostponement String?
+  proofOfUnreachable  String?
+}
+
+type OrdersProducts {
+  UID      String
+  id       String  @map("_id") @db.ObjectId
+  client   String?
+  price    Int
+  quantity Int
+  returned Int?
+  type     String?
+}
+
+type OrdersStatusHistory {
+  id             String    @map("_id") @db.ObjectId
+  cancelled      DateTime? @db.Date
+  collected      DateTime? @db.Date
+  delivered      DateTime? @db.Date
+  outForDelivery DateTime? @db.Date
+  outOfStock     DateTime? @db.Date
+  pending        DateTime? @db.Date
+  postponed      DateTime? @db.Date
+  processing     DateTime? @db.Date
+  returned       DateTime? @db.Date
+  unreachable    DateTime? @db.Date
+}
+
+type ShopifyordersCustomer {
+  id          String  @map("_id") @db.ObjectId
+  address     String
+  first_name  String?
+  governorate String
+  last_name   String?
+  phone       String?
+}
+
+type ShopifyordersOrderImages {
+  proofOfContact      String
+  proofOfGhosting     String?
+  proofOfPostponement String?
+}
+
+type ShopifyordersProducts {
+  id         String                            @map("_id") @db.ObjectId
+  discount   String?
+  id_        String                            @map("id")
+  name       String
+  price      String
+  properties ShopifyordersProductsProperties[]
+  quantity   Int
+  returned   Int
+  variant    String?
+  variant_id String
+}
+
+type ShopifyordersProductsProperties {
+  name  String
+  value String
+}
+
+type ShopifyordersStatusHistory {
+  id             String    @map("_id") @db.ObjectId
+  cancelled      DateTime? @db.Date
+  collected      DateTime? @db.Date
+  delivered      DateTime? @db.Date
+  invalidAddress DateTime? @db.Date
+  outForDelivery DateTime? @db.Date
+  outOfStock     DateTime? @db.Date
+  pending        DateTime? @db.Date
+  postponed      DateTime? @db.Date
+  processing     DateTime? @db.Date
+  returned       DateTime? @db.Date
+  unreachable    DateTime? @db.Date
+}
+
+type ZammitordersCustomer {
+  id          String @map("_id") @db.ObjectId
+  address     String
+  email       String
+  governorate String
+  name        String
+  phone       String
+  region      String
+}
+
+type ZammitordersProducts {
+  id       String  @map("_id") @db.ObjectId
+  id_      String  @map("id")
+  name     String
+  price    Int
+  quantity Int
+  returned Boolean
+  sku      String
+  variant  String
+}
+
+type ZammitordersStatusHistory {
+  id             String   @map("_id") @db.ObjectId
+  invalidAddress DateTime @db.Date
+  outForDelivery DateTime @db.Date
+  pending        DateTime @db.Date
+  postponed      DateTime @db.Date
+}
+
+model admins {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                Int      @map("__v")
+  createdAt        DateTime @db.Date
+  email            String   @unique(map: "email_1")
+  name             String
+  password         String
+  super            Boolean
+  updatedAt        DateTime @db.Date
+  verificationCode String?
+}
+
+model archivedShopifyOrders {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model archivedTuruqOrders {
+  id String @id @default(auto()) @map("_id") @db.ObjectId
+}
+
+model assignmentofficers {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  email      String  @unique(map: "email_1")
+  name       String  @unique(map: "name_1")
+  nationalId String  @unique(map: "nationalId_1")
+  phone      String  @unique(map: "phone_1")
+  username   String  @unique(map: "username_1")
+}
+
+model clientcodes {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  clientCode  String
+  companyName String
+}
+
+model clientorderstatistics {
+  id                String                                 @id @default(auto()) @map("_id") @db.ObjectId
+  v                 Int                                    @map("__v")
+  client            String                                 @unique(map: "client_1") @db.ObjectId
+  integrationOrders ClientorderstatisticsIntegrationOrders
+  turuqOrders       ClientorderstatisticsTuruqOrders
+}
+
+model clients {
+  id                   String                  @id @default(auto()) @map("_id") @db.ObjectId
+  v                    Int                     @map("__v")
+  accessToken          String?
+  active               Boolean
+  companyLocation      String
+  companyName          String                  @unique(map: "companyName_1")
+  createdAt            DateTime                @db.Date
+  email                String                  @unique(map: "email_1")
+  name                 String
+  onboarding           Boolean?
+  orderStatistics      ClientsOrderStatistics  @unique(map: "orderStatistics_1")
+  password             String
+  phone                String                  @unique(map: "phone_1")
+  servicesOffered      String[]
+  shippingFees         ClientsShippingFees?    @unique(map: "shippingFees_1")
+  shopifyAccessToken   String?
+  shopifyCode          String?
+  shopifyEncryptionKey String?
+  shopifyStoreDomain   String?
+  shopifyStoreName     String?
+  shopifyToken         String?
+  storeName            String?
+  updatedAt            DateTime                @db.Date
+  verificationCode     String?
+  woocommerceKeys      ClientsWoocommerceKeys?
+}
+
+model clientshippingfees {
+  id           String                         @id @default(auto()) @map("_id") @db.ObjectId
+  v            Int                            @map("__v")
+  client       String                         @unique(map: "client_1") @db.ObjectId
+  createdAt    DateTime                       @db.Date
+  shippingFees ClientshippingfeesShippingFees
+  updatedAt    DateTime                       @db.Date
+}
+
+model colorcodes {
+  id        String @id @default(auto()) @map("_id") @db.ObjectId
+  color     String
+  colorCode String
+}
+
+model courierdailyorders {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int      @map("__v")
+  courierId       String   @unique(map: "courierId_1") @db.ObjectId
+  orderIds        String[]
+  shopifyOrderIds String[]
+}
+
+model courierorderssnapshots {
+  id            String                                @id @default(auto()) @map("_id") @db.ObjectId
+  courierId     String                                @db.ObjectId
+  date          String
+  orders        CourierorderssnapshotsOrders[]
+  shopifyOrders CourierorderssnapshotsShopifyOrders[]
+  statistics    CourierorderssnapshotsStatistics
+}
+
+model couriers {
+  id                 String    @id @default(auto()) @map("_id") @db.ObjectId
+  v                  Int?      @map("__v")
+  active             Boolean
+  commissionPerOrder Int?
+  createdAt          DateTime? @db.Date
+  criminalRecord     String
+  driverLicense      String
+  name               String
+  nationalId         String    @unique(map: "nationalId_1")
+  nationalIdImage    String
+  password           String
+  phone              String    @unique(map: "phone_1")
+  reshippedOrders    Int
+  salary             Int?
+  updatedAt          DateTime  @db.Date
+  username           String    @unique(map: "username_1")
+  zone               String?
+}
+
+model courierstatistics {
+  id         String                       @id @default(auto()) @map("_id") @db.ObjectId
+  v          Int?                         @map("__v")
+  courierId  String                       @db.ObjectId
+  date       String
+  statistics CourierstatisticsStatistics?
+}
+
+model finances {
+  id             String   @id @default(auto()) @map("_id") @db.ObjectId
+  v              Int      @map("__v")
+  balance        Float
+  client         String  @db.ObjectId
+  collected      Float
+  createdAt      DateTime @db.Date
+  packaging      Int
+  prepaid        Int
+  shipping       Int
+  storage        Int
+  totalCollected Int?
+  updatedAt      DateTime @db.Date
+}
+
+model governorates {
+  id               String   @id @default(auto()) @map("_id") @db.ObjectId
+  v                Int      @map("__v")
+  createdAt        DateTime @db.Date
+  fee              Int
+  name             String
+  name_alt         String[]
+  updatedAt        DateTime @db.Date
+  woocommerceAlias String?
+}
+
+model handoverofficers {
+  id         String @id @default(auto()) @map("_id") @db.ObjectId
+  email      String  @unique(map: "email_1")
+  name       String  @unique(map: "name_1")
+  nationalId String  @unique(map: "nationalId_1")
+  phone      String  @unique(map: "phone_1")
+  username   String  @unique(map: "username_1")
+}
+
+model integrationorders {
+  id                String                          @id @default(auto()) @map("_id") @db.ObjectId
+  OID               String                          @unique(map: "OID_1")
+  v                 Int                             @map("__v")
+  client            String                          @db.ObjectId
+  courier           String?                         @db.ObjectId
+  createdAt         DateTime                        @db.Date
+  customer          IntegrationordersCustomer
+  gotGhosted        Boolean?
+  hasReturnedItems  Boolean?
+  id_               String                          @map("id")
+  missedOpportunity Boolean
+  notes             String?
+  paidShippingOnly  Boolean?
+  products          IntegrationordersProducts[]
+  provider          String
+  reshipped         Boolean?
+  status            String
+  statusHistory     IntegrationordersStatusHistory?
+  total             Int
+  updatedAt         DateTime                        @db.Date
+}
+
+model notifications {
+  id        String   @id @default(auto()) @map("_id") @db.ObjectId
+  v         Int      @map("__v")
+  clientId  String   @db.ObjectId
+  createdAt DateTime @db.Date
+  message   String
+  orderId   String   @db.ObjectId
+  type      String
+}
+
+model orders {
+  id                 String               @id @default(auto()) @map("_id") @db.ObjectId
+  OID                String?
+  v                  Int                  @map("__v")
+  cancellationReason String?
+  client             String               @db.ObjectId
+  courier            String?              @db.ObjectId
+  courierAssignedAt  DateTime?            @db.Date
+  courierCOD         Int?
+  courierNotes       String?
+  createdAt          DateTime             @db.Date
+  customer           OrdersCustomer
+  gotGhosted         Boolean?
+  hasReturnedItems   Boolean?
+  isOutstanding      Boolean?
+  missedOpportunity  Boolean?
+  notes              String?
+  orderImages        OrdersOrderImages?
+  paidShippingOnly   Boolean?
+  paymentMethod      String?
+  postponedDate      DateTime?            @db.Date
+  products           OrdersProducts[]
+  reshipped          Boolean?
+  shippingFees       Int
+  status             String
+  statusHistory      OrdersStatusHistory?
+  subtotal           Float
+  toBeReshipped      Boolean?
+  total              Float
+  type               String?
+  updatedAt          DateTime             @db.Date
+}
+
+model productcategories {
+  id           String @id @default(auto()) @map("_id") @db.ObjectId
+  category     String
+  categoryCode String
+}
+
+model productmappings {
+  id         String   @id @default(auto()) @map("_id") @db.ObjectId
+  UID        String
+  v          Int      @map("__v")
+  assignedAt DateTime @db.Date
+  assignedBy String
+  client     String   @db.ObjectId
+  createdAt  DateTime @db.Date
+  shopifyID  String
+}
+
+model products {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  UID             String   @unique(map: "UID_1")
+  category        String?
+  color           String?
+  createdAt       DateTime @db.Date
+  itemDescription String
+  primaryClient   String   @db.ObjectId
+  quantity        Int
+  secondaryClient String?
+  size            String?
+  storageRemarks  String?
+  updatedAt       DateTime @db.Date
+}
+
+model sequences {
+  id             String @id @map("_id")
+  v              Int    @map("__v")
+  sequence_value Int
+}
+
+model shopifyorders {
+  id                 String                      @id @default(auto()) @map("_id") @db.ObjectId
+  OID                String?
+  v                  Int                         @map("__v")
+  cancellationReason String?
+  client             String?                     @db.ObjectId
+  courier            String?                     @db.ObjectId
+  courierCOD         Int?
+  courierNotes       String?
+  createdAt          DateTime                    @db.Date
+  customer           ShopifyordersCustomer
+  gotGhosted         Boolean?
+  hasReturnedItems   Boolean?
+  id_                String                      @map("id")
+  integratorId       Int?
+  isOutstanding      Boolean?
+  missedOpportunity  Boolean?
+  notes              String?
+  orderImages        ShopifyordersOrderImages?
+  paidShippingOnly   Boolean?
+  paymentMethod      String?
+  paymentStatus      String?
+  products           ShopifyordersProducts[]
+  provider           String
+  reshipped          Boolean?
+  status             String
+  statusHistory      ShopifyordersStatusHistory?
+  toBeReshipped      Boolean?
+  total              Float
+  updatedAt          DateTime                    @db.Date
+}
+
+model sizecharts {
+  id       String @id @default(auto()) @map("_id") @db.ObjectId
+  size     String
+  sizeCode String
+}
+
+model staffmembers {
+  id              String   @id @default(auto()) @map("_id") @db.ObjectId
+  v               Int      @map("__v")
+  active          Boolean
+  createdAt       DateTime @db.Date
+  criminalRecord  String
+  email           String   @unique(map: "email_1")
+  name            String   @unique(map: "name_1")
+  nationalId      String   @unique(map: "nationalId_1")
+  nationalIdImage String
+  password        String
+  phone           String   @unique(map: "phone_1")
+  role            String
+  updatedAt       DateTime @db.Date
+  username        String   @unique(map: "username_1")
+}
+
+model superlativecodes {
+  id              String @id @default(auto()) @map("_id") @db.ObjectId
+  superlative     String
+  superlativeCode String
+}
+
+model warehousestaffs {
+  id          String @id @default(auto()) @map("_id") @db.ObjectId
+  v           Int    @map("__v")
+  accessLevel String
+  email       String @unique(map: "email_1")
+  firstName   String
+  lastName    String
+  password    String
+  phone       String @unique(map: "phone_1")
+  scannedSSN  String @unique(map: "scannedSSN_1")
+  ssn         String @unique(map: "ssn_1")
+  warehouse   Int
+}
+
+model zammitorders {
+  id                String                    @id @default(auto()) @map("_id") @db.ObjectId
+  /// Field referred in an index, but found no data to define the type.
+  OID               Json?                     @unique(map: "OID_1")
+  client            String                    @db.ObjectId
+  courier           String                    @db.ObjectId
+  createdAt         DateTime                  @db.Date
+  customer          ZammitordersCustomer
+  date              String
+  gotGhosted        Boolean
+  id_               String                    @map("id")
+  itemsNum          Int
+  missedOpportunity Boolean
+  paymentMethod     String
+  products          ZammitordersProducts[]
+  reshipped         Boolean
+  status            String
+  statusHistory     ZammitordersStatusHistory
+  total             Int
+  updatedAt         DateTime                  @db.Date
+}

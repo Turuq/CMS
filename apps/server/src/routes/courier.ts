@@ -1,11 +1,14 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { courierModel } from '../models/courier';
+import prisma from '../../prisma/prismaClient';
+import { CourierModel } from '../models/courier';
+import { validateObjectId } from '../utils/validation';
 import {
   courierUpdateSchema,
   createCourierSchema,
+  type Courier,
+  type CourierWithStatistics,
 } from '../validation/courier';
-import { validateObjectId } from '../utils/validation';
 
 // TODO: Add Route Authorization & Authentication
 
@@ -15,7 +18,7 @@ const courierRouter = new Hono()
     // Validate request body
     const data = c.req.valid('json');
     // Check if courier already exists
-    const existingCourier = await courierModel.findOne({
+    const existingCourier = await CourierModel.findOne({
       username: data.username,
     });
     if (existingCourier) {
@@ -25,7 +28,7 @@ const courierRouter = new Hono()
       });
     }
     // Create new courier
-    const newCourier = new courierModel(data);
+    const newCourier = new CourierModel(data);
     try {
       // Save new courier
       await newCourier.save();
@@ -41,32 +44,66 @@ const courierRouter = new Hono()
   })
   .get('/', async (c) => {
     try {
-      // Get all couriers
-      const couriers = await courierModel
-        .find({ active: true })
-        .select('name username phone zone active');
-
-      // Respond with couriers
-      if (!couriers) {
-        c.status(404);
-        return c.json({
-          message: 'No couriers found',
-        });
-      }
-
-      c.status(200);
-      return c.json(couriers);
+      const couriers = await prisma.couriers.findMany({
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          username: true,
+          active: true,
+          zone: true,
+          nationalId: true,
+          commissionPerOrder: true,
+        },
+        orderBy: {
+          active: 'desc',
+        },
+      });
+      return c.json(couriers, 200);
     } catch (error: any) {
       console.error(error);
       c.status(500);
-      return c.json({
-        message: `Failed to get couriers: ${error.message}`,
-      });
+      throw new Error(`Failed to get couriers: ${error.message}`);
+    }
+  })
+  .get('/grouped', async (c) => {
+    try {
+      const result = await CourierModel.aggregate([
+        {
+          $group: {
+            _id: '$active',
+            couriers: {
+              $push: {
+                _id: '$_id',
+                name: '$name',
+                phone: '$phone',
+                username: '$username',
+                active: '$active',
+                zone: '$zone',
+              },
+            },
+          },
+        },
+      ]);
+
+      const couriers: {
+        active: Courier[];
+        inactive: Courier[];
+      } = {
+        active: result.find((group) => group._id === true)?.couriers ?? [],
+        inactive: result.find((group) => group._id === false)?.couriers ?? [],
+      };
+
+      return c.json(couriers, 200);
+    } catch (error: any) {
+      console.error(error);
+      c.status(500);
+      throw new Error(`Failed to get couriers: ${error.message}`);
     }
   })
   .get('/withStatistics', async (c) => {
     try {
-      const grouped = await courierModel.aggregate([
+      const grouped = await CourierModel.aggregate([
         {
           $lookup: {
             from: 'courierstatistics', // Collection name in db
@@ -107,12 +144,13 @@ const courierRouter = new Hono()
 
       if (!grouped) {
         c.status(404);
-        return c.json({
-          message: 'No couriers found',
-        });
+        throw new Error('No couriers found');
       }
 
-      const couriers = {
+      const couriers: {
+        active: CourierWithStatistics[];
+        inactive: CourierWithStatistics[];
+      } = {
         active: grouped.find((group) => group.active === true)?.couriers ?? [],
         inactive:
           grouped.find((group) => group.active === false)?.couriers ?? [],
@@ -123,9 +161,7 @@ const courierRouter = new Hono()
     } catch (error: any) {
       console.error(error);
       c.status(500);
-      return c.json({
-        message: `Failed to get couriers: ${error.message}`,
-      });
+      throw new Error(`Failed to get couriers: ${error.message}`);
     }
   })
   .get('/:id', zValidator('param', validateObjectId), async (c) => {
@@ -133,21 +169,28 @@ const courierRouter = new Hono()
       // Verify that id is a valid ObjectId
       const { id } = c.req.valid('param');
       // Find courier by id
-      const courier = await courierModel.findById(id);
+      const courier = await prisma.couriers.findUnique({
+        where: {
+          id,
+        },
+        select: {
+          id: true,
+          name: true,
+          phone: true,
+          username: true,
+          active: true,
+          zone: true,
+        },
+      });
       if (!courier) {
         c.status(404);
-        return c.json({
-          message: 'Courier not found',
-        });
+        throw new Error('Courier not found');
       }
-      c.status(200);
-      return c.json(courier);
+      return c.json(courier, 200);
     } catch (error: any) {
       console.error(error);
       c.status(500);
-      return c.json({
-        message: `Failed to get courier: ${error.message}`,
-      });
+      throw new Error(`Failed to get courier: ${error.message}`);
     }
   })
   .delete('/:id', zValidator('param', validateObjectId), async (c) => {
@@ -155,7 +198,7 @@ const courierRouter = new Hono()
       // Verify that id is a valid ObjectId
       const { id } = c.req.valid('param');
       // Find courier by id and delete
-      const deletedCourier = await courierModel.findByIdAndDelete(id);
+      const deletedCourier = await CourierModel.findByIdAndDelete(id);
       if (!deletedCourier) {
         c.status(404);
         return c.json({
@@ -184,7 +227,7 @@ const courierRouter = new Hono()
         // Validate request body
         const data = c.req.valid('json');
         // Find courier and update
-        const updatedCourier = await courierModel.findByIdAndUpdate(id, data);
+        const updatedCourier = await CourierModel.findByIdAndUpdate(id, data);
         if (!updatedCourier) {
           c.status(404);
           return c.json({
@@ -208,7 +251,7 @@ const courierRouter = new Hono()
       // Verify that id is a valid ObjectId
       const { id } = c.req.valid('param');
       // Find courier by id and activate
-      const activatedCourier = await courierModel.findByIdAndUpdate(id, {
+      const activatedCourier = await CourierModel.findByIdAndUpdate(id, {
         active: true,
       });
       if (!activatedCourier) {

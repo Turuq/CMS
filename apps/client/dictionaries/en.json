@@ -1,0 +1,321 @@
+{
+  "dashboard": "Barcode Officer Dashboard",
+  "greetingOp": "Good Morning, {name}",
+  "LocaleSwitcher": {
+    "label": "Change Language",
+    "locale": "{locale, select, ar {العربية} en {English} other {Unknown}}"
+  },
+
+  "courierManager": {
+    "tabs": {
+      "home": {
+        "header": "Home",
+        "orderStatistics": {
+          "header": "Order Statistics",
+          "cards": {
+            "delivered": "Delivered",
+            "totalOrders": "Total Orders",
+            "processing": "Processing",
+            "reshipped": "Reshipped",
+            "collected": "Collected",
+            "cancelled": "Cancelled",
+            "outForDelivery": "Out For Delivery",
+            "postponed": "Postponed",
+            "pending": "Pending",
+            "returned": "Returned",
+            "unreachable": "Unreachable",
+            "outOfStock": "Out Of Stock",
+            "invalidAddress": "Invalid Address"
+          }
+        }
+      },
+      "orders": {
+        "header": "Orders",
+        "tabs": {
+          "turuq": "Turuq",
+          "integrations": "Integrations",
+          "imported": "Imported"
+        },
+        "ordersTable": {
+          "columns": {
+            "OID": "OID",
+            "companyName": "Company Name",
+            "courier": "Courier",
+            "customerName": "Customer Name",
+            "phoneNumber": "Phone Number",
+            "products": "# Products",
+            "status": "Status",
+            "type": "Type",
+            "subtotal": "Subtotal",
+            "shippingFees": "Shipping Fees",
+            "total": "Total",
+            "createdAt": "Created At"
+          },
+          "filters": {
+            "courier": {
+              "placeholder": "Filter by Courier"
+            },
+            "status": {
+              "placeholder": "Filter by Status",
+              "values": {
+                "delivered": "Delivered",
+                "processing": "Processing",
+                "reshipped": "Reshipped",
+                "cancelled": "Cancelled",
+                "outForDelivery": "Out For Delivery",
+                "postponed": "Postponed",
+                "pending": "Pending",
+                "returned": "Returned",
+                "unreachable": "Unreachable",
+                "outOfStock": "Out Of Stock",
+                "invalidAddress": "Invalid Address"
+              }
+            },
+            "type": {
+              "placeholder": "Filter by Type"
+            },
+            "governorate": {
+              "placeholder": "Filter by Governorate"
+            },
+            "company": {
+              "placeholder": "Filter by Company"
+            },
+            "otherFilters": {
+              "placeholder": "Other Filters"
+            },
+            "buttons": {
+              "apply": "Apply Filters",
+              "reset": "Reset Filters"
+            }
+          },
+          "search": {
+            "placeholder": "Search by OID",
+            "buttons": {
+              "clear": "clear"
+            }
+          },
+          "categories": {
+            "reshipped": "Reshipped",
+            "instaPay": "InstaPay",
+            "gotGhosted": "Got Ghosted",
+            "returnedItems": "Returned Items"
+          },
+          "dataResults": {
+            "noResults": "No results found"
+          },
+          "pagination": {
+            "header": {
+              "showing": "Showing",
+              "of": "of",
+              "results": "results"
+            },
+            "footer": {
+              "page": "Page",
+              "of": "of"
+            }
+          }
+        }
+      },
+      "assign": {
+        "header": "Assign",
+        "courierAssignPage": {
+          "tabs": {
+            "turuq": "Turuq",
+            "integrations": "Integrations",
+            "imported": "Imported"
+          },
+
+          "ordersTable": {
+            "headers": {
+              "processingOrders": "Processing Orders",
+              "assignedOrders": "Assigned Orders"
+            },
+            "columns": {
+              "OID": "OID",
+              "companyName": "Company Name",
+              "courier": "Courier",
+              "customerName": "Customer Name",
+              "phoneNumber": "Phone Number",
+              "products": "# Products",
+              "status": "Status",
+              "type": "Type",
+              "subtotal": "Subtotal",
+              "shippingFees": "Shipping Fees",
+              "total": "Total",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "buttons": {
+              "assignSelected": "Assign Selected",
+              "finish": "Finish",
+              "remove": "Remove"
+            },
+            "search": {
+              "placeholder": "Search by OID",
+              "buttons": {
+                "clear": "clear"
+              }
+            },
+            "dataResults": {
+              "noProcessingOrders": "No Processing Orders.",
+              "noAssignedOrders": "No Assigned Orders."
+            },
+            "pagination": {
+              "header": {
+                "showing": "Showing",
+                "of": "of",
+                "results": "results"
+              },
+              "footer": {
+                "page": "Page",
+                "of": "of"
+              }
+            }
+          },
+          "toast": {
+            "success": {
+              "header": "Orders assigned successfully",
+              "description": "Orders have been assigned to the courier successfully"
+            },
+            "error": {
+              "header": "Error assigning orders",
+              "description": "An error occurred while assigning orders to the courier"
+            }
+          }
+        }
+      },
+      "inspect": {
+        "header": "Inspect"
+      },
+      "manage": {
+        "header": "Manage",
+        "tabs": {
+          "handoverOfficers": "Handover Officers",
+          "assignmentOfficers": "Assignment Officers",
+          "couriers": "Couriers"
+        },
+        "table": {
+          "columns": {
+            "name": "Name",
+            "username": "Username",
+            "nationalID": "National ID",
+            "joinedAt": "Joined At",
+            "actions": "Actions"
+          },
+          "buttons": {
+            "addHandoverOfficer": "Add New Handover Officer",
+            "addAssignmentOfficer": "Add New Assignment Officer",
+            "addCourier": "Add New Courier"
+          },
+          "dataResults": {
+            "noHandoverOfficers": "No Handover Officers.",
+            "noAssignmentOfficers": "No Assignment Officers.",
+            "noCouriers": "No Couriers."
+          },
+          "pagination": {
+            "header": {
+              "showing": "Showing",
+              "of": "of",
+              "results": "results"
+            },
+            "footer": {
+              "page": "Page",
+              "of": "of"
+            }
+          }
+        },
+        "form": {
+          "couriers": {
+            "headers": {
+              "addCourier": "Add New Courier",
+              "editCourier": "Edit Courier"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "username": "Username",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "licenseImage": "License Image",
+              "criminalRecord": "Criminal Record"
+            }
+          },
+          "handoverOfficers": {
+            "headers": {
+              "addHandoverOfficer": "Add New Handover Officer",
+              "editHandoverOfficer": "Edit Handover Officer"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "email": "Email",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "criminalRecord": "Criminal Record"
+            }
+          },
+          "assignmentOfficers": {
+            "headers": {
+              "addAssignmentOfficer": "Add New Assignment Officer",
+              "editAssignmentOfficer": "Edit Assignment Officer"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "email": "Email",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "criminalRecord": "Criminal Record"
+            }
+          }
+        }
+      }
+    }
+  },
+
+  "assignmentOfficer": {
+    "tabs": {
+      "home": {
+        "header": "Home",
+        "processingOrdersStatistics": {
+          "header": "Processing Orders",
+          "governorate": {
+            "cairo": "Cairo",
+            "giza": "Giza",
+            "alexandria": "Alexandria",
+            "luxor": "Luxor",
+            "aswan": "Aswan",
+            "dakahlia": "Dakahlia",
+            "sharqia": "Sharqia",
+            "beheira": "Beheira",
+            "gharbia": "Gharbia"
+          }
+        },
+        "outForDeliveryOrdersStatistics": {
+          "header": "Out For Delivery Orders",
+          "zone": {
+            "cairo": "Cairo",
+            "giza": "Giza",
+            "alexandria": "Alexandria",
+            "luxor": "Luxor",
+            "aswan": "Aswan",
+            "dakahlia": "Dakahlia",
+            "sharqia": "Sharqia",
+            "beheira": "Beheira",
+            "gharbia": "Gharbia"
+          }
+        }
+      },
+
+      "assign": {
+        "header": "Assign"
+      }
+    }
+  }
+}
