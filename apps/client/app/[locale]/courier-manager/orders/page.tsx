@@ -1,12 +1,13 @@
 'use client';
+
 import { api } from '@/app/actions/api';
 import { columns } from '@/components/tables/orders/order-columns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-// import { useDictionary } from '@/providers/dictionary-provider';
 import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 import { OrdersDataTable } from '@/components/tables/orders/orders-data-table';
 import queryClient from '@/lib/query/query-client';
+import { useTranslations } from 'next-intl';
 
 async function getOrders({
   page,
@@ -42,13 +43,13 @@ async function getIntegrationOrders({
   return data;
 }
 
-export default function Page() {
-  // TODO: Add Translation
-  // const { dictionary } = useDictionary();
-  // const ordersDictionary = dictionary['courierManager']['tabs']['orders'];
-  // const tableDictionary = ordersDictionary['ordersTable'];
-  // const orderCardDictionary = ordersDictionary['orderCard'];
-
+export default function Page({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  // Translations
+  const t = useTranslations('courierManager.tabs.orders');
   // Pagination
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
@@ -98,50 +99,47 @@ export default function Page() {
 
   return (
     <div className="w-full bg-light_border dark:bg-dark p-2 rounded-xl">
-      <Tabs defaultValue="turuq" className="w-full">
+      <Tabs
+        defaultValue="turuq"
+        className="w-full"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      >
         <TabsList>
-          <TabsTrigger className="" value="turuq">
-            Turuq
+          <TabsTrigger className="capitalize" value="turuq">
+            {t('tabs.turuq')}
           </TabsTrigger>
-          <TabsTrigger className="" value="integrations">
-            Integrations
+          <TabsTrigger className="capitalize" value="integrations">
+            {t('tabs.integrations')}
           </TabsTrigger>
-          <TabsTrigger className="" value="imported" disabled>
-            Imported
+          <TabsTrigger className="capitalize" value="imported" disabled>
+            {t('tabs.imported')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="turuq" className="w-full">
           <div className="p-5 rounded-xl bg-light dark:bg-dark_border">
             <OrdersDataTable
+              locale={locale}
               columns={columns}
               data={turuqOrders?.orders ?? []}
               page={page}
               pageSize={pageSize}
               onPageChange={setPage}
               onPageSizeChange={setPageSize}
+              enableServerFilter
             />
           </div>
-          {/* <DataTable
-            columns={columns}
-            tableDictionary={tableDictionary}
-            orderCardDictionary={orderCardDictionary}
-            locale={locale}
-            tableData={turuqOrders?.orders}
-            page={page}
-            pageSize={pageSize}
-            setPage={setPage}
-            setPageSize={setPageSize}
-          /> */}
         </TabsContent>
         <TabsContent value="integrations">
           <div className="p-5 rounded-xl bg-light dark:bg-dark_border">
             <OrdersDataTable
+              locale={locale}
               columns={columns}
               data={integrationOrders?.integrationOrders ?? []}
               page={page}
               pageSize={pageSize}
               onPageChange={setPage}
               onPageSizeChange={setPageSize}
+              enableServerFilter
             />
           </div>
         </TabsContent>

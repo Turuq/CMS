@@ -1,15 +1,12 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
-'use client';
-import moment from 'moment';
 // This file is used to define the columns of the table
 
+import { Courier } from '@/api/validation/courier';
 import { Checkbox } from '@/components/ui/checkbox';
 import { OrderType } from '@/types/order';
 import { getIndicatorColor } from '@/utils/helpers/status-modifier';
 import { ColumnDef } from '@tanstack/react-table';
 import { AlertOctagonIcon } from 'lucide-react';
-import { Courier } from '@/api/validation/courier';
-import { Badge } from '@/components/ui/badge';
 
 // There are two way to populate the table with data
 // 1. By providing the accessorKey and the table will automatically populate the data
@@ -95,7 +92,7 @@ export const columns: ColumnDef<OrderType>[] = [
   {
     id: 'createdAt',
     header: 'Created At',
-    accessorFn: (row) => moment(row?.createdAt).format('LL'),
+    accessorFn: (row) => row?.createdAt,
   },
 ];
 
@@ -155,9 +152,9 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    // @ts-ignore
     accessorFn: (row) =>
       row.customer.name ||
+      // @ts-ignore
       `${row.customer.first_name} ${row.customer.last_name}`,
     header: 'Customer Name',
   },
@@ -189,7 +186,7 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   {
     id: 'createdAt',
     header: 'Created At',
-    accessorFn: (row) => moment(row?.createdAt).format('LL'),
+    accessorFn: (row) => row.createdAt,
   },
 ];
 
@@ -227,9 +224,9 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    // @ts-ignore
     accessorFn: (row) =>
       row.customer.name ||
+      // @ts-ignore
       `${row.customer.first_name} ${row.customer.last_name}`,
     header: 'Customer Name',
   },
@@ -261,7 +258,7 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   {
     id: 'createdAt',
     header: 'Created At',
-    accessorFn: (row) => moment(row?.createdAt).format('LL'),
+    accessorFn: (row) => row.createdAt,
   },
 ];
 
@@ -300,15 +297,7 @@ export const courierStaffColumns: ColumnDef<
   },
   {
     id: 'active',
-    // accessorKey: 'active',
+    accessorKey: 'active',
     header: 'Active',
-    cell: (row) => (
-      <Badge
-        className={`${row.row.original.active ? 'bg-emerald-200 text-emerald-800' : 'bg-red-200 text-red-800'}`}
-        title={row.row.original.active ? 'Active' : 'Inactive'}
-      >
-        {row.row.original.active ? 'Active' : 'Inactive'}
-      </Badge>
-    ),
   },
 ];

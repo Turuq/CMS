@@ -1,33 +1,36 @@
 {
-  "dashboard": "لوحة تحكم ضابط الباركود",
   "greetingOp": "{name} ,صباح الخير",
   "LocaleSwitcher": {
     "label": "تغيير اللغة",
     "locale": "{locale, select, ar {العربية} en {English} other {غير معروف}}"
   },
-
+  "navigation": {
+    "settings": "الإعدادات"
+  },
+  "dashboard": {
+    "statistics": {
+      "title": "الإحصائيات",
+      "cards": {
+        "delivered": "تم تسليمها",
+        "totalOrders": "إجمالي الطلبات",
+        "processing": "يتم تجهيزها",
+        "reshipped": "يعاد شحنها",
+        "collected": "تم تحصيلها",
+        "cancelled": "أُلغيت",
+        "outForDelivery": "يتم شحنها",
+        "postponed": "مؤجلة",
+        "pending": "في انتظار المعالجة",
+        "returned": "مرتجع",
+        "unreachable": "تعثر تسليمها",
+        "outOfStock": "بضائع غير متوفرة",
+        "invalidAddress": "عنوان خاطئ"
+      }
+    }
+  },
   "courierManager": {
     "tabs": {
       "home": {
-        "header": "الرئيسية",
-        "orderStatistics": {
-          "header": "إحصائيات الطلبات",
-          "cards": {
-            "delivered": "تم تسليمها",
-            "totalOrders": "إجمالي الطلبات",
-            "processing": "يتم تجهيزها",
-            "reshipped": "يعاد شحنها",
-            "collected": "تم تحصيلها",
-            "cancelled": "أُلغيت",
-            "outForDelivery": "يتم شحنها",
-            "postponed": "مؤجلة",
-            "pending": "في انتظار المعالجة",
-            "returned": "مرتجع",
-            "unreachable": "تعثر تسليمها",
-            "outOfStock": "بضائع غير متوفرة",
-            "invalidAddress": "عنوان خاطئ"
-          }
-        }
+        "header": "الرئيسية"
       },
       "orders": {
         "header": "الطلبات",
@@ -39,10 +42,11 @@
         "ordersTable": {
           "columns": {
             "OID": "رقم الطلب",
+            "courier": "مندوب",
             "companyName": "اسم الشركة",
             "customerName": "اسم العميل",
             "phoneNumber": "رقم الهاتف",
-            "products": "# المنتجات",
+            "products": "عدد المنتجات",
             "status": "الحالة",
             "type": "النوع",
             "subtotal": "المجموع الفرعي",
@@ -50,6 +54,7 @@
             "total": "المجموع",
             "createdAt": "تاريخ الإنشاء"
           },
+          "empty": "لا توجد طلبات",
           "filters": {
             "courier": {
               "placeholder": "تصفية حسب الرائد"
@@ -93,11 +98,12 @@
               "clear": "امسح"
             }
           },
-          "categories": {
+          "legend": {
             "reshipped": "إعادة الشحن",
             "instaPay": "إنستا باي",
             "gotGhosted": "تم تجاهلها",
-            "returnedItems": "العناصر المرتجعة"
+            "returnedItems": "العناصر المرتجعة",
+            "paidShippingOnly": "الشحن المدفوع فقط"
           },
           "dataResults": {
             "noResults": "لا توجد نتائج"
@@ -179,6 +185,10 @@
               "description": "حدث خطأ أثناء تعيين الطلبات للمندوب"
             }
           }
+        },
+        "tabs": {
+          "active": "نشط",
+          "inactive": "غير نشط"
         }
       },
       "inspect": {
@@ -194,9 +204,15 @@
         "table": {
           "columns": {
             "name": "الاسم",
-            "username": "اسم المستخدم",
-            "nationalID": "الرقم القومي",
-            "joinedAt": "تاريخ الانضمام",
+            "phone": "الهاتف",
+            "nationalId": "الرقم القومي",
+            "commissionPerOrder": "عمولة لكل طلب",
+            "zone": "المنطقة",
+            "active": "حاله",
+            "badge": {
+              "true": "نشط",
+              "false": "غير نشط"
+            },
             "actions": "الإجراءات"
           },
           "buttons": {

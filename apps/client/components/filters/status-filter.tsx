@@ -9,6 +9,7 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface StatusFilterProps {
   onServerColumnFilterChange: Dispatch<SetStateAction<ColumnFiltersState>>;
@@ -21,6 +22,10 @@ export default function StatusFilter({
   statusFilter,
   onStatusChange,
 }: StatusFilterProps) {
+  const t = useTranslations(
+    'courierManager.tabs.orders.ordersTable.filters.status'
+  );
+
   function filterByStatus(status: string) {
     onStatusChange(status);
     onServerColumnFilterChange((columns) => [
@@ -34,7 +39,7 @@ export default function StatusFilter({
       <SelectTrigger
         className={`rounded-xl text-xs font-semibold bg-muted/50 p-2 hover:bg-muted w-40 h-8 border-none`}
       >
-        <SelectValue placeholder={`Select Status`} />
+        <SelectValue placeholder={t('placeholder')} />
       </SelectTrigger>
       <SelectContent>
         {data.map((status) => (

@@ -5,14 +5,14 @@ import CourierCard from '@/components/cards/courier-card';
 import CourierCardSkeleton from '@/components/feedback/courier-card-skeleton';
 import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useTranslations } from 'next-intl';
 
 export default function Page({
   params: { locale },
 }: {
   params: { locale: string };
 }) {
-  // const res = await api.courier.grouped.$get();
-  // const data = await res.json();
+  const t = useTranslations('courierManager.tabs.assign');
 
   const { data, isPending, error } = useQuery({
     queryKey: ['get-grouped-couriers'],
@@ -28,7 +28,7 @@ export default function Page({
 
   if (isPending) {
     return (
-      <div className="max-w-7xl mx-auto p-5">
+      <div className="p-2">
         <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-5">
           {Array.from({ length: 6 }).map((_, index) => (
             <CourierCardSkeleton key={index} />
@@ -44,10 +44,14 @@ export default function Page({
 
   return (
     <div className="w-full bg-light dark:bg-dark p-2 rounded-xl">
-      <Tabs defaultValue="active" className="w-full">
+      <Tabs
+        defaultValue="active"
+        className="w-full"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      >
         <TabsList>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="inactive">Inactive</TabsTrigger>
+          <TabsTrigger value="active">{t('tabs.active')}</TabsTrigger>
+          <TabsTrigger value="inactive">{t('tabs.inactive')}</TabsTrigger>
         </TabsList>
         <TabsContent value="active">
           <div className="grid md:grid-cols-1 lg:grid-cols-2 gap-5">

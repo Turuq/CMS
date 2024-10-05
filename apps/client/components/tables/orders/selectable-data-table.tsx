@@ -5,6 +5,17 @@
 // And rendering the table with the provided data and columns
 
 import {
+  ColumnDef,
+  ColumnFiltersState,
+  flexRender,
+  getCoreRowModel,
+  getFilteredRowModel,
+  getPaginationRowModel,
+  OnChangeFn,
+  RowSelectionState,
+  useReactTable,
+} from '@tanstack/react-table';
+import {
   Table,
   TableBody,
   TableCell,
@@ -12,19 +23,8 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
-import {
-  ColumnDef,
-  ColumnFiltersState,
-  flexRender,
-  getCoreRowModel,
-  getFilteredRowModel,
-  getPaginationRowModel,
-  useReactTable,
-} from '@tanstack/react-table';
 import { useState } from 'react';
 
-import CourierFilter from '@/components/filters/courier-filter';
-import StatusFilter from '@/components/filters/status-filter';
 import { icons } from '@/components/icons/icons';
 import { Button } from '@/components/ui/button';
 import {
@@ -34,14 +34,16 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
-import { OrderType } from '@/types/order';
 import { Legend } from '@tremor/react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
+import CourierFilter from '@/components/filters/courier-filter';
+import StatusFilter from '@/components/filters/status-filter';
+import { OrderType } from '@/types/order';
 import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
 
-interface OrdersDataTableProps<TValue> {
+interface SelectableOrdersDataTableProps<TValue> {
   locale: string;
   columns: ColumnDef<OrderType, TValue>[];
   data: OrderType[];
@@ -50,12 +52,15 @@ interface OrdersDataTableProps<TValue> {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   enableServerFilter?: boolean;
+  enableRowSelection?: boolean;
+  rowSelection?: RowSelectionState;
+  onRowSelectionChange?: OnChangeFn<RowSelectionState> | undefined;
 }
 
 // This a generic data table component that can be used to render any table
 // To enable filtering, sorting, and pagination refer to the documentation https://tanstack.com/table/latest/docs/framework/react
 
-export function OrdersDataTable<TValue>({
+export function SelectableOrdersDataTable<TValue>({
   locale,
   columns,
   data,
@@ -64,7 +69,10 @@ export function OrdersDataTable<TValue>({
   onPageChange,
   onPageSizeChange,
   enableServerFilter,
-}: OrdersDataTableProps<TValue>) {
+  enableRowSelection = false,
+  rowSelection,
+  onRowSelectionChange,
+}: SelectableOrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
@@ -83,8 +91,11 @@ export function OrdersDataTable<TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       columnFilters: clientColumnFilters,
+      rowSelection,
     },
     onColumnFiltersChange: setClientColumnFilters,
+    onRowSelectionChange,
+    enableRowSelection,
     getRowId: (row) => row._id,
   });
 
@@ -109,46 +120,44 @@ export function OrdersDataTable<TValue>({
       {/* <pre>
         {JSON.stringify({ clientColumnFilters, serverColumnFilters }, null, 2)}
       </pre> */}
-      <div className="flex flex-col gap-2">
+      <div className="flex flex-col lg:flex-row lg:items-center justify-between">
         {enableServerFilter && (
           <>
-            <div className="flex flex-col lg:flex-row lg:items-center justify-between  gap-2 w-full">
-              <div className="flex flex-col lg:flex-row lg:items-center gap-2">
-                {/* Important Filter 1 */}
-                <CourierFilter
-                  onServerColumnFilterChange={setServerColumnFilters}
-                  courierFilter={courierFilter}
-                  onCourierChange={setCourierFilter}
-                />
-                {/* Important Filter 2 */}
-                <StatusFilter
-                  onServerColumnFilterChange={setServerColumnFilters}
-                  statusFilter={statusFilter}
-                  onStatusChange={setStatusFilter}
-                />
-              </div>
-              {(clientColumnFilters.length > 0 ||
-                serverColumnFilters.length > 0) && (
-                <div className="flex items-center gap-2">
-                  <Button
-                    variant={'default'}
-                    className="w-auto h-8 rounded-xl hidden lg:flex items-center gap-2"
-                    // onClick={handleFilterReset}
-                  >
-                    {/* {icons.resetFilter} */}
-                    <p>{t('filters.buttons.apply')}</p>
-                  </Button>
-                  <Button
-                    variant={'link'}
-                    className="w-auto hover:text-red-500 h-8 rounded-xl hidden lg:flex items-center gap-2"
-                    onClick={handleFilterReset}
-                  >
-                    {/* {icons.resetFilter} */}
-                    <p>{t('filters.buttons.reset')}</p>
-                  </Button>
-                </div>
-              )}
+            <div className="flex flex-col lg:flex-row lg:items-center gap-2">
+              {/* Important Filter 1 */}
+              <CourierFilter
+                onServerColumnFilterChange={setServerColumnFilters}
+                courierFilter={courierFilter}
+                onCourierChange={setCourierFilter}
+              />
+              {/* Important Filter 2 */}
+              <StatusFilter
+                onServerColumnFilterChange={setServerColumnFilters}
+                statusFilter={statusFilter}
+                onStatusChange={setStatusFilter}
+              />
             </div>
+            {(clientColumnFilters.length > 0 ||
+              serverColumnFilters.length > 0) && (
+              <div className="flex items-center gap-2">
+                <Button
+                  variant={'default'}
+                  className="w-auto h-8 rounded-xl hidden lg:flex items-center gap-2"
+                  // onClick={handleFilterReset}
+                >
+                  {/* {icons.resetFilter} */}
+                  <p>{t('filters.buttons.apply')}</p>
+                </Button>
+                <Button
+                  variant={'link'}
+                  className="w-auto hover:text-red-500 h-8 rounded-xl hidden lg:flex items-center gap-2"
+                  onClick={handleFilterReset}
+                >
+                  {/* {icons.resetFilter} */}
+                  <p>{t('filters.buttons.reset')}</p>
+                </Button>
+              </div>
+            )}
             <Separator />
           </>
         )}
@@ -276,7 +285,8 @@ export function OrdersDataTable<TValue>({
                       {header.isPlaceholder
                         ? null
                         : flexRender(
-                            header.id !== 'statusIndicator'
+                            header.id !== 'statusIndicator' &&
+                              header.id !== 'select'
                               ? t(`columns.${header.id}`)
                               : header.column.columnDef.header,
                             header.getContext()
@@ -296,16 +306,14 @@ export function OrdersDataTable<TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-center text-xs">
-                      <>
-                        {cell.column.columnDef.id === 'createdAt'
-                          ? moment(cell.getValue() as string)
-                              .locale(locale)
-                              .format('LL')
-                          : flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )}
-                      </>
+                      {cell.column.columnDef.id === 'createdAt'
+                        ? moment(cell.getValue() as string)
+                            .locale(locale)
+                            .format('LL')
+                        : flexRender(
+                            cell.column.columnDef.cell,
+                            cell.getContext()
+                          )}
                     </TableCell>
                   ))}
                 </TableRow>

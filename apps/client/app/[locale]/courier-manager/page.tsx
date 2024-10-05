@@ -1,95 +1,94 @@
 'use client';
 import KpiCard from '@/components/cards/kpi-card';
-import { useDictionary } from '@/providers/dictionary-provider';
 import { ordersStatistics } from '@/utils/data/dummy';
+import { useTranslations } from 'next-intl';
 
-export default function CourierManagerHome() {
-  const { dictionary } = useDictionary();
-  const header =
-    dictionary['courierManager']['tabs']['home']['orderStatistics']['header'];
-  const titles =
-    dictionary['courierManager']['tabs']['home']['orderStatistics']['cards'];
-  console.log('titles', titles);
+export default function CourierManagerHome({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const t = useTranslations('dashboard.statistics');
   return (
     <main className="flex min-h-screen flex-col gap-5">
-      <h1 className="text-3xl font-bold opacity-80">{header}</h1>
-      <div className="col-span-12 lg:col-span-4 flex flex-col gap-3">
-        <KpiCard
-          title={`${titles.totalOrders}`}
-          statistic={ordersStatistics.totalOrders}
-          color="accent"
-          dotted
-        />
-      </div>
-      <div className="col-span-12 lg:col-span-4">
-        <KpiCard
-          title={`${titles.delivered}`}
-          statistic={ordersStatistics.delivered}
-        />
-      </div>
-      <div className="col-span-12 lg:col-span-4">
-        <KpiCard
-          title={`${titles.processing}`}
-          statistic={ordersStatistics.processing}
-          color="warning"
-          dotted
-        />
-      </div>
+      <h1 className="text-3xl font-bold opacity-80">{t('title')}</h1>
       <div className="col-span-12 grid grid-cols-12 gap-5">
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-12 lg:col-span-4 flex flex-col gap-3">
           <KpiCard
-            title={`${titles.collected}`}
+            title={t('cards.totalOrders')}
+            statistic={ordersStatistics.totalOrders}
+            color="accent"
+            dotted
+          />
+        </div>
+        <div className="col-span-12 lg:col-span-4">
+          <KpiCard
+            title={t('cards.delivered')}
+            statistic={ordersStatistics.delivered}
+          />
+        </div>
+        <div className="col-span-12 lg:col-span-4">
+          <KpiCard
+            title={t('cards.processing')}
+            statistic={ordersStatistics.processing}
+            color="warning"
+            dotted
+          />
+        </div>
+        <div className="col-span-6 lg:col-span-4">
+          <KpiCard
+            title={t('cards.collected')}
             statistic={ordersStatistics.collected}
             color="accent"
           />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.returned}`}
+            title={t('cards.returned')}
             statistic={ordersStatistics.returned}
           />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.outForDelivery}`}
+            title={t('cards.outForDelivery')}
             statistic={ordersStatistics.outForDelivery}
           />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.pending}`}
+            title={t('cards.pending')}
             statistic={ordersStatistics.pending}
           />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.cancelled}`}
+            title={t('cards.cancelled')}
             statistic={ordersStatistics.cancelled}
           />
         </div>
-        <div className="col-span-6 lg:col-span-2">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.outOfStock}`}
+            title={t('cards.outOfStock')}
             statistic={ordersStatistics.outOfStock}
           />
         </div>
-        <div className="col-span-6 lg:col-span-3">
+        <div className="col-span-6 lg:col-span-4">
           <KpiCard
-            title={`${titles.unreachable}`}
+            title={t('cards.unreachable')}
             statistic={ordersStatistics.unreachable}
           />
         </div>
-        <div className="col-span-12 lg:col-span-6 order-2">
+        <div className="col-span-12 lg:col-span-4 order-2">
           <KpiCard
-            title={`${titles.invalidAddress}`}
+            title={t('cards.invalidAddress')}
             statistic={ordersStatistics.invalidAddress}
             color="error"
             dotted
           />
         </div>
-        <div className="col-span-6 lg:col-span-3 order-2 lg:order-3">
+        <div className="col-span-6 lg:col-span-4 order-2 lg:order-3">
           <KpiCard
-            title={`${titles.postponed}`}
+            title={t('cards.postponed')}
             statistic={ordersStatistics.postponed}
           />
         </div>

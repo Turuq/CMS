@@ -8,8 +8,13 @@ import { courierManagerIcons } from '../icons/courier-manager-icons';
 import { useState } from 'react';
 import { usePathname } from 'next/navigation';
 import { icons } from '@/components/icons/icons';
+import { useTranslations } from 'next-intl';
 
 export default function CourierManagerSidebar({ locale }: { locale: string }) {
+  // Translating page using next-intl --> client side
+  const t = useTranslations('courierManager.tabs');
+  const tNav = useTranslations('navigation');
+
   const [isExpanded, toggleExpand] = useState<boolean>(true);
 
   const pathname = usePathname();
@@ -18,7 +23,7 @@ export default function CourierManagerSidebar({ locale }: { locale: string }) {
     <div
       className={`${
         isExpanded && 'min-w-52'
-      } flex flex-col justify-between pr-2 gap-2 border-r border-dark_border/20 dark:border-muted`}
+      } flex flex-col justify-between px-2 gap-2 ${locale === 'ar' ? 'border-l' : 'border-r'} border-dark_border/20 dark:border-muted`}
     >
       <div className="flex flex-col gap-2">
         <button className="p-2" onClick={() => toggleExpand(!isExpanded)}>
@@ -38,7 +43,9 @@ export default function CourierManagerSidebar({ locale }: { locale: string }) {
             } hover:bg-light dark:hover:bg-muted/10 p-2 rounded-xl hover:text-accent`}
           >
             {icons['home']}
-            {isExpanded && <p className="text-sm font-semibold">Home</p>}
+            {isExpanded && (
+              <p className="text-sm font-semibold">{t('home.header')}</p>
+            )}
           </div>
         </Link>
         <Separator />
@@ -53,7 +60,9 @@ export default function CourierManagerSidebar({ locale }: { locale: string }) {
             >
               {courierManagerIcons[link.icon]}
               {isExpanded && (
-                <p className="text-sm font-semibold">{link.title}</p>
+                <p className="text-sm font-semibold capitalize">
+                  {t(`${link.title}.header`)}
+                </p>
               )}
             </div>
           </Link>
@@ -61,8 +70,10 @@ export default function CourierManagerSidebar({ locale }: { locale: string }) {
         <Separator />
       </div>
       <button className="flex items-center gap-2 justify-self-end text-red-500 p-2">
-        {icons['settings']}
-        {isExpanded && <p className="text-sm font-semibold">Settings</p>}
+        {icons.settings}
+        {isExpanded && (
+          <p className="text-sm font-semibold">{tNav('settings')}</p>
+        )}
       </button>
     </div>
   );

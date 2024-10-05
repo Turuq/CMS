@@ -1,33 +1,36 @@
 {
-  "dashboard": "Barcode Officer Dashboard",
   "greetingOp": "Good Morning, {name}",
   "LocaleSwitcher": {
     "label": "Change Language",
     "locale": "{locale, select, ar {العربية} en {English} other {Unknown}}"
   },
-
+  "navigation": {
+    "settings": "Settings"
+  },
+  "dashboard": {
+    "statistics": {
+      "title": "Order Statistics",
+      "cards": {
+        "delivered": "Delivered",
+        "totalOrders": "Total Orders",
+        "processing": "Processing",
+        "reshipped": "Reshipped",
+        "collected": "Collected",
+        "cancelled": "Cancelled",
+        "outForDelivery": "Out For Delivery",
+        "postponed": "Postponed",
+        "pending": "Pending",
+        "returned": "Returned",
+        "unreachable": "Unreachable",
+        "outOfStock": "Out Of Stock",
+        "invalidAddress": "Invalid Address"
+      }
+    }
+  },
   "courierManager": {
     "tabs": {
       "home": {
-        "header": "Home",
-        "orderStatistics": {
-          "header": "Order Statistics",
-          "cards": {
-            "delivered": "Delivered",
-            "totalOrders": "Total Orders",
-            "processing": "Processing",
-            "reshipped": "Reshipped",
-            "collected": "Collected",
-            "cancelled": "Cancelled",
-            "outForDelivery": "Out For Delivery",
-            "postponed": "Postponed",
-            "pending": "Pending",
-            "returned": "Returned",
-            "unreachable": "Unreachable",
-            "outOfStock": "Out Of Stock",
-            "invalidAddress": "Invalid Address"
-          }
-        }
+        "header": "Home"
       },
       "orders": {
         "header": "Orders",
@@ -51,6 +54,7 @@
             "total": "Total",
             "createdAt": "Created At"
           },
+          "empty": "No orders found",
           "filters": {
             "courier": {
               "placeholder": "Filter by Courier"
@@ -94,11 +98,12 @@
               "clear": "clear"
             }
           },
-          "categories": {
+          "legend": {
             "reshipped": "Reshipped",
             "instaPay": "InstaPay",
             "gotGhosted": "Got Ghosted",
-            "returnedItems": "Returned Items"
+            "returnedItems": "Returned Items",
+            "paidShippingOnly": "Paid Shipping Only"
           },
           "dataResults": {
             "noResults": "No results found"
@@ -182,6 +187,10 @@
               "description": "An error occurred while assigning orders to the courier"
             }
           }
+        },
+        "tabs": {
+          "active": "Active",
+          "inactive": "Inactive"
         }
       },
       "inspect": {
@@ -197,9 +206,11 @@
         "table": {
           "columns": {
             "name": "Name",
-            "username": "Username",
-            "nationalID": "National ID",
-            "joinedAt": "Joined At",
+            "phone": "Phone",
+            "nationalId": "National ID",
+            "commissionPerOrder": "Commission Per Order",
+            "zone": "Zone",
+            "active": "Status",
             "actions": "Actions"
           },
           "buttons": {

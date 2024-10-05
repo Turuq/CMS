@@ -4,7 +4,6 @@ import { api } from '@/app/actions/api';
 import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
-import { OrdersDataTable } from '@/components/tables/orders/orders-data-table';
 import {
   unassignedColumns,
   unassignedSelectedColumns,
@@ -18,6 +17,8 @@ import { Button } from '@/components/ui/button';
 import { toast } from 'sonner';
 import { Loader2 } from 'lucide-react';
 import TableSkeleton from '@/components/feedback/table-skeleton';
+import { SelectableOrdersDataTable } from '@/components/tables/orders/selectable-data-table';
+import { useTranslations } from 'next-intl';
 
 async function getProcessingTuruqOrders({
   page,
@@ -54,10 +55,11 @@ async function getProcessingIntegrationOrders({
 }
 
 export default function Page({
-  params: { courierId },
+  params: { locale, courierId },
 }: {
-  params: { courierId: string };
+  params: { locale: string; courierId: string };
 }) {
+  const t = useTranslations('courierManager.tabs');
   const [page, setPage] = useState<number>(1);
   const [pageSize, setPageSize] = useState<number>(10);
 
@@ -187,7 +189,8 @@ export default function Page({
       json: { ids },
     });
     if (!res.ok) {
-      toast.error('Failed to assign orders', {
+      toast.error(t('assign.courierAssignPage.toast.error'), {
+        description: t('assign.courierAssignPage.toast.error.description'),
         style: {
           backgroundColor: '#FEEFEE',
           color: '#D8000C',
@@ -198,7 +201,8 @@ export default function Page({
     if (data) {
       setSelectedOrders([]);
       onRowSelectionChange({});
-      toast.success('Orders have been assigned', {
+      toast.success(t('assign.courierAssignPage.toast.success'), {
+        description: t('assign.courierAssignPage.toast.success.description'),
         style: {
           backgroundColor: '#F3FBEF',
           color: '#3B8C2A',
@@ -214,7 +218,8 @@ export default function Page({
       json: { ids },
     });
     if (!res.ok) {
-      toast.error('Failed to assign orders', {
+      toast.error(t('assign.courierAssignPage.toast.error'), {
+        description: t('assign.courierAssignPage.toast.error.description'),
         style: {
           backgroundColor: '#FEEFEE',
           color: '#D8000C',
@@ -232,7 +237,8 @@ export default function Page({
           pageSize,
         ],
       });
-      toast.success('Orders have been assigned', {
+      toast.success(t('assign.courierAssignPage.toast.success'), {
+        description: t('assign.courierAssignPage.toast.success.description'),
         style: {
           backgroundColor: '#F3FBEF',
           color: '#3B8C2A',
@@ -251,28 +257,35 @@ export default function Page({
 
   return (
     <div>
-      <Tabs defaultValue="turuq" className="w-full">
+      <Tabs
+        defaultValue="turuq"
+        className="w-full"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      >
         <TabsList>
           <TabsTrigger className="" value="turuq">
-            Turuq
+            {t('orders.tabs.turuq')}
           </TabsTrigger>
           <TabsTrigger className="" value="integrations">
-            Integrations
+            {t('orders.tabs.integrations')}
           </TabsTrigger>
           <TabsTrigger className="" value="imported" disabled>
-            Imported
+            {t('orders.tabs.imported')}
           </TabsTrigger>
         </TabsList>
-        <TabsContent value="turuq" className="w-full px-5">
+        <TabsContent value="turuq" className="w-full">
           {isLoadingTuruqOrders ? (
             <TableSkeleton />
           ) : (
             <div className="flex flex-col space-y-5">
               <h1 className="font-bold text-lg text-foreground">
-                Processing Orders
+                {t(
+                  'assign.courierAssignPage.ordersTable.headers.processingOrders'
+                )}
               </h1>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <OrdersDataTable
+                <SelectableOrdersDataTable
+                  locale={locale}
                   columns={unassignedColumns}
                   data={turuqOrders?.orders ?? []}
                   page={page}
@@ -285,10 +298,13 @@ export default function Page({
                 />
               </div>
               <h1 className="font-bold text-lg text-foreground">
-                Selected Orders
+                {t(
+                  'assign.courierAssignPage.ordersTable.headers.assignedOrders'
+                )}
               </h1>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
+                  locale={locale}
                   columns={unassignedSelectedColumns}
                   data={selectedOrders ?? []}
                 />
@@ -305,24 +321,27 @@ export default function Page({
                       className={'text-inherit animate-spin'}
                     />
                   ) : (
-                    'Assign Orders'
+                    t(
+                      'assign.courierAssignPage.ordersTable.buttons.assignSelected'
+                    )
                   )}
                 </Button>
               </div>
             </div>
           )}
         </TabsContent>
-        <TabsContent value="integrations" className="w-full space-y-5 px-5">
+        <TabsContent value="integrations" className="w-full space-y-5">
           {/* <pre>{JSON.stringify(integrationRowSelection, null, 2)}</pre> */}
           {isLoadingIntegrationOrders ? (
             <TableSkeleton />
           ) : (
             <div className="flex flex-col space-y-5">
-              <h1 className="font-bold text-lg text-foreground">
-                Processing Orders
-              </h1>
+              {t(
+                'assign.courierAssignPage.ordersTable.headers.processingOrders'
+              )}
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <OrdersDataTable
+                <SelectableOrdersDataTable
+                  locale={locale}
                   columns={unassignedColumns}
                   data={integrationOrders?.integrationOrders ?? []}
                   page={page}
@@ -334,11 +353,10 @@ export default function Page({
                   onRowSelectionChange={onIntegrationRowSelectionChange}
                 />
               </div>
-              <h1 className="font-bold text-lg text-foreground">
-                Selected Orders
-              </h1>
+              {t('assign.courierAssignPage.ordersTable.headers.assignedOrders')}
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
+                  locale={locale}
                   columns={unassignedSelectedColumns}
                   data={selectedIntegrationOrders ?? []}
                 />
@@ -358,7 +376,9 @@ export default function Page({
                       className={'text-inherit animate-spin'}
                     />
                   ) : (
-                    'Assign Orders'
+                    t(
+                      'assign.courierAssignPage.ordersTable.buttons.assignSelected'
+                    )
                   )}
                 </Button>
               </div>

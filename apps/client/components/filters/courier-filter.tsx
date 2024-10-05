@@ -13,6 +13,7 @@ import { toast } from 'sonner';
 import { Skeleton } from '../ui/skeleton';
 import { ColumnFiltersState } from '@tanstack/react-table';
 import { Dispatch, SetStateAction } from 'react';
+import { useTranslations } from 'next-intl';
 
 interface CourierFilterProps {
   courierFilter: string | undefined;
@@ -35,6 +36,9 @@ export default function CourierFilter({
   onCourierChange,
   onServerColumnFilterChange,
 }: CourierFilterProps) {
+  const t = useTranslations(
+    'courierManager.tabs.orders.ordersTable.filters.courier'
+  );
   //   Fetch Couriers
   const {
     data: couriers,
@@ -67,7 +71,7 @@ export default function CourierFilter({
           <SelectTrigger
             className={`rounded-xl text-xs font-semibold bg-muted/50 p-2 hover:bg-muted w-40 h-8 border-none`}
           >
-            <SelectValue placeholder={`Select Courier`} />
+            <SelectValue placeholder={t('placeholder')} />
           </SelectTrigger>
           <SelectContent>
             {couriers ? (

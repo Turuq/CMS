@@ -7,18 +7,14 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import StaffManagementTable from './management-table';
 import { courierStaffColumns } from '@/components/tables/orders/order-columns';
+import { useTranslations } from 'next-intl';
 
-export default function Page() {
-  // const { locale, dictionary } = useDictionary();
-  // const tabs = dictionary['courierManager']['tabs']['manage']['tabs'];
-  // const tableDictionary =
-  //   dictionary['courierManager']['tabs']['manage']['table'];
-  // const formDictionary =
-  //   dictionary['courierManager']['tabs']['manage']['form']['fields'];
-
-  // const [selectedRow, setSelectedRow] = useState<any>(null);
-  // const [isAdding, setIsAdding] = useState<boolean>(false);
-
+export default function Page({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const t = useTranslations('courierManager.tabs.manage');
   const {
     data: couriers,
     error: couriersError,
@@ -41,51 +37,65 @@ export default function Page() {
 
   return (
     <div className="w-full bg-light dark:bg-dark p-2 rounded-xl">
-      <Tabs defaultValue="handover-officers" className="w-full">
+      <Tabs
+        defaultValue="handover-officers"
+        className="w-full"
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+      >
         <TabsList>
           <TabsTrigger className="" value="handover-officers">
-            Handover Officers
+            {t('tabs.handoverOfficers')}
           </TabsTrigger>
           <TabsTrigger className="" value="assignment-officers">
-            Assignment Officers
+            {t('tabs.assignmentOfficers')}
           </TabsTrigger>
           <TabsTrigger className="" value="couriers">
-            Couriers
+            {t('tabs.couriers')}
           </TabsTrigger>
         </TabsList>
         <TabsContent value="handover-officers" className="w-full">
           <div className="flex items-center justify-between">
             <div className="flex flex-col space-y-5">
               <h1 className="font-bold text-lg text-foreground">
-                Handover Officers
+                {t('tabs.handoverOfficers')}
               </h1>
             </div>
-            <Button onClick={() => {}}>Add Handover Officer</Button>
+            <Button onClick={() => {}}>
+              {t('form.handoverOfficers.headers.addHandoverOfficer')}
+            </Button>
           </div>
         </TabsContent>
         <TabsContent value="assignment-officers">
           <div className="flex items-center justify-between">
             <div className="flex flex-col space-y-5">
               <h1 className="font-bold text-lg text-foreground">
-                Assignment Officers
+                {t('tabs.assignmentOfficers')}
               </h1>
             </div>
-            <Button onClick={() => {}}>Add Assignment Officer</Button>
+            <Button onClick={() => {}}>
+              {t('form.assignmentOfficers.headers.addAssignmentOfficer')}
+            </Button>
           </div>
         </TabsContent>
         <TabsContent value="couriers" className="w-full">
           <div className="flex flex-col space-y-5 w-full">
             <div className="flex items-start justify-between gap-5 w-full">
-              <h1 className="font-bold text-lg text-foreground">Couriers</h1>
-              <Button onClick={() => {}}>Add Courier</Button>
+              <h1 className="font-bold text-lg text-foreground">
+                {t('tabs.couriers')}
+              </h1>
+              <Button onClick={() => {}}>
+                {t('form.couriers.headers.addCourier')}
+              </Button>
             </div>
             {fetchingCouriers ? (
               <TableSkeleton />
             ) : (
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border w-full">
                 <StaffManagementTable
+                  locale={locale}
                   columns={courierStaffColumns}
                   data={couriers}
+                  type="courier"
                 />
               </div>
             )}

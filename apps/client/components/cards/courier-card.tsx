@@ -3,6 +3,7 @@ import Link from 'next/link';
 import { icons } from '../icons/icons';
 import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Courier, CourierWithStatistics } from '@/api/validation/courier';
+import { useTranslations } from 'next-intl';
 
 interface ICourierCardProps {
   courier: Courier | CourierWithStatistics;
@@ -23,12 +24,11 @@ export default function CourierCard({
   children,
   hrefOptions,
 }: ICourierCardProps) {
+  const t = useTranslations('courierManager.tabs.assign');
   return (
     <Card className="w-full rounded-xl h-fit flex flex-col gap-0">
       <CardHeader>
-        <CardTitle
-          className={`flex ${locale === 'ar' && 'flex-row-reverse'} items-center justify-between gap-5`}
-        >
+        <CardTitle className={`flex items-center justify-between gap-5`}>
           <div className="flex flex-col gap-1">
             <p className="text-lg font-bold capitalize">{courier.name}</p>
             <p className="text-sm font-semibold text-dark/50 dark:text-light/50">
@@ -51,7 +51,7 @@ export default function CourierCard({
               ) : (
                 icons.externalLink
               )}
-              <span>{hrefOptions?.label ?? 'Assign'}</span>
+              <span>{hrefOptions?.label ?? t('header')}</span>
               <span className="absolute bottom-0 flex-col hidden mb-12 group-hover:flex items-center">
                 <span className="relative z-30 p-2 text-xs leading-none whitespace-nowrap text-white bg-accent rounded-md">
                   {/* {locale === 'en' ? 'Assign' : 'تعيين'} */}

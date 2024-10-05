@@ -1,4 +1,9 @@
+import { Metadata } from 'next';
 import CourierManagerSidebar from './components/navigation/courier-manager-sidebar';
+
+export const metadata: Metadata = {
+  title: "Courier Manager"
+}
 
 export default async function CourierManagerLayout({
   children,
