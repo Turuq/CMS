@@ -23,7 +23,14 @@
         "returned": "Returned",
         "unreachable": "Unreachable",
         "outOfStock": "Out Of Stock",
-        "invalidAddress": "Invalid Address"
+        "invalidAddress": "Invalid Address",
+        "toBeReshipped": "To Be Reshipped",
+        "totalToBeReceived": "Total To Be Received",
+        "totalShippingFees": "Total Shipping Fees",
+        "numberOfCouriers": "Couriers in a batch",
+        "viewMore": "View More",
+        "processingAssigned": "Processing Assigned",
+        "processingUnassigned": "Processing Unassigned"
       }
     }
   },
@@ -211,6 +218,10 @@
             "commissionPerOrder": "Commission Per Order",
             "zone": "Zone",
             "active": "Status",
+            "badge": {
+              "true": "Active",
+              "false": "Inactive"
+            },
             "actions": "Actions"
           },
           "buttons": {
@@ -326,6 +337,70 @@
 
       "assign": {
         "header": "Assign"
+      }
+    }
+  },
+  "authentication": {
+    "dontHaveAnAccount": "Don't have an account?",
+    "alreadyHaveAnAccount": "Already have an account?",
+    "login": {
+      "header": "Sign in to Turuq",
+      "description": "Welcome back! Please sign in to continue.",
+      "fields": {
+        "email": "Email",
+        "username": "Username",
+        "password": "Password"
+      },
+      "placeholders": {
+        "email": "Enter your email",
+        "username": "Enter your username",
+        "password": "Enter your password"
+      },
+      "buttons": {
+        "login": "Sign in"
+      }
+    },
+    "signup": {
+      "courier": {
+        "header": "Create courier account",
+        "description": "Please enter the courier's information, to create a new account."
+      },
+      "staff": {
+        "header": "Create staff member account",
+        "description": "Please enter the staff member's information, to create a new account."
+      },
+      "fields": {
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "phone": "Phone",
+        "nationalId": "National ID",
+        "zone": "Zone",
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "nationalIdImage": "National ID Image",
+        "driverLicenseImage": "Driver License Image",
+        "criminalRecordImage": "Criminal Record",
+        "role": {
+          "label": "Staff Member Role",
+          "manager": "Courier Manager",
+          "handover": "Handover Officer",
+          "assignment": "Assignment Officer"
+        }
+      },
+      "placeholders": {
+        "name": "Enter the staff member's name",
+        "username": "Enter the staff member's username",
+        "email": "Enter the staff member's email",
+        "phone": "Enter the staff member's phone",
+        "nationalId": "Enter the staff member's national ID",
+        "zone": "Enter the staff member's zone",
+        "password": "Enter the staff member's password",
+        "confirmPassword": "Confirm the staff member's password",
+        "role": "Select the staff member's role"
+      },
+      "buttons": {
+        "signup": "Create account"
       }
     }
   }

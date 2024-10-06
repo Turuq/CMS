@@ -23,7 +23,14 @@
         "returned": "مرتجع",
         "unreachable": "تعثر تسليمها",
         "outOfStock": "بضائع غير متوفرة",
-        "invalidAddress": "عنوان خاطئ"
+        "invalidAddress": "عنوان خاطئ",
+        "toBeReshipped": "يجب إعادة شحنها",
+        "totalToBeReceived": "إجمالي المبالغ المستحقة",
+        "totalShippingFees": "إجمالي رسوم الشحن",
+        "numberOfCouriers": "عدد الرواد في رحله",
+        "viewMore": "عرض المزيد",
+        "processingAssigned": "تم تعينها للتوصيل",
+        "processingUnassigned": "لم يتم تعيينها للتوصيل"
       }
     }
   },
@@ -325,6 +332,70 @@
 
       "assign": {
         "header": "تعيين"
+      }
+    }
+  },
+  "authentication": {
+    "dontHaveAnAccount": "ليس لديك حساب؟",
+    "alreadyHaveAnAccount": "لديك حساب؟",
+    "login": {
+      "header": "سجل الدخول الي طرق",
+      "description": "سجل الدخول للوصول إلى حسابك",
+      "fields": {
+        "email": "البريد الإلكتروني",
+        "username": "اسم المستخدم",
+        "password": "كلمة المرور"
+      },
+      "placeholders": {
+        "email": "أدخل البريد الإلكتروني",
+        "username": "أدخل اسم المستخدم",
+        "password": "أدخل كلمة المرور"
+      },
+      "buttons": {
+        "login": "تسجيل الدخول"
+      }
+    },
+    "signup": {
+      "courier": {
+        "header": "انشاء حساب مندوب جديد",
+        "description": "ادخل بيانات المندوب, لانشاء حساب جديد"
+      },
+      "staff": {
+        "header": "انشاء حساب موظف جديد",
+        "description": "ادخل بيانات الموظف, لانشاء حساب جديد"
+      },
+      "fields": {
+        "name": "الاسم",
+        "email": "البريد الإلكتروني",
+        "username": "اسم المستخدم",
+        "phone": "الهاتف",
+        "nationalId": "الرقم القومي",
+        "zone": "المنطقة",
+        "password": "كلمة المرور",
+        "nationalIdImage": "صورة البطاقة",
+        "driverLicenseImage": "صورة الرخصة",
+        "criminalRecordImage": "صورة السجل الجنائي",
+        "confirmPassword": "تأكيد كلمة المرور",
+        "role": {
+          "label": "دور الموظف",
+          "manager": "مدير المناديب",
+          "handover": "ضابط التسليم",
+          "assignment": "ضابط التعيين"
+        }
+      },
+      "placeholders": {
+        "name": "أدخل الاسم",
+        "email": "أدخل البريد الإلكتروني",
+        "username": "أدخل اسم المستخدم",
+        "phone": "أدخل رقم الهاتف",
+        "nationalId": "أدخل الرقم القومي",
+        "zone": "أدخل المنطقة",
+        "password": "أدخل كلمة المرور",
+        "role": "اختر دور الموظف",
+        "confirmPassword": "أعد إدخال كلمة المرور"
+      },
+      "buttons": {
+        "signup": "إنشاء حساب"
       }
     }
   }

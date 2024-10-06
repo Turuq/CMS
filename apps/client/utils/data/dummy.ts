@@ -1204,41 +1204,41 @@ export const Couriers = [
     zone: 'Aswan',
     _id: 'co5',
   },
-  {
-    name: 'Ahmed Nasser',
-    username: 'ahmed.nasser',
-    phone: '01018372878',
-    zone: 'Cairo',
-    _id: 'co6',
-  },
-  {
-    name: 'mohamed ali',
-    username: 'mohamed.ali',
-    phone: '01018372878',
-    zone: 'Giza',
-    _id: 'co7',
-  },
-  {
-    name: 'ammar Ahmed',
-    username: 'ammar.ahmed',
-    phone: '01018372878',
-    zone: 'Alexandria',
-    _id: 'co8',
-  },
-  {
-    name: 'Khaled mohamed',
-    username: 'khaled.mohamed',
-    phone: '01018372878',
-    zone: 'Luxor',
-    _id: 'co9',
-  },
-  {
-    name: 'Ali Ahmed',
-    username: 'ali.ahmed',
-    phone: '01018372878',
-    zone: 'Aswan',
-    _id: 'co10',
-  },
+  // {
+  //   name: 'Ahmed Nasser',
+  //   username: 'ahmed.nasser',
+  //   phone: '01018372878',
+  //   zone: 'Cairo',
+  //   _id: 'co6',
+  // },
+  // {
+  //   name: 'mohamed ali',
+  //   username: 'mohamed.ali',
+  //   phone: '01018372878',
+  //   zone: 'Giza',
+  //   _id: 'co7',
+  // },
+  // {
+  //   name: 'ammar Ahmed',
+  //   username: 'ammar.ahmed',
+  //   phone: '01018372878',
+  //   zone: 'Alexandria',
+  //   _id: 'co8',
+  // },
+  // {
+  //   name: 'Khaled mohamed',
+  //   username: 'khaled.mohamed',
+  //   phone: '01018372878',
+  //   zone: 'Luxor',
+  //   _id: 'co9',
+  // },
+  // {
+  //   name: 'Ali Ahmed',
+  //   username: 'ali.ahmed',
+  //   phone: '01018372878',
+  //   zone: 'Aswan',
+  //   _id: 'co10',
+  // },
 ];
 
 export const handoverOfficers = [
@@ -1731,18 +1731,24 @@ export const couriers = [
 ];
 
 export const ordersStatistics = {
-  totalOrders: 26779,
-  delivered: 23456,
+  totalOrders: 384,
+  delivered: 188,
   processing: 1234,
   collected: 1234,
   returned: 1234,
-  outForDelivery: 1234,
+  outForDelivery: 270,
   pending: 1234,
   cancelled: 1234,
   outOfStock: 1234,
   unreachable: 2,
   postponed: 1234,
   invalidAddress: 1234,
+  toBeReshipped: 16,
+  totalShippingFees: 2990,
+  totalToBeReceived: 8659,
+  numberOfCouriers: 23,
+  processingAssigned: 220,
+  processingUnassigned: 164,
 };
 
 export const processingOrdersStatisticsPerGovernorate = {

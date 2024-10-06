@@ -43,7 +43,7 @@ export default function Page({
   }
 
   return (
-    <div className="w-full bg-light dark:bg-dark p-2 rounded-xl">
+    <div className="w-full bg-light_border dark:bg-dark p-2 rounded-xl">
       <Tabs
         defaultValue="active"
         className="w-full"

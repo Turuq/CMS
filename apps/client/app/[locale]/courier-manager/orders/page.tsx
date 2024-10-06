@@ -98,7 +98,8 @@ export default function Page({
   }
 
   return (
-    <div className="w-full bg-light_border dark:bg-dark p-2 rounded-xl">
+    <div className="w-full bg-light_border dark:bg-dark p-2 rounded-xl space-y-5">
+      <h1 className="text-3xl font-bold opacity-80">{t('header')}</h1>
       <Tabs
         defaultValue="turuq"
         className="w-full"

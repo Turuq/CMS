@@ -336,9 +336,11 @@ export default function Page({
             <TableSkeleton />
           ) : (
             <div className="flex flex-col space-y-5">
-              {t(
-                'assign.courierAssignPage.ordersTable.headers.processingOrders'
-              )}
+              <h1 className="font-bold text-lg text-foreground">
+                {t(
+                  'assign.courierAssignPage.ordersTable.headers.processingOrders'
+                )}
+              </h1>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectableOrdersDataTable
                   locale={locale}
@@ -353,7 +355,11 @@ export default function Page({
                   onRowSelectionChange={onIntegrationRowSelectionChange}
                 />
               </div>
-              {t('assign.courierAssignPage.ordersTable.headers.assignedOrders')}
+              <h1 className="font-bold text-lg text-foreground">
+                {t(
+                  'assign.courierAssignPage.ordersTable.headers.assignedOrders'
+                )}
+              </h1>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
                   locale={locale}
