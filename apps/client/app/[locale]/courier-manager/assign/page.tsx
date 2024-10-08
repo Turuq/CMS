@@ -1,10 +1,10 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import { getGroupedCouriers } from '@/app/actions/courier-actions';
 import CourierCard from '@/components/cards/courier-card';
 import CourierCardSkeleton from '@/components/feedback/courier-card-skeleton';
-import { useQuery } from '@tanstack/react-query';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 
 export default function Page({
@@ -16,14 +16,7 @@ export default function Page({
 
   const { data, isPending, error } = useQuery({
     queryKey: ['get-grouped-couriers'],
-    queryFn: async () => {
-      const res = await api.courier.grouped.$get();
-      if (!res.ok) {
-        throw new Error('Failed to get couriers');
-      }
-      const data = await res.json();
-      return data;
-    },
+    queryFn: () => getGroupedCouriers(),
   });
 
   if (isPending) {

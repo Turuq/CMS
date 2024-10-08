@@ -2,6 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { CourierModel } from '../models/courier';
 import {
+  validateFilters,
   validateObjectId,
   validateObjectIdArray,
   validatePagination,
@@ -11,18 +12,27 @@ import { integrationOrderModel } from '../models/integration-order';
 import prisma from '../../prisma/prismaClient';
 import { ClientModel } from '../models/client';
 import type { orders } from '@prisma/client';
+import { getUser } from '../lib/supabase/supabaseClient';
 
 const orderRouter = new Hono()
-  // FIXME: Merge the following two endpoints into a single endpoint after the restructuring phase
-  .get(
+  // GET ALL ORDERS, PAGINATED, & FILTERED
+  .post(
     '/turuq/:page/:pageSize',
+    getUser,
     zValidator('param', validatePagination),
+    zValidator('json', validateFilters),
     async (c) => {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       // Validate request params
       const { page, pageSize } = c.req.valid('param');
+      const conditions = c.req.valid('json');
       try {
         const orders = await orderModel
-          .find()
+          .find(conditions)
           .populate({
             path: 'client',
             model: ClientModel,
@@ -32,17 +42,18 @@ const orderRouter = new Hono()
             path: 'courier',
             select: '_id name',
           })
-          .limit(+pageSize)
-          .skip((+page - 1) * +pageSize)
+          .limit(Number(pageSize))
+          .skip((Number(page) - 1) * Number(pageSize))
           .sort({ createdAt: -1 });
-
+        const totalPages =
+          (await orderModel.countDocuments(conditions)) / Number(pageSize);
         if (!orders) {
           c.status(404);
           throw new Error('No orders found');
         }
 
         c.status(200);
-        return c.json({ len: orders.length, orders });
+        return c.json({ len: orders.length, totalPages, orders });
       } catch (error: any) {
         console.error(error);
         c.status(500);
@@ -50,15 +61,23 @@ const orderRouter = new Hono()
       }
     }
   )
-  .get(
+  .post(
     '/integration/:page/:pageSize',
+    getUser,
     zValidator('param', validatePagination),
+    zValidator('json', validateFilters),
     async (c) => {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       // Validate request params
       const { page, pageSize } = c.req.valid('param');
+      const conditions = c.req.valid('json');
       try {
         const integrationOrders = await integrationOrderModel
-          .find()
+          .find(conditions)
           .populate({
             path: 'client',
             model: ClientModel,
@@ -68,17 +87,23 @@ const orderRouter = new Hono()
             path: 'courier',
             select: '_id name',
           })
-          .limit(+pageSize)
-          .skip((+page - 1) * +pageSize)
+          .limit(Number(pageSize))
+          .skip((Number(page) - 1) * Number(pageSize))
           .sort({ createdAt: -1 });
-
+        const totalPages =
+          (await integrationOrderModel.countDocuments(conditions)) /
+          Number(pageSize);
         if (!integrationOrders) {
           c.status(404);
           throw new Error('No integration orders found');
         }
 
         c.status(200);
-        return c.json({ len: integrationOrders.length, integrationOrders });
+        return c.json({
+          len: integrationOrders.length,
+          totalPages,
+          integrationOrders,
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);

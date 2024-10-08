@@ -1,47 +1,17 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import {
+  getIntegrationOrders,
+  getTuruqOrders,
+} from '@/app/actions/order-actions';
 import { columns } from '@/components/tables/orders/order-columns';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
 import { OrdersDataTable } from '@/components/tables/orders/orders-data-table';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import queryClient from '@/lib/query/query-client';
+import { FilterObject } from '@/utils/validation/filters';
+import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
-
-async function getOrders({
-  page,
-  pageSize,
-}: {
-  page: string;
-  pageSize: string;
-}) {
-  const res = await api.order.turuq[':page'][':pageSize'].$get({
-    param: { page, pageSize },
-  });
-  if (!res.ok) {
-    throw new Error('Failed to get orders');
-  }
-  const data = await res.json();
-  return data;
-}
-
-async function getIntegrationOrders({
-  page,
-  pageSize,
-}: {
-  page: string;
-  pageSize: string;
-}) {
-  const res = await api.order.integration[':page'][':pageSize'].$get({
-    param: { page, pageSize },
-  });
-  if (!res.ok) {
-    throw new Error('Failed to get orders');
-  }
-  const data = await res.json();
-  return data;
-}
+import { useEffect, useState } from 'react';
 
 export default function Page({
   params: { locale },
@@ -50,44 +20,85 @@ export default function Page({
 }) {
   // Translations
   const t = useTranslations('courierManager.tabs.orders');
+  const [turuqServerColumnFilters, setTuruqServerColumnFilters] =
+    useState<FilterObject>({});
+  const [integrationServerColumnFilters, setIntegrationServerColumnFilters] =
+    useState<FilterObject>({});
   // Pagination
-  const [page, setPage] = useState<number>(1);
-  const [pageSize, setPageSize] = useState<number>(10);
+  const [turuqPage, setTuruqPage] = useState<number>(1);
+  const [integrationPage, setIntegrationPage] = useState<number>(1);
+  const [turuqPageSize, setTuruqPageSize] = useState<number>(10);
+  const [integrationPageSize, setIntegrationPageSize] = useState<number>(10);
 
   // Fetch Table Data
   const { data: turuqOrders, error: turuqError } = useQuery({
-    queryKey: ['get-orders', page, pageSize],
+    queryKey: [
+      'get-orders',
+      turuqPage,
+      turuqPageSize,
+      turuqServerColumnFilters,
+    ],
     queryFn: () =>
-      getOrders({ page: page.toString(), pageSize: pageSize.toString() }),
+      getTuruqOrders({
+        page: turuqPage.toString(),
+        pageSize: turuqPageSize.toString(),
+        conditions: turuqServerColumnFilters,
+      }),
   });
 
   const { data: integrationOrders, error: integrationError } = useQuery({
-    queryKey: ['get-integration-orders', page, pageSize],
+    queryKey: [
+      'get-integration-orders',
+      integrationPage,
+      integrationPageSize,
+      integrationServerColumnFilters,
+    ],
     queryFn: () =>
       getIntegrationOrders({
-        page: page.toString(),
-        pageSize: pageSize.toString(),
+        page: integrationPage.toString(),
+        pageSize: integrationPageSize.toString(),
+        conditions: integrationServerColumnFilters,
       }),
   });
 
   useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ['get-orders', page + 1, pageSize],
+      queryKey: [
+        'get-orders',
+        turuqPage + 1,
+        turuqPageSize,
+        turuqServerColumnFilters,
+      ],
       queryFn: () =>
-        getOrders({
-          page: (page + 1).toString(),
-          pageSize: pageSize.toString(),
+        getTuruqOrders({
+          page: (turuqPage + 1).toString(),
+          pageSize: turuqPageSize.toString(),
+          conditions: turuqServerColumnFilters,
         }),
     });
+  }, [turuqPage, turuqPageSize, turuqOrders, turuqServerColumnFilters]);
+
+  useEffect(() => {
     queryClient.prefetchQuery({
-      queryKey: ['get-integration-orders', page + 1, pageSize],
+      queryKey: [
+        'get-integration-orders',
+        integrationPage + 1,
+        integrationPageSize,
+        integrationServerColumnFilters,
+      ],
       queryFn: () =>
         getIntegrationOrders({
-          page: (page + 1).toString(),
-          pageSize: pageSize.toString(),
+          page: (integrationPage + 1).toString(),
+          pageSize: integrationPageSize.toString(),
+          conditions: integrationServerColumnFilters,
         }),
     });
-  }, [page, pageSize, turuqOrders, integrationOrders]);
+  }, [
+    integrationPage,
+    integrationPageSize,
+    integrationOrders,
+    integrationServerColumnFilters,
+  ]);
 
   if (turuqError) {
     return <div>An Error Has Occurred: {turuqError.message}</div>;
@@ -122,11 +133,14 @@ export default function Page({
               locale={locale}
               columns={columns}
               data={turuqOrders?.orders ?? []}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
+              page={turuqPage}
+              pageSize={turuqPageSize}
+              totalPages={turuqOrders?.totalPages ?? 1}
+              onPageChange={setTuruqPage}
+              onPageSizeChange={setTuruqPageSize}
               enableServerFilter
+              serverColumnFilters={turuqServerColumnFilters}
+              setServerColumnFilters={setTuruqServerColumnFilters}
             />
           </div>
         </TabsContent>
@@ -136,11 +150,14 @@ export default function Page({
               locale={locale}
               columns={columns}
               data={integrationOrders?.integrationOrders ?? []}
-              page={page}
-              pageSize={pageSize}
-              onPageChange={setPage}
-              onPageSizeChange={setPageSize}
+              page={integrationPage}
+              pageSize={integrationPageSize}
+              totalPages={integrationOrders?.totalPages ?? 1}
+              onPageChange={setIntegrationPage}
+              onPageSizeChange={setIntegrationPageSize}
               enableServerFilter
+              serverColumnFilters={integrationServerColumnFilters}
+              setServerColumnFilters={setIntegrationServerColumnFilters}
             />
           </div>
         </TabsContent>

@@ -1,8 +1,15 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import { getCouriers } from '@/app/actions/courier-actions';
+import {
+  getAssignmentOfficers,
+  getHandoverOfficers,
+} from '@/app/actions/staff-actions';
 import TableSkeleton from '@/components/feedback/table-skeleton';
-import { courierStaffColumns } from '@/components/tables/orders/order-columns';
+import {
+  courierStaffColumns,
+  staffMemberColumns,
+} from '@/components/tables/orders/order-columns';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
@@ -21,18 +28,37 @@ export default function Page({
     isPending: fetchingCouriers,
   } = useQuery({
     queryKey: ['get-couriers'],
-    queryFn: async () => {
-      const res = await api.courier.$get();
-      if (!res.ok) {
-        throw new Error('Failed to get couriers');
-      }
-      const data = await res.json();
-      return data;
-    },
+    queryFn: async () => getCouriers(),
+  });
+
+  const {
+    data: handoverOfficers,
+    error: handoverOfficersError,
+    isPending: fetchingHandoverOfficers,
+  } = useQuery({
+    queryKey: ['get-handover-officers'],
+    queryFn: async () => getHandoverOfficers(),
+  });
+
+  const {
+    data: assignmentOfficers,
+    error: assignmentOfficersError,
+    isPending: fetchingAssignmentOfficers,
+  } = useQuery({
+    queryKey: ['get-assignment-officers'],
+    queryFn: async () => getAssignmentOfficers(),
   });
 
   if (couriersError) {
     return <div>An Error Has Occurred: {couriersError.message}</div>;
+  }
+
+  if (handoverOfficersError) {
+    return <div>An Error Has Occurred: {handoverOfficersError.message}</div>;
+  }
+
+  if (assignmentOfficersError) {
+    return <div>An Error Has Occurred: {assignmentOfficersError.message}</div>;
   }
 
   return (
@@ -54,33 +80,61 @@ export default function Page({
           </TabsTrigger>
         </TabsList>
         <TabsContent value="handover-officers" className="w-full">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col space-y-5">
-              <h1 className="font-bold text-lg text-foreground">
-                {t('tabs.handoverOfficers')}
-              </h1>
+          <div className="flex flex-col space-y-5 w-full">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col space-y-5">
+                <h1 className="font-bold text-lg text-foreground">
+                  {t('tabs.handoverOfficers')}
+                </h1>
+              </div>
+              <Link
+                href={'manage/create/staff'}
+                className="h-8 px-4 py-2 rounded-xl text-xs font-semibold w-auto bg-accent text-accent-foreground hover:bg-accent/90 inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {t('form.handoverOfficers.headers.addHandoverOfficer')}
+              </Link>
             </div>
-            <Link
-              href={'manage/create/staff'}
-              className="h-8 px-4 py-2 rounded-xl text-xs font-semibold w-auto bg-accent text-accent-foreground hover:bg-accent/90 inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {t('form.handoverOfficers.headers.addHandoverOfficer')}
-            </Link>
+            {fetchingHandoverOfficers ? (
+              <TableSkeleton />
+            ) : (
+              <div className="p-2 rounded-xl bg-light dark:bg-dark_border w-full">
+                <StaffManagementTable
+                  locale={locale}
+                  columns={staffMemberColumns}
+                  data={handoverOfficers}
+                  type="handover"
+                />
+              </div>
+            )}
           </div>
         </TabsContent>
-        <TabsContent value="assignment-officers">
-          <div className="flex items-center justify-between">
-            <div className="flex flex-col space-y-5">
-              <h1 className="font-bold text-lg text-foreground">
-                {t('tabs.assignmentOfficers')}
-              </h1>
+        <TabsContent value="assignment-officers" className="w-full">
+          <div className="flex flex-col space-y-5 w-full">
+            <div className="flex items-center justify-between">
+              <div className="flex flex-col space-y-5">
+                <h1 className="font-bold text-lg text-foreground">
+                  {t('tabs.assignmentOfficers')}
+                </h1>
+              </div>
+              <Link
+                href={'manage/create/staff'}
+                className="h-8 px-4 py-2 rounded-xl text-xs font-semibold w-auto bg-accent text-accent-foreground hover:bg-accent/90 inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+              >
+                {t('form.assignmentOfficers.headers.addAssignmentOfficer')}
+              </Link>
             </div>
-            <Link
-              href={'manage/create/staff'}
-              className="h-8 px-4 py-2 rounded-xl text-xs font-semibold w-auto bg-accent text-accent-foreground hover:bg-accent/90 inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
-            >
-              {t('form.assignmentOfficers.headers.addAssignmentOfficer')}
-            </Link>
+            {fetchingAssignmentOfficers ? (
+              <TableSkeleton />
+            ) : (
+              <div className="p-2 rounded-xl bg-light dark:bg-dark_border w-full">
+                <StaffManagementTable
+                  locale={locale}
+                  columns={staffMemberColumns}
+                  data={assignmentOfficers}
+                  type="assignment"
+                />
+              </div>
+            )}
           </div>
         </TabsContent>
         <TabsContent value="couriers" className="w-full">

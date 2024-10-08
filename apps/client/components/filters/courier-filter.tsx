@@ -11,14 +11,14 @@ import {
 import { useQuery } from '@tanstack/react-query';
 import { toast } from 'sonner';
 import { Skeleton } from '../ui/skeleton';
-import { ColumnFiltersState } from '@tanstack/react-table';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslations } from 'next-intl';
+import { FilterObject } from '@/utils/validation/filters';
 
 interface CourierFilterProps {
   courierFilter: string | undefined;
   onCourierChange: (courier: string) => void;
-  onServerColumnFilterChange: Dispatch<SetStateAction<ColumnFiltersState>>;
+  onServerColumnFilterChange: Dispatch<SetStateAction<FilterObject>>;
 }
 
 async function getCouriers() {
@@ -56,10 +56,9 @@ export default function CourierFilter({
 
   function filterByCourier(courier: string) {
     onCourierChange(courier);
-    onServerColumnFilterChange((columns) => [
-      ...columns,
-      { id: 'courier', value: courier },
-    ]);
+    onServerColumnFilterChange((columns) =>
+      Object.keys(columns) ? { ...columns, courier } : { courier }
+    );
   }
 
   return (
@@ -78,7 +77,7 @@ export default function CourierFilter({
               couriers.map((courier) => (
                 <SelectItem
                   key={courier.id}
-                  value={courier.name}
+                  value={courier.id}
                   className="capitalize"
                 >
                   <span>{courier.name}</span>

@@ -1,15 +1,55 @@
+'use client';
+
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import { Separator } from '@/components/ui/separator';
-import { getTranslations } from 'next-intl/server';
+import { signInSchema } from '@/utils/validation/auth';
+import { useForm } from '@tanstack/react-form';
+import { zodValidator } from '@tanstack/zod-form-adapter';
+import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import Link from 'next/link';
+import { signInAction } from '../actions/auth-actions';
+import { toast } from 'sonner';
+import { useState } from 'react';
+import { Loader2 } from 'lucide-react';
 
-export default async function Home() {
-  const t = await getTranslations('authentication');
+export default function Home({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  const t = useTranslations('authentication');
+  const [loading, setLoading] = useState<boolean>(false);
+
+  // sign-in form
+  const form = useForm({
+    defaultValues: {
+      email: '',
+      password: '',
+    },
+    onSubmit: async ({ value }) => {
+      setLoading(true);
+      const res = await signInAction(value, locale);
+      if (res?.error) {
+        setLoading(false);
+        toast.error('Failed to Sign In', {
+          style: {
+            backgroundColor: '#FEEFEE',
+            color: '#D8000C',
+          },
+        });
+      }
+      setLoading(false);
+    },
+    validatorAdapter: zodValidator(),
+    validators: {
+      onChange: signInSchema,
+    },
+  });
+
   return (
     <div className="flex flex-col items-center justify-center gap-20">
-      <div className="bg-light dark:bg-muted rounded-xl w-auto h-[60svh] p-2 shadow-md dark:shadow-light_border/10 shadow-dark_border/30">
+      <div className="bg-light dark:bg-muted rounded-xl w-full lg:w-1/3 h-[60svh] p-2 shadow-md dark:shadow-light_border/10 shadow-dark_border/30">
         <div className="w-full flex flex-col items-center justify-between gap-10 p-5">
           <Image
             src={'/babyblue.png'}
@@ -22,43 +62,66 @@ export default async function Home() {
             <p className="font-semibold text-sm text-dark_border/80 dark:text-light_border/80">
               {t('login.description')}
             </p>
-            <div className="flex flex-col gap-5 my-5 w-full">
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="username">{t('login.fields.username')}</label>
-                <Input
-                  id="username"
-                  className="w-full rounded-xl bg-light_border dark:bg-dark_border border-none ring-0 outline-none"
-                  placeholder={t('login.placeholders.username')}
-                />
-              </div>
-              <div className="flex flex-col gap-2 w-full">
-                <label htmlFor="password">{t('login.fields.password')}</label>
-                <Input
-                  id="password"
-                  className="w-full rounded-xl bg-light_border dark:bg-dark_border border-none ring-0 outline-none"
-                  placeholder={t('login.placeholders.password')}
-                />
-              </div>
-            </div>
-            <Button type="submit" className="w-full">
-              {t('login.buttons.login')}
-            </Button>
-          </div>
-          <div className="flex flex-col gap-5 items-center justify-center">
-            <span className="text-sm">
-              {t('dontHaveAnAccount')}
-              <Link
-                href="/sign-up"
-                className="underline hover:text-accent font-semibold mx-0.5"
-              >
-                {t('signup.header')}
-              </Link>
-            </span>
+            <form
+              onSubmit={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                form.handleSubmit();
+              }}
+              className="flex flex-col gap-5 my-5 w-full"
+            >
+              <form.Field name="email" mode="value">
+                {(field) => (
+                  <div className="flex flex-col gap-2 w-full">
+                    <label htmlFor={field.name}>
+                      {t('login.fields.email')}
+                    </label>
+                    <Input
+                      id={field.name}
+                      type="text"
+                      name={field.name}
+                      value={field.state.value}
+                      required
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                      className="w-full rounded-xl bg-light_border dark:bg-dark_border border-none ring-0 outline-none"
+                      placeholder={t('login.placeholders.email')}
+                    />
+                  </div>
+                )}
+              </form.Field>
+              <form.Field name="password" mode="value">
+                {(field) => (
+                  <div className="flex flex-col gap-2 w-full">
+                    <label htmlFor={field.name}>
+                      {t('login.fields.password')}
+                    </label>
+                    <Input
+                      id={field.name}
+                      type="password"
+                      name={field.name}
+                      value={field.state.value}
+                      required
+                      onChange={(e) => field.handleChange(e.target.value)}
+                      onBlur={field.handleBlur}
+                      className="w-full rounded-xl bg-light_border dark:bg-dark_border border-none ring-0 outline-none"
+                      placeholder={t('login.placeholders.password')}
+                    />
+                  </div>
+                )}
+              </form.Field>
+              <Button type="submit" className="w-full">
+                {loading ? (
+                  <Loader2 size={16} className="text-inherit animate-spin" />
+                ) : (
+                  t('login.buttons.login')
+                )}
+              </Button>
+            </form>
           </div>
         </div>
       </div>
       <Separator />
-      
     </div>
   );
 }

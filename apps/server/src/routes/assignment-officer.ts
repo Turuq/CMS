@@ -6,6 +6,7 @@ import {
 } from '../validation/assignment-officer';
 import { staffMemberModel } from '../models/staff';
 import { validateObjectId } from '../utils/validation';
+import { getUser } from '../lib/supabase/supabaseClient';
 
 const assignmentOfficerRouter = new Hono()
   .post(
@@ -47,11 +48,16 @@ const assignmentOfficerRouter = new Hono()
       }
     }
   )
-  .get('/', async (c) => {
+  .get('/', getUser, async (c) => {
     try {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       const assignmentOfficers = await staffMemberModel
         .find({ role: 'ASSIGNMENT_OFFICER' })
-        .select('name username phone active');
+        .select('name username phone active nationalId');
       if (!assignmentOfficers) {
         return c.json(
           {

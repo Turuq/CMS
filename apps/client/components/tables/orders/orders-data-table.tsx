@@ -21,7 +21,7 @@ import {
   getPaginationRowModel,
   useReactTable,
 } from '@tanstack/react-table';
-import { useState } from 'react';
+import { Dispatch, SetStateAction, useState } from 'react';
 
 import CourierFilter from '@/components/filters/courier-filter';
 import StatusFilter from '@/components/filters/status-filter';
@@ -40,6 +40,7 @@ import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
+import { FilterObject } from '@/utils/validation/filters';
 
 interface OrdersDataTableProps<TValue> {
   locale: string;
@@ -47,9 +48,12 @@ interface OrdersDataTableProps<TValue> {
   data: OrderType[];
   page: number;
   pageSize: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   enableServerFilter?: boolean;
+  serverColumnFilters: FilterObject;
+  setServerColumnFilters: Dispatch<SetStateAction<FilterObject>>;
 }
 
 // This a generic data table component that can be used to render any table
@@ -61,16 +65,18 @@ export function OrdersDataTable<TValue>({
   data,
   page,
   pageSize,
+  totalPages,
   onPageChange,
   onPageSizeChange,
   enableServerFilter,
+  serverColumnFilters,
+  setServerColumnFilters,
 }: OrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [serverColumnFilters, setServerColumnFilters] =
-    useState<ColumnFiltersState>([]);
+
   const [courierFilter, setCourierFilter] = useState<string | undefined>();
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [searchValue, setSearchValue] = useState('');
@@ -91,7 +97,7 @@ export function OrdersDataTable<TValue>({
   function handleServerFilterReset() {
     setCourierFilter('');
     setStatusFilter('');
-    setServerColumnFilters([]);
+    setServerColumnFilters({});
   }
 
   function handleClientFilterReset() {
@@ -128,16 +134,14 @@ export function OrdersDataTable<TValue>({
                 />
               </div>
               {(clientColumnFilters.length > 0 ||
-                serverColumnFilters.length > 0) && (
+                Object.keys(serverColumnFilters).length > 0) && (
                 <div className="flex items-center gap-2">
-                  <Button
+                  {/* <Button
                     variant={'default'}
                     className="w-auto h-8 rounded-xl hidden lg:flex items-center gap-2"
-                    // onClick={handleFilterReset}
                   >
-                    {/* {icons.resetFilter} */}
                     <p>{t('filters.buttons.apply')}</p>
-                  </Button>
+                  </Button> */}
                   <Button
                     variant={'link'}
                     className="w-auto hover:text-red-500 h-8 rounded-xl hidden lg:flex items-center gap-2"
@@ -327,7 +331,7 @@ export function OrdersDataTable<TValue>({
           <p className="text-xs font-bold">
             {t('pagination.footer.page')} {page.toLocaleString(`${locale}-EG`)}{' '}
             {t('pagination.footer.of')}{' '}
-            {table.getPageCount().toLocaleString(`${locale}-EG`)}
+            {Math.ceil(totalPages).toLocaleString(`${locale}-EG`)}
           </p>
           <button
             onClick={() => onPageChange(page - 1)}
@@ -342,7 +346,7 @@ export function OrdersDataTable<TValue>({
           </button>
           <button
             onClick={() => onPageChange(page + 1)}
-            // disabled={}
+            disabled={page === Math.ceil(totalPages)}
             className="text-accent/50 hover:text-accent disabled:text-muted disabled:cursor-not-allowed disabled:hover:text-muted"
           >
             {locale === 'ar' ? (

@@ -98,6 +98,7 @@ export default function KpiCard({
                         notation: notation,
                         style: 'currency',
                         currency: 'EGP',
+                        maximumFractionDigits: 0,
                       })
                     : statistic.toLocaleString(`${locale}-EG`, {
                         notation: notation,

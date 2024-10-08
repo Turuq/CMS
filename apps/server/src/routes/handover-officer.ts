@@ -7,6 +7,7 @@ import {
   updateHandoverOfficerSchema,
 } from '../validation/handover-officer';
 import { staffMemberModel } from '../models/staff';
+import { getUser } from '../lib/supabase/supabaseClient';
 
 const handoverOfficerRouter = new Hono()
   .post(
@@ -15,6 +16,7 @@ const handoverOfficerRouter = new Hono()
     async (c) => {
       // Validate request body
       const data = c.req.valid('json');
+      console.log(data);
       // Check if handover officer already exists
       const existingHandoverOfficer = await staffMemberModel.findOne({
         username: data.username,
@@ -22,9 +24,7 @@ const handoverOfficerRouter = new Hono()
       });
       if (existingHandoverOfficer) {
         c.status(409);
-        return c.json({
-          message: 'Handover Officer already exists',
-        });
+        throw new Error('Handover officer already exists');
       }
       // Create new handover officer
       const newHandoverOfficer = new staffMemberModel({
@@ -39,31 +39,30 @@ const handoverOfficerRouter = new Hono()
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to create handover officer: ${error.message}`,
-        });
+        throw new Error(`Failed to create handover officer: ${error.message}`);
       }
     }
   )
-  .get('/', async (c) => {
+  .get('/', getUser, async (c) => {
     try {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       const handoverOfficers = await staffMemberModel
         .find({ role: 'HANDOVER_OFFICER' })
-        .select('name username phone active');
+        .select('name username phone active nationalId');
       if (!handoverOfficers) {
         c.status(404);
-        return c.json({
-          message: 'No handover officers found',
-        });
+        throw new Error('Handover officers not found');
       }
       c.status(200);
       return c.json(handoverOfficers);
     } catch (error: any) {
       console.error(error);
       c.status(500);
-      return c.json({
-        message: `Failed to get handover officers: ${error.message}`,
-      });
+      throw new Error(`Failed to get handover officers: ${error.message}`);
     }
   })
   .get('/:id', zValidator('param', validateObjectId), async (c) => {

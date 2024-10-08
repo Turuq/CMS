@@ -21,8 +21,9 @@ export const createAssignmentOfficerSchema = z.object({
   phone: z.string().min(11).max(11),
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
+  password: z.string(),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const updateAssignmentOfficerSchema = z.object({

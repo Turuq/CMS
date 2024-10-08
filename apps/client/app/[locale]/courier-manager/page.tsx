@@ -1,19 +1,50 @@
-'use client';
+// import { api } from '@/app/actions/api';
 import KpiCard from '@/components/cards/kpi-card';
 // import { icons } from '@/components/icons/icons';
 import { ordersStatistics } from '@/utils/data/dummy';
+// import { useQuery } from '@tanstack/react-query';
 import moment from 'moment';
-import { useTranslations } from 'next-intl';
+import { getTranslations } from 'next-intl/server';
 
-export default function CourierManagerHome({
+// async function getStaffDashboard() {
+//   const res = await api.inspector.dashboard.$get();
+//   if (!res.ok) {
+//     throw new Error('An unexpected error occurred');
+//   }
+//   const data = await res.json();
+//   return data;
+// }
+
+export default async function CourierManagerHome({
   params: { locale },
 }: {
   params: { locale: string };
 }) {
-  const t = useTranslations('dashboard.statistics');
+  const t = await getTranslations('dashboard.statistics');
+
+  // const { data, error, isPending } = useQuery({
+  //   queryKey: ['staff-dashboard'],
+  //   queryFn: getStaffDashboard,
+  // });
+
+  // if (isPending)
+  //   return (
+  //     <>
+  //       <p className="">Fetching ...</p>
+  //     </>
+  //   );
+
+  // if (error)
+  //   return (
+  //     <p>An unexpected error occurred: {JSON.stringify(error, null, 2)}</p>
+  //   );
+
   return (
     <main className="flex min-h-screen flex-col gap-5">
       <h1 className="text-3xl font-bold opacity-80">{t('title')}</h1>
+      <span className="italic text-red-500 text-xs font-bold">
+        hardcoded until the batch implementation is done
+      </span>
       <div className="grid grid-cols-3 items-center gap-5">
         <div className="col-span-3 lg:col-span-1">
           <KpiCard
@@ -21,7 +52,6 @@ export default function CourierManagerHome({
             title={t('cards.totalOrders')}
             statistic={ordersStatistics.totalOrders}
             dotted
-            animated
             link="courier-manager/orders"
           />
         </div>
@@ -53,7 +83,6 @@ export default function CourierManagerHome({
               title={t('cards.totalShippingFees')}
               statistic={ordersStatistics.totalShippingFees}
               financial
-              animated
             />
           </div>
           <div className="col-span-3 lg:col-span-1">
@@ -62,7 +91,6 @@ export default function CourierManagerHome({
               title={t('cards.totalToBeReceived')}
               statistic={ordersStatistics.totalToBeReceived}
               financial
-              animated
             />
           </div>
           <div className="col-span-3 lg:col-span-1">
@@ -93,6 +121,7 @@ export default function CourierManagerHome({
           />
         </div>
       </div>
+      {/* <pre>{JSON.stringify(data, null, 2)}</pre> */}
       {/* <h1 className="text-3xl font-bold opacity-80">{`Top 5 Courier By Deliveries`}</h1> */}
       {/* <div className="grid grid-cols-5 gap-5">
         {Couriers.map((courier, index) => (

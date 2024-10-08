@@ -5,6 +5,7 @@ import { Courier } from '@/api/validation/courier';
 import { Checkbox } from '@/components/ui/checkbox';
 import { OrderType } from '@/types/order';
 import { getIndicatorColor } from '@/utils/helpers/status-modifier';
+import { Staff } from '@/utils/validation/staff';
 import { ColumnDef } from '@tanstack/react-table';
 import { AlertOctagonIcon } from 'lucide-react';
 
@@ -262,12 +263,7 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   },
 ];
 
-export const courierStaffColumns: ColumnDef<
-  Pick<
-    Courier,
-    'nationalId' | 'name' | 'phone' | 'commissionPerOrder' | 'zone' | 'active'
-  > & { id: string }
->[] = [
+export const courierStaffColumns: ColumnDef<Staff>[] = [
   {
     id: 'nationalId',
     accessorKey: 'nationalId',
@@ -294,6 +290,34 @@ export const courierStaffColumns: ColumnDef<
     id: 'zone',
     header: 'Zone',
     cell: (row) => <span>{row.row.original.zone ?? 'N/A'}</span>,
+  },
+  {
+    id: 'active',
+    accessorKey: 'active',
+    header: 'Active',
+  },
+];
+
+export const staffMemberColumns: ColumnDef<Staff>[] = [
+  {
+    id: 'nationalId',
+    accessorKey: 'nationalId',
+    header: 'NationalId',
+  },
+  {
+    id: 'name',
+    accessorKey: 'name',
+    header: 'Name',
+  },
+  {
+    id: 'username',
+    accessorKey: 'username',
+    header: 'Username',
+  },
+  {
+    id: 'phone',
+    accessorKey: 'phone',
+    header: 'Phone',
   },
   {
     id: 'active',

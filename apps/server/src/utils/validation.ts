@@ -30,3 +30,8 @@ export const validatePagination = z.object({
       message: 'PageSize has to be a positive integer',
     }),
 });
+
+export const validateFilters = z.object({
+  courier: z.string().optional(),
+  status: z.string().optional(),
+});

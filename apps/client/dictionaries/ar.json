@@ -211,6 +211,7 @@
         "table": {
           "columns": {
             "name": "الاسم",
+            "username": "اسم المستخدم",
             "phone": "الهاتف",
             "nationalId": "الرقم القومي",
             "commissionPerOrder": "عمولة لكل طلب",
@@ -398,5 +399,10 @@
         "signup": "إنشاء حساب"
       }
     }
+  },
+  "roles": {
+    "HANDOVER_OFFICER": "ضابط التسليم",
+    "ASSIGNMENT_OFFICER": "ضابط التعيين",
+    "COURIER_MANAGER": "مدير المناديب"
   }
 }

@@ -10,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { Staff } from '@/utils/validation/staff';
 import {
   ColumnDef,
   flexRender,
@@ -21,19 +22,19 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
 
-interface SelectedOrderTableProps<TData, TValue> {
+interface SelectedOrderTableProps {
   locale: string;
-  columns: ColumnDef<TData, TValue>[];
-  data: TData[];
-  type: "courier" | "handover" | "assignment"
+  columns: ColumnDef<Staff>[];
+  data: Staff[];
+  type: 'courier' | 'handover' | 'assignment';
 }
 
-export default function StaffManagementTable<TData, TValue>({
+export default function StaffManagementTable({
   locale,
   columns,
   data,
-  type
-}: SelectedOrderTableProps<TData, TValue>) {
+  type,
+}: SelectedOrderTableProps) {
   const t = useTranslations('courierManager.tabs');
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -108,7 +109,11 @@ export default function StaffManagementTable<TData, TValue>({
           ) : (
             <TableRow>
               <TableCell colSpan={columns.length} className="h-24 text-center">
-                {type === "courier" ? t('manage.table.dataResults.noCouriers') : type === "handover" ? t('manage.table.dataResults.noHandoverOfficers') : t('manage.table.dataResults.noAssignmentOfficers')}
+                {type === 'courier'
+                  ? t('manage.table.dataResults.noCouriers')
+                  : type === 'handover'
+                    ? t('manage.table.dataResults.noHandoverOfficers')
+                    : t('manage.table.dataResults.noAssignmentOfficers')}
               </TableCell>
             </TableRow>
           )}

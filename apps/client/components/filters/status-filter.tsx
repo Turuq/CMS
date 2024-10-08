@@ -1,5 +1,4 @@
 import { data } from '@/utils/status';
-import { ColumnFiltersState } from '@tanstack/react-table';
 
 import {
   Select,
@@ -10,9 +9,10 @@ import {
 } from '@/components/ui/select';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslations } from 'next-intl';
+import { FilterObject } from '@/utils/validation/filters';
 
 interface StatusFilterProps {
-  onServerColumnFilterChange: Dispatch<SetStateAction<ColumnFiltersState>>;
+  onServerColumnFilterChange: Dispatch<SetStateAction<FilterObject>>;
   statusFilter: string | undefined;
   onStatusChange: (courier: string) => void;
 }
@@ -28,10 +28,9 @@ export default function StatusFilter({
 
   function filterByStatus(status: string) {
     onStatusChange(status);
-    onServerColumnFilterChange((columns) => [
-      ...columns,
-      { id: 'status', value: status },
-    ]);
+    onServerColumnFilterChange((columns) =>
+      Object.keys(columns) ? { ...columns, status } : { status }
+    );
   }
 
   return (

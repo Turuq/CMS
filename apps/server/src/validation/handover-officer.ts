@@ -12,17 +12,18 @@ export const handoverOfficerSchema = z.object({
   salary: z.number().positive().min(0),
   active: z.boolean(),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const createHandoverOfficerSchema = z.object({
   name: z.string(),
   username: z.string(),
   phone: z.string().min(11).max(11),
+  password: z.string(),
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const updateHandoverOfficerSchema = z.object({

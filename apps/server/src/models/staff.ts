@@ -42,7 +42,7 @@ const staffMemberSchema = new Schema(
       required: true,
       unique: true,
     },
-    criminalRecord: {
+    criminalRecordImage: {
       type: String,
       required: true,
     },

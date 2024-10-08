@@ -213,6 +213,7 @@
         "table": {
           "columns": {
             "name": "Name",
+            "username": "Username",
             "phone": "Phone",
             "nationalId": "National ID",
             "commissionPerOrder": "Commission Per Order",
@@ -300,7 +301,6 @@
       }
     }
   },
-
   "assignmentOfficer": {
     "tabs": {
       "home": {
@@ -403,5 +403,10 @@
         "signup": "Create account"
       }
     }
+  },
+  "roles": {
+    "HANDOVER_OFFICER": "Handover Officer",
+    "ASSIGNMENT_OFFICER": "Assignment Officer",
+    "COURIER_MANAGER": "Courier Manager"
   }
 }

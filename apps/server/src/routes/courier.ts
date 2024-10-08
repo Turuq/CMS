@@ -9,6 +9,7 @@ import {
   type Courier,
   type CourierWithStatistics,
 } from '../validation/courier';
+import { getUser } from '../lib/supabase/supabaseClient';
 
 // TODO: Add Route Authorization & Authentication
 
@@ -42,23 +43,19 @@ const courierRouter = new Hono()
       });
     }
   })
-  .get('/', async (c) => {
+  // GET ALL COURIERS
+  .get('/', getUser, async (c) => {
     try {
-      const couriers = await prisma.couriers.findMany({
-        select: {
-          id: true,
-          name: true,
-          phone: true,
-          username: true,
-          active: true,
-          zone: true,
-          nationalId: true,
-          commissionPerOrder: true,
-        },
-        orderBy: {
-          active: 'desc',
-        },
-      });
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
+      const couriers = await CourierModel.find({})
+        .select(
+          'name _id phone username active zone commissionPerOrder nationalId'
+        )
+        .sort({ active: 'desc' });
       return c.json(couriers, 200);
     } catch (error: any) {
       console.error(error);
@@ -66,8 +63,14 @@ const courierRouter = new Hono()
       throw new Error(`Failed to get couriers: ${error.message}`);
     }
   })
-  .get('/grouped', async (c) => {
+  // GET ALL COURIERS GROUPED BY ACTIVE STATUS
+  .get('/grouped', getUser, async (c) => {
     try {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       const result = await CourierModel.aggregate([
         {
           $group: {
