@@ -1,16 +1,16 @@
 "use client";
 
-import clsx from "clsx";
-import { useParams } from "next/navigation";
-import { ChangeEvent, ReactNode, useTransition } from "react";
-import { useRouter, usePathname } from "@/lib/navigation";
-import { Locale } from "@/types/locale";
+import { usePathname, useRouter } from '@/lib/navigation';
+import { Locale } from '@/types/locale';
+import { useParams } from 'next/navigation';
+import { ReactNode, useTransition } from 'react';
 import {
   Select,
   SelectContent,
   SelectTrigger,
   SelectValue,
-} from "../ui/select";
+} from '../ui/select';
+import { icons } from '../icons/icons';
 
 type Props = {
   children: ReactNode;
@@ -36,7 +36,7 @@ export default function LocaleSwitcherSelect({
         // are used in combination with a given `pathname`. Since the two will
         // always match for the current route, we can skip runtime checks.
         { pathname, params },
-        { locale: nextLocale },
+        { locale: nextLocale }
       );
     });
   }
@@ -48,7 +48,8 @@ export default function LocaleSwitcherSelect({
       disabled={isPending}
       onValueChange={onSelectChange}
     >
-      <SelectTrigger className="w-[180px] bg-light dark:bg-dark border-light_border dark:border-dark_border">
+      <SelectTrigger className="w-auto group flex items-center justify-start gap-5 bg-transparent border-none">
+        {icons.localeSwitcher}
         <SelectValue placeholder={label} />
       </SelectTrigger>
       <SelectContent className="bg-light dark:bg-dark border-light_border dark:border-dark_border">

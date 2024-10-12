@@ -25,6 +25,31 @@ export function getStatusColor(status: string) {
   return result;
 }
 
+export function getStatusTextColor(status: string) {
+  let result = '';
+  switch (status) {
+    case 'delivered':
+      result = 'text-emerald-200 dark:text-emerald-200';
+      break;
+    case 'outForDelivery':
+      result = 'text-sky-200 dark:text-sky-200';
+      break;
+    case 'processing':
+    case 'pending':
+      result = 'text-amber-200 dark:text-amber-200';
+      break;
+    case 'cancelled':
+    case 'postponed':
+    case 'returned':
+      result = 'text-red-200 dark:text-red-200';
+      break;
+    default:
+      result = 'text-gray-200 dark:text-gray-200';
+      break;
+  }
+  return result;
+}
+
 export function getIndicatorColor(order: OrderType) {
   if (order?.paidShippingOnly) return 'text-lime-500';
   if (order?.paymentMethod === 'INSTAPAY') return 'text-violet-500';

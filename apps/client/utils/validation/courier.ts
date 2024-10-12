@@ -1,21 +1,6 @@
 import { z } from 'zod';
-import { ObjectId } from 'mongodb';
 
-export type StaffRole =
-  | 'HANDOVER_OFFICER'
-  | 'ASSIGNMENT_OFFICER'
-  | 'COURIER_MANAGER';
-
-const authenticatedStaffMember = z.object({
-  _id: z.instanceof(ObjectId),
-  name: z.string(),
-  email: z.string().email(),
-  username: z.string(),
-  role: z.enum(['HANDOVER_OFFICER', 'ASSIGNMENT_OFFICER', 'COURIER_MANAGER']),
-  active: z.boolean(),
-});
-
-export const editStaffMember = z.object({
+export const EditCourierSchema = z.object({
   _id: z.string(),
   name: z.string(),
   email: z.string().email(),
@@ -30,9 +15,10 @@ export const editStaffMember = z.object({
     .string()
     .min(14, { message: 'National Id has to be exactly 14 digits' })
     .max(14, { message: 'National Id has to be exactly 14 digits' }),
-  role: z.string(),
+  zone: z.string(),
   nationalIdImage: z.string().url(),
   criminalRecordImage: z.string().url(),
+  driverLicenseImage: z.string().url(),
 });
 
-export type AuthenticatedStaffMember = z.infer<typeof authenticatedStaffMember>;
+export type EditCourier = z.infer<typeof EditCourierSchema>;

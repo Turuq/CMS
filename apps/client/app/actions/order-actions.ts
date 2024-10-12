@@ -1,9 +1,8 @@
 'use server';
 
-import { getToken } from '@/utils/helpers/getToken';
-import { FilterObject } from '@/utils/validation/filters';
-import { redirect } from 'next/navigation';
+import { verifyToken } from '@/utils/helpers/get-token';
 import { api } from './api';
+import { FilterObject } from '@/api/utils/validation';
 
 export async function getTuruqOrders({
   page,
@@ -14,11 +13,7 @@ export async function getTuruqOrders({
   pageSize: string;
   conditions: FilterObject;
 }) {
-  const token = getToken();
-
-  if (!token) {
-    redirect('/');
-  }
+  const token = verifyToken();
 
   const res = await api.order.turuq[':page'][':pageSize'].$post(
     {
@@ -47,11 +42,7 @@ export async function getIntegrationOrders({
   pageSize: string;
   conditions: FilterObject;
 }) {
-  const token = getToken();
-
-  if (!token) {
-    redirect('/');
-  }
+  const token = verifyToken();
 
   const res = await api.order.integration[':page'][':pageSize'].$post(
     {
@@ -78,11 +69,7 @@ export async function getProcessingUnassignedTuruqOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = getToken();
-
-  if (!token) {
-    redirect('/');
-  }
+  const token = verifyToken();
 
   const res = await api.order.turuq.processing.unassigned[':page'][
     ':pageSize'
@@ -108,11 +95,7 @@ export async function getProcessingUnassignedIntegrationOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = getToken();
-
-  if (!token) {
-    redirect('/');
-  }
+  const token = verifyToken();
 
   const res = await api.order.integration.processing.unassigned[':page'][
     ':pageSize'

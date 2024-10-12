@@ -408,5 +408,40 @@
     "HANDOVER_OFFICER": "Handover Officer",
     "ASSIGNMENT_OFFICER": "Assignment Officer",
     "COURIER_MANAGER": "Courier Manager"
+  },
+  "forms": {
+    "edit": {
+      "staff": {
+        "header": "Edit {name}'s Information",
+        "description": "Please change the information you want to edit.",
+        "fields": {
+          "name": "Name",
+          "username": "Username",
+          "email": "Email",
+          "phone": "Phone",
+          "nationalId": "National ID",
+          "zone": "Zone",
+          "nationalIdImage": "National ID Image",
+          "driverLicenseImage": "Driver License Image",
+          "criminalRecordImage": "Criminal Record",
+          "role": {
+            "label": "Staff Member Role",
+            "manager": "Courier Manager",
+            "handover": "Handover Officer",
+            "assignment": "Assignment Officer"
+          }
+        },
+        "buttons": {
+          "save": "Save Changes",
+          "uploadImage": "Upload Image"
+        },
+        "feedback": {
+          "dragNDrop": "Drag & Drop or",
+          "chooseFile": "Choose File",
+          "toUpload": "to Upload",
+          "dropHere": "Drop here"
+        }
+      }
+    }
   }
 }

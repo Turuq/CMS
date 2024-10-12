@@ -8,6 +8,7 @@ import {
 } from '../validation/handover-officer';
 import { staffMemberModel } from '../models/staff';
 import { getUser } from '../lib/supabase/supabaseClient';
+import { authorizeUser } from '../utils/authorization';
 
 const handoverOfficerRouter = new Hono()
   .post(
@@ -44,12 +45,8 @@ const handoverOfficerRouter = new Hono()
     }
   )
   .get('/', getUser, async (c) => {
+    authorizeUser({ c, level: ['COURIER_MANAGER'] });
     try {
-      const { role } = c.var.user;
-      if (role !== 'COURIER_MANAGER') {
-        c.status(403);
-        throw new Error('Unauthorized');
-      }
       const handoverOfficers = await staffMemberModel
         .find({ role: 'HANDOVER_OFFICER' })
         .select('name username phone active nationalId');

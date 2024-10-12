@@ -14,6 +14,7 @@ import courierRouter from './routes/courier';
 import handoverOfficerRouter from './routes/handover-officer';
 import inspectorRouter from './routes/inspector';
 import orderRouter from './routes/order';
+import staffRouter from './routes/staff';
 
 const app = new Hono();
 
@@ -24,6 +25,7 @@ const apiRoutes = app
   .route('/handover-officer', handoverOfficerRouter)
   .route('/assignment-officer', assignmentOfficerRouter)
   .route('/order', orderRouter)
+  .route('/staff', staffRouter)
   .route('/inspector', inspectorRouter);
 
 app.use('*', logger());

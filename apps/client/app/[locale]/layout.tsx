@@ -12,6 +12,7 @@ import { getMessages } from 'next-intl/server';
 import { Montserrat, Cairo } from 'next/font/google';
 import { getDictionary } from '../dictionaries';
 import '../globals.css';
+import { Separator } from '@/components/ui/separator';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -44,8 +45,8 @@ export default async function RootLayout({
       >
         <ThemeProvider
           attribute="class"
-          defaultTheme="system"
-          enableSystem
+          defaultTheme="dark"
+
           // disableTransitionOnChange
         >
           <TanStackQueryProvider>
@@ -59,9 +60,18 @@ export default async function RootLayout({
                       {children}
                       <Toaster />
                     </div>
-                    <footer className="flex items-center justify-end gap-10 p-5 bg-light_border dark:bg-dark">
-                      <ThemeToggle />
-                      <LocaleSwitcher />
+                    <footer className="flex items-center justify-between rounded-xl mt-5 gap-5 p-5 bg-light dark:bg-dark_border">
+                      <p className="font-semibold text-[10px] text-dark_border/80 dark:text-light_border/80">
+                        Copyright © 2024 Turuq. All Rights Reserved.
+                      </p>
+                      <div className="flex items-center gap-5">
+                        <ThemeToggle />
+                        <Separator
+                          orientation="vertical"
+                          className="bg-dark_border/20 dark:bg-light/20 h-5"
+                        />
+                        <LocaleSwitcher />
+                      </div>
                     </footer>
                   </div>
                 </div>

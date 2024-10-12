@@ -23,7 +23,7 @@ export default function CourierManagerSidebar({ locale }: { locale: string }) {
     <div
       className={`${
         isExpanded && 'min-w-52'
-      } flex flex-col justify-between px-2 gap-2 ${locale === 'ar' ? 'border-l' : 'border-r'} border-dark_border/20 dark:border-muted`}
+      } bg-light dark:bg-dark_border py-5 rounded-xl flex flex-col justify-between px-2 gap-2`}
     >
       <div className="flex flex-col gap-2">
         <button className="p-2" onClick={() => toggleExpand(!isExpanded)}>

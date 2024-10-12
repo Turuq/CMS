@@ -1,5 +1,6 @@
 'use client';
 
+import { FilterObject } from '@/api/utils/validation';
 import {
   getIntegrationOrders,
   getTuruqOrders,
@@ -8,7 +9,6 @@ import { columns } from '@/components/tables/orders/order-columns';
 import { OrdersDataTable } from '@/components/tables/orders/orders-data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import queryClient from '@/lib/query/query-client';
-import { FilterObject } from '@/utils/validation/filters';
 import { useQuery } from '@tanstack/react-query';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
@@ -31,7 +31,11 @@ export default function Page({
   const [integrationPageSize, setIntegrationPageSize] = useState<number>(10);
 
   // Fetch Table Data
-  const { data: turuqOrders, error: turuqError } = useQuery({
+  const {
+    data: turuqOrders,
+    error: turuqError,
+    isPending: turuqPending,
+  } = useQuery({
     queryKey: [
       'get-orders',
       turuqPage,
@@ -46,7 +50,11 @@ export default function Page({
       }),
   });
 
-  const { data: integrationOrders, error: integrationError } = useQuery({
+  const {
+    data: integrationOrders,
+    error: integrationError,
+    isPending: integrationPending,
+  } = useQuery({
     queryKey: [
       'get-integration-orders',
       integrationPage,
@@ -141,6 +149,7 @@ export default function Page({
               enableServerFilter
               serverColumnFilters={turuqServerColumnFilters}
               setServerColumnFilters={setTuruqServerColumnFilters}
+              loading={turuqPending}
             />
           </div>
         </TabsContent>
@@ -158,6 +167,7 @@ export default function Page({
               enableServerFilter
               serverColumnFilters={integrationServerColumnFilters}
               setServerColumnFilters={setIntegrationServerColumnFilters}
+              loading={integrationPending}
             />
           </div>
         </TabsContent>

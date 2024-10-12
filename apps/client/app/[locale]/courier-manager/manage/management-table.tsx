@@ -96,7 +96,8 @@ export default function StaffManagementTable({
                           className={`${cell.getValue() ? 'bg-emerald-200 text-emerald-800' : 'bg-red-200 text-red-800'} capitalize`}
                           title={cell.getValue() ? 'Active' : 'Inactive'}
                         >
-                          {t(`manage.table.columns.badge.${cell.getValue()}`)}
+                          {/* {t(`manage.table.columns.badge.${cell.getValue()}`)} */}
+                          {cell.getValue() ? 'Active' : 'Inactive'}
                         </Badge>
                       </>
                     ) : (

@@ -53,6 +53,7 @@ export type OrderType = {
   courier: {
     _id: string;
     name: string;
+    phone: string;
   };
   courierAssignedAt: string;
   courierCOD: number;

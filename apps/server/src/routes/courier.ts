@@ -10,6 +10,7 @@ import {
   type CourierWithStatistics,
 } from '../validation/courier';
 import { getUser } from '../lib/supabase/supabaseClient';
+import { authorizeUser } from '../utils/authorization';
 
 // TODO: Add Route Authorization & Authentication
 
@@ -45,12 +46,8 @@ const courierRouter = new Hono()
   })
   // GET ALL COURIERS
   .get('/', getUser, async (c) => {
+    authorizeUser({ level: ['COURIER_MANAGER'], c });
     try {
-      const { role } = c.var.user;
-      if (role !== 'COURIER_MANAGER') {
-        c.status(403);
-        throw new Error('Unauthorized');
-      }
       const couriers = await CourierModel.find({})
         .select(
           'name _id phone username active zone commissionPerOrder nationalId'
@@ -167,24 +164,13 @@ const courierRouter = new Hono()
       throw new Error(`Failed to get couriers: ${error.message}`);
     }
   })
-  .get('/:id', zValidator('param', validateObjectId), async (c) => {
+  .get('/:id', getUser, zValidator('param', validateObjectId), async (c) => {
+    authorizeUser({ level: ['COURIER_MANAGER'], c });
     try {
       // Verify that id is a valid ObjectId
       const { id } = c.req.valid('param');
       // Find courier by id
-      const courier = await prisma.couriers.findUnique({
-        where: {
-          id,
-        },
-        select: {
-          id: true,
-          name: true,
-          phone: true,
-          username: true,
-          active: true,
-          zone: true,
-        },
-      });
+      const courier = await CourierModel.findById(id);
       if (!courier) {
         c.status(404);
         throw new Error('Courier not found');
@@ -221,14 +207,18 @@ const courierRouter = new Hono()
   })
   .put(
     '/:id',
+    getUser,
     zValidator('param', validateObjectId),
     zValidator('json', courierUpdateSchema),
     async (c) => {
+      authorizeUser({ c, level: ['COURIER_MANAGER'] });
       try {
         // Verify that id is a valid ObjectId
         const { id } = c.req.valid('param');
+        console.log(id);
         // Validate request body
         const data = c.req.valid('json');
+        console.log(data);
         // Find courier and update
         const updatedCourier = await CourierModel.findByIdAndUpdate(id, data);
         if (!updatedCourier) {
@@ -241,7 +231,7 @@ const courierRouter = new Hono()
         c.status(201);
         return c.json(updatedCourier);
       } catch (error: any) {
-        console.error(error);
+        console.log(error);
         c.status(500);
         return c.json({
           message: `Failed to update courier: ${error.message}`,
@@ -249,29 +239,66 @@ const courierRouter = new Hono()
       }
     }
   )
-  .put('activate/:id', zValidator('param', validateObjectId), async (c) => {
-    try {
-      // Verify that id is a valid ObjectId
-      const { id } = c.req.valid('param');
-      // Find courier by id and activate
-      const activatedCourier = await CourierModel.findByIdAndUpdate(id, {
-        active: true,
-      });
-      if (!activatedCourier) {
-        c.status(404);
+  .put(
+    'activate/:id',
+    getUser,
+    zValidator('param', validateObjectId),
+    async (c) => {
+      authorizeUser({ c, level: ['COURIER_MANAGER'] });
+      try {
+        // Verify that id is a valid ObjectId
+        const { id } = c.req.valid('param');
+        // Find courier by id and activate
+        const activatedCourier = await CourierModel.findByIdAndUpdate(id, {
+          active: true,
+        });
+        if (!activatedCourier) {
+          c.status(404);
+          return c.json({
+            message: 'Courier not found',
+          });
+        }
+
+        c.status(201);
+        return c.json(activatedCourier);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
         return c.json({
-          message: 'Courier not found',
+          message: `Failed to activate courier: ${error.message}`,
         });
       }
-
-      c.status(201);
-      return c.json(activatedCourier);
-    } catch (error: any) {
-      console.error(error);
-      c.status(500);
-      return c.json({
-        message: `Failed to activate courier: ${error.message}`,
-      });
     }
-  });
+  )
+  .put(
+    'deactivate/:id',
+    getUser,
+    zValidator('param', validateObjectId),
+    async (c) => {
+      authorizeUser({ c, level: ['COURIER_MANAGER'] });
+      try {
+        // Verify that id is a valid ObjectId
+        const { id } = c.req.valid('param');
+        // Find courier by id and deactivate
+        const deactivatedCourier = await CourierModel.findByIdAndUpdate(id, {
+          active: false,
+        });
+        if (!deactivatedCourier) {
+          c.status(404);
+          return c.json({
+            message: 'Courier not found',
+          });
+        }
+
+        c.status(201);
+        return c.json(deactivatedCourier);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        return c.json({
+          message: `Failed to deactivate courier: ${error.message}`,
+        });
+      }
+    }
+  );
 export default courierRouter;

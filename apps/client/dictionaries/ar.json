@@ -404,5 +404,40 @@
     "HANDOVER_OFFICER": "ضابط التسليم",
     "ASSIGNMENT_OFFICER": "ضابط التعيين",
     "COURIER_MANAGER": "مدير المناديب"
+  },
+  "forms": {
+    "edit": {
+      "staff": {
+        "header": "تعديل بيانات الموظف {name}",
+        "description": "قم بتعديل البيانت التي تريد تعديلها",
+        "fields": {
+          "name": "الاسم",
+          "email": "البريد الإلكتروني",
+          "username": "اسم المستخدم",
+          "phone": "الهاتف",
+          "nationalId": "الرقم القومي",
+          "zone": "المنطقة",
+          "nationalIdImage": "صورة البطاقة",
+          "driverLicenseImage": "صورة الرخصة",
+          "criminalRecordImage": "صورة السجل الجنائي",
+          "role": {
+            "label": "دور الموظف",
+            "manager": "مدير المناديب",
+            "handover": "ضابط التسليم",
+            "assignment": "ضابط التعيين"
+          }
+        },
+        "buttons": {
+          "save": "حفظ التعديلات",
+          "uploadImage": "رفع صورة"
+        },
+        "feedback": {
+          "dragNDrop": "اسحب وأسقط أو",
+          "chooseFile": "اختر ملف",
+          "toUpload": "للرفع",
+          "dropHere": "اسحب الصورة هنا"
+        }
+      }
+    }
   }
 }

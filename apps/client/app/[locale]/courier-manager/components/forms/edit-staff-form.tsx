@@ -1,6 +1,6 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import { updateStaff } from '@/app/actions/staff-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -11,19 +11,28 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { supabase } from '@/lib/supabase/supabase';
-import { NewStaffSchema } from '@/utils/validation/staff';
+import { ToastStyles } from '@/utils/styles';
+import { EditStaff, EditStaffSchema } from '@/utils/validation/staff';
 import { useForm } from '@tanstack/react-form';
 import { zodValidator } from '@tanstack/zod-form-adapter';
-import { Loader2 } from 'lucide-react';
+import { Loader2Icon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
+import { useRouter } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
-import Droppable from '../../../components/forms/droppable';
+import Droppable from './droppable';
 
-export default function CreateNewStaffMember() {
-  const t = useTranslations('authentication');
+export default function EditStaffForm({
+  locale,
+  defaultValues,
+}: {
+  locale: string;
+  defaultValues: EditStaff;
+}) {
+  const t = useTranslations('forms.edit.staff');
+
+  const router = useRouter();
 
   const [uploading, setUploading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -35,7 +44,7 @@ export default function CreateNewStaffMember() {
   }: {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>;
     file: File | null;
-    field: 'nationalIdImage' | 'criminalRecordImage';
+    field: 'nationalIdImage' | 'criminalRecordImage' | 'driverLicenseImage';
   }) {
     e.preventDefault();
     if (file) {
@@ -51,10 +60,7 @@ export default function CreateNewStaffMember() {
       if (uploadError) {
         setUploading(false);
         toast.error('Failed to Upload Image', {
-          style: {
-            backgroundColor: '#FEEFEE',
-            color: '#D8000C',
-          },
+          style: ToastStyles.error,
         });
         return;
       }
@@ -65,10 +71,7 @@ export default function CreateNewStaffMember() {
 
       form.setFieldValue(field, publicUrl);
       toast.success('Image Uploaded Successfully', {
-        style: {
-          backgroundColor: '#E6EFEC',
-          color: '#4F8A10',
-        },
+        style: ToastStyles.success,
       });
 
       setUploading(false);
@@ -76,75 +79,33 @@ export default function CreateNewStaffMember() {
   }
 
   const form = useForm({
-    defaultValues: {
-      name: '',
-      username: '',
-      email: '',
-      phone: '',
-      nationalId: '',
-      role: '',
-      password: '',
-      nationalIdImage: '',
-      criminalRecordImage: '',
-    },
+    defaultValues,
     onSubmit: async ({ value }) => {
       setLoading(true);
-      if (value.role === 'HANDOVER_OFFICER') {
-        const res = await api['handover-officer'].create.$post({ json: value });
-        if (!res.ok) {
+      updateStaff(defaultValues._id, value)
+        .then(() => {
+          toast.success('Staff Updated Successfully', {
+            style: ToastStyles.success,
+          });
           setLoading(false);
-          toast.error('Failed to Create Handover Officer', {
-            style: {
-              backgroundColor: '#FEEFEE',
-              color: '#D8000C',
-            },
+          router.replace(`/${locale}/courier-manager/manage`);
+        })
+        .catch((error) => {
+          toast.error('Failed to Update Staff', {
+            description: error.message,
+            style: ToastStyles.error,
           });
-        }
-        const data = await res.json();
-        if (data) {
-          toast.success('Handover Officer Created Successfully', {
-            style: {
-              backgroundColor: '#E6EFEC',
-              color: '#4F8A10',
-            },
-          });
-          redirect('/courier-manager/manage');
-        }
-        setLoading(false);
-      } else if (value.role === 'ASSIGNMENT_OFFICER') {
-        const res = await api['assignment-officer'].create.$post({
-          json: value,
+          setLoading(false);
         });
-        if (!res.ok) {
-          setLoading(false);
-          toast.error('Failed to Create Assignment Officer', {
-            style: {
-              backgroundColor: '#FEEFEE',
-              color: '#D8000C',
-            },
-          });
-        }
-        const data = await res.json();
-        if (data) {
-          toast.success('Assignment Officer Created Successfully', {
-            style: {
-              backgroundColor: '#E6EFEC',
-              color: '#4F8A10',
-            },
-          });
-          redirect('/courier-manager/manage');
-        }
-        setLoading(false);
-      }
     },
     validatorAdapter: zodValidator(),
     validators: {
-      onSubmit: NewStaffSchema,
+      onSubmit: EditStaffSchema,
     },
   });
   return (
-    <div className="flex items-center justify-center">
-      <div className="bg-light dark:bg-dark_border rounded-xl w-1/2 h-full p-2 shadow-md dark:shadow-light_border/10 shadow-dark_border/30">
+    <div className="flex items-center justify-center w-full">
+      <div className="bg-light dark:bg-dark_border rounded-xl w-full lg:w-1/2 h-full p-2">
         <div className="w-full flex flex-col items-center justify-between gap-10 p-5">
           <Image
             src={'/babyblue.png'}
@@ -153,9 +114,11 @@ export default function CreateNewStaffMember() {
             height={80}
           />
           <div className="flex flex-col gap-1 items-center justify-center w-full">
-            <h1 className="font-bold text-lg">{t('signup.staff.header')}</h1>
+            <h1 className="font-bold text-lg">
+              {t('header', { name: defaultValues.name })}
+            </h1>
             <p className="font-semibold text-sm text-dark_border/80 dark:text-light_border/80">
-              {t('signup.staff.description')}
+              {t('description', { name: defaultValues.name })}
             </p>
             <form
               onSubmit={(e) => {
@@ -168,14 +131,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="name"
                 validators={{
-                  onChange: NewStaffSchema.shape.name,
+                  onChange: EditStaffSchema.shape.name,
                 }}
               >
                 {(field) => (
                   <div className="flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.name')}
-                    </label>
+                    <label htmlFor={field.name}>{t('fields.name')}</label>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -183,8 +144,8 @@ export default function CreateNewStaffMember() {
                       required
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.name')}
+                      className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      placeholder={defaultValues[field.name]}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -197,14 +158,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="username"
                 validators={{
-                  onChange: NewStaffSchema.shape.username,
+                  onChange: EditStaffSchema.shape.username,
                 }}
               >
                 {(field) => (
                   <div className="flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.username')}
-                    </label>
+                    <label htmlFor={field.name}>{t('fields.username')}</label>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -212,8 +171,8 @@ export default function CreateNewStaffMember() {
                       required
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.username')}
+                      className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      placeholder={defaultValues[field.name]}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -226,14 +185,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="email"
                 validators={{
-                  onChange: NewStaffSchema.shape.email,
+                  onChange: EditStaffSchema.shape.email,
                 }}
               >
                 {(field) => (
-                  <div className="col-span-2 flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.email')}
-                    </label>
+                  <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
+                    <label htmlFor={field.name}>{t('fields.email')}</label>
                     <Input
                       id={field.name}
                       name={field.name}
@@ -242,8 +199,8 @@ export default function CreateNewStaffMember() {
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       type="email"
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.email')}
+                      className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      placeholder={defaultValues[field.name]}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -256,14 +213,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="phone"
                 validators={{
-                  onChange: NewStaffSchema.shape.phone,
+                  onChange: EditStaffSchema.shape.phone,
                 }}
               >
                 {(field) => (
                   <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.phone')}
-                    </label>
+                    <label htmlFor={field.name}>{t('fields.phone')}</label>
                     <Input
                       id={field.name}
                       type="tel"
@@ -274,8 +229,8 @@ export default function CreateNewStaffMember() {
                       onBlur={field.handleBlur}
                       minLength={11}
                       maxLength={11}
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.phone')}
+                      className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      placeholder={defaultValues[field.name]}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -288,14 +243,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="nationalId"
                 validators={{
-                  onChange: NewStaffSchema.shape.nationalId,
+                  onChange: EditStaffSchema.shape.nationalId,
                 }}
               >
                 {(field) => (
                   <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.nationalId')}
-                    </label>
+                    <label htmlFor={field.name}>{t('fields.nationalId')}</label>
                     <Input
                       id={field.name}
                       type="text"
@@ -306,8 +259,8 @@ export default function CreateNewStaffMember() {
                       onBlur={field.handleBlur}
                       minLength={14}
                       maxLength={14}
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.nationalId')}
+                      className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      placeholder={defaultValues[field.name]}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -320,14 +273,12 @@ export default function CreateNewStaffMember() {
               <form.Field
                 name="role"
                 validators={{
-                  onChange: NewStaffSchema.shape.role,
+                  onChange: EditStaffSchema.shape.role,
                 }}
               >
                 {(field) => (
-                  <div className="flex flex-col gap-2 w-full">
-                    <label htmlFor="role">
-                      {t('signup.fields.role.label')}
-                    </label>
+                  <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
+                    <label htmlFor="role">{t('fields.role.label')}</label>
                     <Select
                       key={'role'}
                       name={field.name}
@@ -335,20 +286,20 @@ export default function CreateNewStaffMember() {
                       value={field.state.value}
                       onValueChange={(value) => field.handleChange(value)}
                     >
-                      <SelectTrigger className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none">
-                        <SelectValue
-                          placeholder={t('signup.placeholders.role')}
-                        />
+                      <SelectTrigger
+                        className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                      >
+                        <SelectValue placeholder={defaultValues[field.name]} />
                       </SelectTrigger>
                       <SelectContent>
                         <SelectItem value="HANDOVER_OFFICER">
-                          {t('signup.fields.role.handover')}
+                          {t('fields.role.handover')}
                         </SelectItem>
                         <SelectItem value="ASSIGNMENT_OFFICER">
-                          {t('signup.fields.role.assignment')}
+                          {t('fields.role.assignment')}
                         </SelectItem>
                         <SelectItem value="COURIER_MANAGER">
-                          {t('signup.fields.role.manager')}
+                          {t('fields.role.manager')}
                         </SelectItem>
                       </SelectContent>
                     </Select>
@@ -360,57 +311,66 @@ export default function CreateNewStaffMember() {
                   </div>
                 )}
               </form.Field>
-              <form.Field
-                name="password"
-                validators={{
-                  onChange: NewStaffSchema.shape.password,
-                }}
-              >
-                {(field) => (
-                  <div className="flex flex-col gap-2 w-full">
-                    <label htmlFor={field.name}>
-                      {t('signup.fields.password')}
+              <div className="col-span-2 grid grid-cols-1 items-center gap-5">
+                <div className="grid grid-cols-3 items-center gap-5">
+                  <div className="col-span-3 lg:col-span-2 flex flex-col gap-2">
+                    <label htmlFor="nationalIdImage">
+                      {t('fields.nationalIdImage')}
                     </label>
-                    <Input
-                      id={field.name}
-                      type="password"
-                      name={field.name}
-                      value={field.state.value}
-                      required
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      className="w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none"
-                      placeholder={t('signup.placeholders.password')}
+                    <Droppable
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                      field="nationalIdImage"
                     />
-                    {field.state.meta.errors && (
-                      <p className="text-xs italic font-semibold text-red-500">
-                        {field.state.meta.errors.join(', ')}
+                  </div>
+                  <div
+                    className={`col-span-3 lg:col-span-1 flex items-center justify-center bg-light_border dark:bg-muted rounded-xl w-full h-full min-h-32 p-2 ${defaultValues.nationalIdImage !== form.getFieldValue('nationalIdImage') && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                  >
+                    {form.getFieldValue('nationalIdImage') ? (
+                      <Image
+                        src={form.getFieldValue('nationalIdImage')}
+                        alt="National ID"
+                        width={160}
+                        height={160}
+                        className="rounded-xl object-cover"
+                      />
+                    ) : (
+                      <p className="text-xs font-semibold text-amber-500 dark:text-amber-300">
+                        No Image to Preview
                       </p>
                     )}
                   </div>
-                )}
-              </form.Field>
+                </div>
 
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <label htmlFor="nationalIdImage">
-                  {t('signup.fields.nationalIdImage')}
-                </label>
-                <Droppable
-                  field="nationalIdImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
-
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <label htmlFor={'criminalRecordImage'}>
-                  {t('signup.fields.criminalRecordImage')}
-                </label>
-                <Droppable
-                  field="criminalRecordImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
+                <div className="grid grid-cols-3 items-center gap-5">
+                  <div className="col-span-3 lg:col-span-2 flex flex-col gap-2">
+                    <label htmlFor="nationalIdImage">
+                      {t('fields.criminalRecordImage')}
+                    </label>
+                    <Droppable
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                      field="criminalRecordImage"
+                    />
+                  </div>
+                  <div
+                    className={`col-span-3 lg:col-span-1 flex items-center justify-center bg-light_border dark:bg-muted rounded-xl w-full h-full min-h-32 p-2 ${defaultValues.criminalRecordImage !== form.getFieldValue('criminalRecordImage') && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
+                  >
+                    {form.getFieldValue('criminalRecordImage') ? (
+                      <Image
+                        src={form.getFieldValue('criminalRecordImage')}
+                        alt="Criminal Record"
+                        width={160}
+                        height={160}
+                        className="rounded-xl object-cover"
+                      />
+                    ) : (
+                      <p className="text-xs font-semibold text-amber-500 dark:text-amber-300">
+                        No Image to Preview
+                      </p>
+                    )}
+                  </div>
+                </div>
               </div>
               <Button
                 disabled={loading || uploading}
@@ -418,9 +378,12 @@ export default function CreateNewStaffMember() {
                 className="w-full"
               >
                 {loading ? (
-                  <Loader2 size={16} className="text-inherit animate-spin" />
+                  <Loader2Icon
+                    size={16}
+                    className="text-inherit animate-spin"
+                  />
                 ) : (
-                  t('signup.buttons.signup')
+                  t('buttons.save')
                 )}
               </Button>
             </form>

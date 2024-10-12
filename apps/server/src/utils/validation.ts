@@ -34,4 +34,7 @@ export const validatePagination = z.object({
 export const validateFilters = z.object({
   courier: z.string().optional(),
   status: z.string().optional(),
+  OID: z.string().optional(),
 });
+
+export type FilterObject = z.infer<typeof validateFilters>;

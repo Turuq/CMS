@@ -1,15 +1,12 @@
 'use server';
 
-import { getToken } from '@/utils/helpers/getToken';
-import { redirect } from 'next/navigation';
+import { verifyToken } from '@/utils/helpers/get-token';
 import { api } from './api';
+import { Courier } from '@/api/validation/courier';
+import { EditCourier } from '@/utils/validation/courier';
 
 export async function getGroupedCouriers() {
-  const token = getToken();
-
-  if (!token) {
-    redirect('/');
-  }
+  const token = verifyToken();
 
   const res = await api.courier.grouped.$get(
     {},
@@ -27,11 +24,8 @@ export async function getGroupedCouriers() {
 }
 
 export async function getCouriers() {
-  const token = getToken();
+  const token = verifyToken();
 
-  if (!token) {
-    redirect('/');
-  }
   const res = await api.courier.$get(
     {},
     {
@@ -42,6 +36,85 @@ export async function getCouriers() {
   );
   if (!res.ok) {
     throw new Error('Failed to get couriers');
+  }
+  const data: Courier[] = await res.json();
+  return data;
+}
+
+export async function getCourierById({ id }: { id: string }) {
+  const token = verifyToken();
+
+  const res = await api.courier[':id'].$get(
+    { param: { id } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get courier');
+  }
+  const data = await res.json();
+  return data;
+}
+
+export async function activateCourier({ id }: { id: string }) {
+  const token = verifyToken();
+
+  const res = await api.courier.activate[':id'].$put(
+    { param: { id } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to activate courier');
+  }
+  const data = await res.json();
+  return data;
+}
+
+export async function deactivateCourier({ id }: { id: string }) {
+  const token = verifyToken();
+
+  const res = await api.courier.deactivate[':id'].$put(
+    { param: { id } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to deactivate courier');
+  }
+  const data = await res.json();
+  return data;
+}
+
+export async function updateCourier({
+  id,
+  courier,
+}: {
+  id: string;
+  courier: EditCourier;
+}) {
+  const token = verifyToken();
+
+  const res = await api.courier[':id'].$put(
+    { param: { id }, json: courier },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    console.log(res.status, res.statusText);
+    throw new Error('Failed to update courier');
   }
   const data = await res.json();
   return data;

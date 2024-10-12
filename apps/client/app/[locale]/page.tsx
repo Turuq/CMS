@@ -12,6 +12,7 @@ import { signInAction } from '../actions/auth-actions';
 import { toast } from 'sonner';
 import { useState } from 'react';
 import { Loader2 } from 'lucide-react';
+import { icons } from '@/components/icons/icons';
 
 export default function Home({
   params: { locale },
@@ -20,6 +21,7 @@ export default function Home({
 }) {
   const t = useTranslations('authentication');
   const [loading, setLoading] = useState<boolean>(false);
+  const [showPassword, setShowPassword] = useState<boolean>(false);
 
   // sign-in form
   const form = useForm({
@@ -96,17 +98,33 @@ export default function Home({
                     <label htmlFor={field.name}>
                       {t('login.fields.password')}
                     </label>
-                    <Input
-                      id={field.name}
-                      type="password"
-                      name={field.name}
-                      value={field.state.value}
-                      required
-                      onChange={(e) => field.handleChange(e.target.value)}
-                      onBlur={field.handleBlur}
-                      className="w-full rounded-xl bg-light_border dark:bg-dark_border border-none ring-0 outline-none"
-                      placeholder={t('login.placeholders.password')}
-                    />
+                    <div className="flex items-center justify-between pt-0 gap-1 w-full rounded-xl bg-light_border dark:bg-dark_border">
+                      <Input
+                        id={field.name}
+                        type={showPassword ? 'text' : 'password'}
+                        name={field.name}
+                        value={field.state.value}
+                        required
+                        onChange={(e) => field.handleChange(e.target.value)}
+                        onBlur={field.handleBlur}
+                        className="bg-transparent rounded-l-xl border-none ring-0 outline-none"
+                        placeholder={t('login.placeholders.password')}
+                      />
+                      <div className="bg-dark_border/10 dark:bg-light_border/10 hover:text-accent flex items-center justify-center rounded-r-xl size-10">
+                        <button
+                          autoFocus={false}
+                          type="button"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            e.stopPropagation();
+                            setShowPassword(!showPassword);
+                          }}
+                          className="text-inherit"
+                        >
+                          {showPassword ? icons.eyeOpen : icons.eyeClosed}
+                        </button>
+                      </div>
+                    </div>
                   </div>
                 )}
               </form.Field>

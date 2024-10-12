@@ -8,7 +8,7 @@ export default async function middleware(request: NextRequest) {
   const [, locale] = pathname.split('/');
 
   const token = cookies().get('token')?.value;
-  if (!token && !pathname.endsWith(locale)) {
+  if (!token) {
     request.nextUrl.pathname = `/${locale}`;
   } else {
     const res = await api.auth.me.$post({ json: { token: token ?? '' } });

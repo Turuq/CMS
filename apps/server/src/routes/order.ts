@@ -40,7 +40,7 @@ const orderRouter = new Hono()
           })
           .populate({
             path: 'courier',
-            select: '_id name',
+            select: '_id name phone',
           })
           .limit(Number(pageSize))
           .skip((Number(page) - 1) * Number(pageSize))
@@ -85,7 +85,7 @@ const orderRouter = new Hono()
           })
           .populate({
             path: 'courier',
-            select: '_id name',
+            select: '_id name phone',
           })
           .limit(Number(pageSize))
           .skip((Number(page) - 1) * Number(pageSize))

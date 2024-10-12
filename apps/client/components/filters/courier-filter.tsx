@@ -1,6 +1,6 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import { getCouriers } from '@/app/actions/courier-actions';
 import {
   Select,
   SelectContent,
@@ -9,26 +9,15 @@ import {
   SelectValue,
 } from '@/components/ui/select';
 import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { Skeleton } from '../ui/skeleton';
-import { Dispatch, SetStateAction } from 'react';
 import { useTranslations } from 'next-intl';
-import { FilterObject } from '@/utils/validation/filters';
+import { Dispatch, SetStateAction } from 'react';
+import { Skeleton } from '../ui/skeleton';
+import { FilterObject } from '@/api/utils/validation';
 
 interface CourierFilterProps {
   courierFilter: string | undefined;
   onCourierChange: (courier: string) => void;
   onServerColumnFilterChange: Dispatch<SetStateAction<FilterObject>>;
-}
-
-async function getCouriers() {
-  const res = await api.courier.$get();
-  if (!res.ok) {
-    toast.error('Failed to get couriers');
-    return;
-  }
-  const data = await res.json();
-  return data;
 }
 
 export default function CourierFilter({
@@ -46,7 +35,7 @@ export default function CourierFilter({
     isPending,
   } = useQuery({
     queryKey: ['get-couriers'],
-    queryFn: getCouriers,
+    queryFn: () => getCouriers(),
     staleTime: 1000 * 60 * 60, // 1 hour
   });
 
@@ -76,8 +65,8 @@ export default function CourierFilter({
             {couriers ? (
               couriers.map((courier) => (
                 <SelectItem
-                  key={courier.id}
-                  value={courier.id}
+                  key={courier._id}
+                  value={courier._id}
                   className="capitalize"
                 >
                   <span>{courier.name}</span>
