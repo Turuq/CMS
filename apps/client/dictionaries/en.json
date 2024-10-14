@@ -5,7 +5,14 @@
     "locale": "{locale, select, ar {العربية} en {English} other {Unknown}}"
   },
   "navigation": {
-    "settings": "Settings"
+    "settings": "Settings",
+    "orders": {
+      "tabs": {
+        "turuq": "Turuq",
+        "integrations": "Integrations",
+        "imported": "Imported"
+      }
+    }
   },
   "dashboard": {
     "statistics": {
@@ -340,6 +347,19 @@
       }
     }
   },
+  "handoverOfficer": {
+    "tabs": {
+      "home": {
+        "header": "Home"
+      },
+      "hand over": {
+        "header": "Hand Over"
+      },
+      "hand in": {
+        "header": "Hand In"
+      }
+    }
+  },
   "authentication": {
     "dontHaveAnAccount": "Don't have an account?",
     "alreadyHaveAnAccount": "Already have an account?",
@@ -442,6 +462,21 @@
           "dropHere": "Drop here"
         }
       }
+    }
+  },
+  "courierCard": {
+    "href": {
+      "handover": "Handover",
+      "assign": "Assign"
+    }
+  },
+  "batch": {
+    "warning": {
+      "title": "Heads Up!",
+      "description": "This courier is currently delivering a batch, Please check back later!"
+    },
+    "buttons": {
+      "start": "Start Batch"
     }
   }
 }

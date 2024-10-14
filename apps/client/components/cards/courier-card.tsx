@@ -25,6 +25,7 @@ export default function CourierCard({
   hrefOptions,
 }: ICourierCardProps) {
   const t = useTranslations('courierManager.tabs.assign');
+  const t_href = useTranslations('courierCard.href');
   return (
     <Card className="w-full rounded-xl h-fit flex flex-col gap-0">
       <CardHeader>
@@ -51,11 +52,15 @@ export default function CourierCard({
               ) : (
                 icons.externalLink
               )}
-              <span>{hrefOptions?.label ?? t('header')}</span>
+              <span>
+                {hrefOptions?.label ? t_href(hrefOptions?.label) : t('header')}
+              </span>
               <span className="absolute bottom-0 flex-col hidden mb-12 group-hover:flex items-center">
                 <span className="relative z-30 p-2 text-xs leading-none whitespace-nowrap text-white bg-accent rounded-md">
-                  {/* {locale === 'en' ? 'Assign' : 'تعيين'} */}
-                  {hrefOptions?.tooltip || locale === 'en' ? 'Assign' : 'تعيين'}
+                  {hrefOptions?.tooltip &&
+                    (hrefOptions?.label
+                      ? t_href(hrefOptions?.label)
+                      : t('header'))}
                 </span>
               </span>
             </Link>

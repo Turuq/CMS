@@ -13,9 +13,9 @@ export default async function CourierManagerLayout({
   params: { locale: string };
 }) {
   return (
-    <div className="flex gap-2 min-h-svh">
+    <div className="flex flex-col lg:flex-row gap-2 min-h-svh">
       <CourierManagerSidebar locale={locale} />
-      <div className="w-full mx-5">{children}</div>
+      <div className="w-full lg:mx-5">{children}</div>
     </div>
   );
 }

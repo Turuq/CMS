@@ -31,6 +31,12 @@ export const validatePagination = z.object({
     }),
 });
 
+export const validateCourierOrdersPagination = validatePagination.extend({
+  id: z
+    .string()
+    .refine((id) => ObjectId.isValid(id), { message: 'Invalid ObjectId' }),
+});
+
 export const validateFilters = z.object({
   courier: z.string().optional(),
   status: z.string().optional(),

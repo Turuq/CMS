@@ -14,8 +14,8 @@ export const courierSchema = z.object({
   commissionPerOrder: z.number().positive().min(0),
   active: z.boolean(),
   nationalIdImage: z.string().url(),
-  driverLicense: z.string().url(), // Driver license image
-  criminalRecord: z.string().url(), // Criminal record image
+  driverLicenseImage: z.string().url(), // Driver license image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const createCourierSchema = z.object({
@@ -25,8 +25,8 @@ export const createCourierSchema = z.object({
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
   nationalIdImage: z.string().url(),
-  driverLicense: z.string().url(), // Driver license image
-  criminalRecord: z.string().url(), // Criminal record image
+  driverLicenseImage: z.string().url(), // Driver license image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const courierUpdateSchema = z.object({
@@ -38,8 +38,8 @@ export const courierUpdateSchema = z.object({
   zone: z.string().optional(),
   commissionPerOrder: z.number().positive().min(0).optional(),
   nationalIdImage: z.string().url().optional(),
-  driverLicense: z.string().url().optional(),
-  criminalRecord: z.string().url().optional(),
+  driverLicenseImage: z.string().url().optional(),
+  criminalRecordImage: z.string().url().optional(),
 });
 
 export const statisticsSchema = z.object({

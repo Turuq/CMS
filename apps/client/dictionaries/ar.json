@@ -5,7 +5,14 @@
     "locale": "{locale, select, ar {العربية} en {English} other {غير معروف}}"
   },
   "navigation": {
-    "settings": "الإعدادات"
+    "settings": "الإعدادات",
+    "orders": {
+      "tabs": {
+        "turuq": "طرق",
+        "integrations": "التكاملات",
+        "imported": "مستوردة"
+      }
+    }
   },
   "dashboard": {
     "statistics": {
@@ -336,6 +343,19 @@
       }
     }
   },
+  "handoverOfficer": {
+    "tabs": {
+      "home": {
+        "header": "الرئيسية"
+      },
+      "hand over": {
+        "header": "تسليم"
+      },
+      "hand in": {
+        "header": "تسلم"
+      }
+    }
+  },
   "authentication": {
     "dontHaveAnAccount": "ليس لديك حساب؟",
     "alreadyHaveAnAccount": "لديك حساب؟",
@@ -438,6 +458,21 @@
           "dropHere": "اسحب الصورة هنا"
         }
       }
+    }
+  },
+  "courierCard": {
+    "href": {
+      "handover": "تسليم",
+      "assign": "تعيين"
+    }
+  },
+  "batch": {
+    "warning": {
+      "title": "تحذيرّ!",
+      "description": "المندوب خرج لتوصيل الطلبات. يرجي التحقق لاحقا لتسليم طلبات جديدة!"
+    },
+    "buttons": {
+      "start": "بدء التسليم"
     }
   }
 }

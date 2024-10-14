@@ -2,6 +2,7 @@ import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import { CourierModel } from '../models/courier';
 import {
+  validateCourierOrdersPagination,
   validateFilters,
   validateObjectId,
   validateObjectIdArray,
@@ -113,11 +114,11 @@ const orderRouter = new Hono()
   )
   // FIXME: Merge the following two endpoints into a single endpoint after the restructuring phase
   .get(
-    '/turuq/assigned/:id',
-    zValidator('param', validateObjectId),
+    '/turuq/assigned/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
     async (c) => {
       // Validate request params
-      const { id } = c.req.valid('param');
+      const { id, page, pageSize } = c.req.valid('param');
       try {
         const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
@@ -126,19 +127,18 @@ const orderRouter = new Hono()
         }
 
         // Find Processing Orders Assigned to Courier
-        const orders = await prisma.orders.findMany({
-          where: {
-            courier: id,
-            status: 'processing',
-          },
-          include: {
-            client: {
-              select: {
-                companyName: true,
-                name: true,
-              },
-            },
-          },
+        const orders = await orderModel
+          .find({ courier: id, status: 'processing' })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await orderModel.countDocuments({
+          courier: id,
+          status: 'processing',
         });
 
         if (!orders) {
@@ -147,7 +147,10 @@ const orderRouter = new Hono()
         }
 
         c.status(200);
-        return c.json(orders);
+        return c.json({
+          orders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);
@@ -156,11 +159,11 @@ const orderRouter = new Hono()
     }
   )
   .get(
-    '/integration/assigned/:id',
-    zValidator('param', validateObjectId),
+    '/integration/assigned/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
     async (c) => {
       // Validate request params
-      const { id } = c.req.valid('param');
+      const { id, page, pageSize } = c.req.valid('param');
       try {
         const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
@@ -169,19 +172,18 @@ const orderRouter = new Hono()
         }
 
         // Find Processing Integration Orders Assigned to Courier
-        const integrationOrders = await prisma.shopifyorders.findMany({
-          where: {
-            courier: id,
-            status: 'processing',
-          },
-          include: {
-            client: {
-              select: {
-                companyName: true,
-                name: true,
-              },
-            },
-          },
+        const integrationOrders = await integrationOrderModel
+          .find({ courier: id, status: 'processing' })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await integrationOrderModel.countDocuments({
+          courier: id,
+          status: 'processing',
         });
 
         if (!integrationOrders) {
@@ -190,7 +192,10 @@ const orderRouter = new Hono()
         }
 
         c.status(200);
-        return c.json(integrationOrders);
+        return c.json({
+          integrationOrders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);

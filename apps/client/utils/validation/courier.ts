@@ -3,7 +3,7 @@ import { z } from 'zod';
 export const EditCourierSchema = z.object({
   _id: z.string(),
   name: z.string(),
-  email: z.string().email(),
+  email: z.string().email().optional(),
   username: z
     .string()
     .min(6, { message: 'Username must be at least 6 characters long' }),
@@ -15,7 +15,7 @@ export const EditCourierSchema = z.object({
     .string()
     .min(14, { message: 'National Id has to be exactly 14 digits' })
     .max(14, { message: 'National Id has to be exactly 14 digits' }),
-  zone: z.string(),
+  zone: z.string().nullable(),
   nationalIdImage: z.string().url(),
   criminalRecordImage: z.string().url(),
   driverLicenseImage: z.string().url(),

@@ -49,6 +49,7 @@ interface SelectableOrdersDataTableProps<TValue> {
   data: OrderType[];
   page: number;
   pageSize: number;
+  totalPages: number;
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   enableServerFilter?: boolean;
@@ -66,6 +67,7 @@ export function SelectableOrdersDataTable<TValue>({
   data,
   page,
   pageSize,
+  totalPages,
   onPageChange,
   onPageSizeChange,
   enableServerFilter,
@@ -258,11 +260,9 @@ export function SelectableOrdersDataTable<TValue>({
           <p className="text-xs">
             {t('pagination.header.of')}{' '}
             <strong>
-              {table
-                .getRowModel()
-                .rows.length.toLocaleString(
-                  locale === 'ar' ? 'ar-EG' : 'en-US'
-                )}
+              {(totalPages * pageSize).toLocaleString(
+                locale === 'ar' ? 'ar-EG' : 'en-US'
+              )}
             </strong>{' '}
             {t('pagination.header.results')}
           </p>
@@ -335,7 +335,7 @@ export function SelectableOrdersDataTable<TValue>({
           <p className="text-xs font-bold">
             {t('pagination.footer.page')} {page.toLocaleString(`${locale}-EG`)}{' '}
             {t('pagination.footer.of')}{' '}
-            {table.getPageCount().toLocaleString(`${locale}-EG`)}
+            {totalPages.toLocaleString(`${locale}-EG`)}
           </p>
           <button
             onClick={() => onPageChange(page - 1)}

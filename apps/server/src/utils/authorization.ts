@@ -9,7 +9,6 @@ export function authorizeUser({
   c: Context;
 }) {
   const { role } = c.var.user;
-
   if (!level.includes(role)) {
     c.status(403);
     throw new Error('Unauthorized');

@@ -3,6 +3,7 @@
 import { verifyToken } from '@/utils/helpers/get-token';
 import { api } from './api';
 import { FilterObject } from '@/api/utils/validation';
+import { OrderType } from '@/types/order';
 
 export async function getTuruqOrders({
   page,
@@ -111,5 +112,58 @@ export async function getProcessingUnassignedIntegrationOrders({
     throw new Error('Failed to get orders');
   }
   const data = await res.json();
+  return data;
+}
+
+export async function getCourierAssignedOrders({
+  id,
+  page,
+  pageSize,
+}: {
+  id: string;
+  page: string;
+  pageSize: string;
+}) {
+  const token = verifyToken();
+  const res = await api.order.turuq.assigned[':id'][':page'][':pageSize'].$get(
+    { param: { id, page, pageSize } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get orders');
+  }
+  const data: { orders: OrderType[]; totalPages: number } = await res.json();
+  return data;
+}
+
+export async function getCourierAssignedIntegrationOrders({
+  id,
+  page,
+  pageSize,
+}: {
+  id: string;
+  page: string;
+  pageSize: string;
+}) {
+  const token = verifyToken();
+  const res = await api.order.integration.assigned[':id'][':page'][
+    ':pageSize'
+  ].$get(
+    { param: { id, page, pageSize } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get orders');
+  }
+  const data: { integrationOrders: OrderType[]; totalPages: number } =
+    await res.json();
   return data;
 }

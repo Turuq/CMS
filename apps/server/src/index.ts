@@ -15,8 +15,10 @@ import handoverOfficerRouter from './routes/handover-officer';
 import inspectorRouter from './routes/inspector';
 import orderRouter from './routes/order';
 import staffRouter from './routes/staff';
+import courierBatchRouter from './routes/courier-batch';
 
 const app = new Hono();
+app.use('*', logger());
 
 const apiRoutes = app
   .basePath('/api')
@@ -26,9 +28,9 @@ const apiRoutes = app
   .route('/assignment-officer', assignmentOfficerRouter)
   .route('/order', orderRouter)
   .route('/staff', staffRouter)
-  .route('/inspector', inspectorRouter);
+  .route('/inspector', inspectorRouter)
+  .route('/batch', courierBatchRouter);
 
-app.use('*', logger());
 app.use(
   '/api/*',
   cors({

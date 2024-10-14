@@ -1,5 +1,6 @@
 import type { PipelineStage } from 'mongoose';
 import type { ObjectIdArray } from '../validation/inspector';
+import { CourierBatchSequenceModel } from '../models/courier-batch';
 
 export const generateDailyOrderPipeline = (ids: ObjectIdArray) => {
   const pipeline: Array<PipelineStage> = [
@@ -90,3 +91,18 @@ export const generateDailyOrderPipeline = (ids: ObjectIdArray) => {
 
   return pipeline;
 };
+
+export async function getNextSequence(courierId: string) {
+  const sequence = await CourierBatchSequenceModel.findOneAndUpdate(
+    { courier: courierId },
+    { $inc: { sequence: 1 } },
+    { new: true }
+  );
+
+  if (!sequence) {
+    await new CourierBatchSequenceModel({ courier: courierId }).save();
+    return 1;
+  }
+
+  return sequence.sequence;
+}

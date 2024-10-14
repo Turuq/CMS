@@ -165,7 +165,7 @@ const courierRouter = new Hono()
     }
   })
   .get('/:id', getUser, zValidator('param', validateObjectId), async (c) => {
-    authorizeUser({ level: ['COURIER_MANAGER'], c });
+    authorizeUser({ level: ['COURIER_MANAGER', 'HANDOVER_OFFICER'], c });
     try {
       // Verify that id is a valid ObjectId
       const { id } = c.req.valid('param');

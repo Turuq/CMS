@@ -60,7 +60,7 @@ export default async function RootLayout({
                       {children}
                       <Toaster />
                     </div>
-                    <footer className="flex items-center justify-between rounded-xl mt-5 gap-5 p-5 bg-light dark:bg-dark_border">
+                    <footer className="flex flex-col-reverse lg:flex-row items-center justify-between rounded-xl mt-5 gap-5 p-5 bg-light dark:bg-dark_border">
                       <p className="font-semibold text-[10px] text-dark_border/80 dark:text-light_border/80">
                         Copyright © 2024 Turuq. All Rights Reserved.
                       </p>

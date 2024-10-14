@@ -72,6 +72,7 @@ export default function CourierCardLayout({
                 href={`hand-over/${courier._id}`}
                 hrefOptions={{
                   tooltip: 'Hand Over',
+                  label: 'handover',
                 }}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">
@@ -121,6 +122,7 @@ export default function CourierCardLayout({
                 href={`hand-over/${courier._id}`}
                 hrefOptions={{
                   tooltip: 'Hand Over',
+                  label: 'handover',
                 }}
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">

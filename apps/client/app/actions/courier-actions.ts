@@ -55,7 +55,7 @@ export async function getCourierById({ id }: { id: string }) {
   if (!res.ok) {
     throw new Error('Failed to get courier');
   }
-  const data = await res.json();
+  const data: Courier = await res.json();
   return data;
 }
 

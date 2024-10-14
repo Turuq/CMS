@@ -38,11 +38,11 @@ const courierSchema = new Schema<Courier>(
       required: true,
       unique: true,
     },
-    criminalRecord: {
+    criminalRecordImage: {
       type: String,
       required: true,
     },
-    driverLicense: {
+    driverLicenseImage: {
       type: String,
       required: true,
     },
