@@ -10,3 +10,10 @@ export function formatBytes(bytes: number, decimals = 2) {
 
   return `${formattedValue} ${units[index]}`;
 }
+
+export function getBatchProgress(
+  progress: number,
+  totalNumberOfOrders: number
+) {
+  return (progress / totalNumberOfOrders) * 100;
+}

@@ -13,8 +13,8 @@ export const courierManagerLinks = [
   },
   {
     title: 'inspect',
-    href: '/courier-manager/inspection',
-    path: '/inspection',
+    href: '/courier-manager/inspector',
+    path: '/inspector',
     icon: 'inspect',
   },
   {

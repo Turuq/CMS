@@ -54,3 +54,19 @@ export const batchStatistics = new Schema({
     default: 0,
   },
 });
+
+export type BatchStatistics = {
+  delivered: number;
+  cancelled: number;
+  returned: number;
+  unreachable: number;
+  outForDelivery: number;
+  postponed: number;
+  toBeReshipped: number;
+  instapay: number;
+  paidShippingOnly: number;
+  gotGhosted: number;
+  courierCollected: number;
+  totalDelivered: number;
+  maxPossibleDelivered: number;
+};

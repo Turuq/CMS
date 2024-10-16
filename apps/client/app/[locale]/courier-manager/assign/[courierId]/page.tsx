@@ -34,6 +34,9 @@ import {
   getProcessingUnassignedIntegrationOrders,
   getProcessingUnassignedTuruqOrders,
 } from '@/app/actions/order-actions';
+import { hasActiveBatch } from '@/app/actions/batch-actions';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { icons } from '@/components/icons/icons';
 
 export default function Page({
   params: { locale, courierId },
@@ -41,6 +44,7 @@ export default function Page({
   params: { locale: string; courierId: string };
 }) {
   const t = useTranslations('courierManager.tabs');
+  const info = useTranslations('batch.info');
   const [turuqPage, setTuruqPage] = useState<number>(1);
   const [integrationPage, setIntegrationPage] = useState<number>(1);
   const [turuqPageSize, setTuruqPageSize] = useState<number>(10);
@@ -90,6 +94,11 @@ export default function Page({
         pageSize: integrationPageSize.toString(),
       }),
     staleTime: 1000 * 60, // 1 minute
+  });
+
+  const { data: hasActive } = useQuery({
+    queryKey: ['has-active-batch', courierId],
+    queryFn: () => hasActiveBatch({ id: courierId }),
   });
 
   useEffect(() => {
@@ -243,7 +252,20 @@ export default function Page({
   }
 
   return (
-    <div>
+    <div className="flex flex-col gap-5">
+      {hasActive && (
+        <Alert className="bg-amber-500 dark:bg-amber-300 text-light dark:text-dark">
+          <div className="flex items-start gap-2">
+            <div className="text-inherit">{icons.info}</div>
+            <div className="flex flex-col gap-1">
+              <AlertTitle className="font-bold">{info('title')}</AlertTitle>
+              <AlertDescription className="">
+                {info('description')}
+              </AlertDescription>
+            </div>
+          </div>
+        </Alert>
+      )}
       <Tabs
         defaultValue="turuq"
         className="w-full"
@@ -282,6 +304,7 @@ export default function Page({
                   enableRowSelection
                   rowSelection={rowSelection}
                   onRowSelectionChange={onRowSelectionChange}
+                  totalPages={turuqOrders?.totalPages ?? 1}
                 />
               </div>
               <h1 className="font-bold text-lg text-foreground">
@@ -369,6 +392,7 @@ export default function Page({
                   enableRowSelection
                   rowSelection={integrationRowSelection}
                   onRowSelectionChange={onIntegrationRowSelectionChange}
+                  totalPages={integrationOrders?.totalPages ?? 1}
                 />
               </div>
               <h1 className="font-bold text-lg text-foreground">

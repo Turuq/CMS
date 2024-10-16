@@ -65,5 +65,5 @@ export type CourierCardType = Pick<
 > & { id: string };
 
 export type CourierWithStatistics = Courier & {
-  statistics: z.infer<typeof statisticsSchema>[];
+  statistics: z.infer<typeof statisticsSchema>;
 };

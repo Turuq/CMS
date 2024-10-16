@@ -467,13 +467,22 @@
   "courierCard": {
     "href": {
       "handover": "Handover",
-      "assign": "Assign"
+      "assign": "Assign",
+      "inspect": "Inspect"
     }
   },
   "batch": {
     "warning": {
       "title": "Heads Up!",
       "description": "This courier is currently delivering a batch, Please check back later!"
+    },
+    "outstanding-warn": {
+      "title": "Heads Up!",
+      "description": "The courier has outstanding orders. You can end the batch once all orders are fulfilled."
+    },
+    "info": {
+      "title": "Disclaimer",
+      "description": "This courier is currently delivering a batch. You can assign new orders to them, but they will not be able to deliver them until they finish their current batch."
     },
     "buttons": {
       "start": "Start Batch"

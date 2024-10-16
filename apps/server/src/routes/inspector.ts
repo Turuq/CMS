@@ -6,7 +6,7 @@ import type {
 } from '../validation/inspector';
 import { orderModel } from '../models/order';
 import { integrationOrderModel } from '../models/integration-order';
-import { generateDailyOrderPipeline } from '../utils/functions';
+import { generateDailyOrderPipeline } from '../utils/functions/helpers';
 
 const inspectorRouter = new Hono().get('/dashboard', async (c) => {
   // Get all orderIds and integrationOrderIds from courierDailyOrders collection

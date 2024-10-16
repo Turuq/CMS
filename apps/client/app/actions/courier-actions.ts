@@ -23,6 +23,24 @@ export async function getGroupedCouriers() {
   return data;
 }
 
+export async function getCouriersWithStatistics() {
+  const token = verifyToken();
+
+  const res = await api.courier.withStatistics.$get(
+    {},
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get couriers');
+  }
+  const data = await res.json();
+  return data;
+}
+
 export async function getCouriers() {
   const token = verifyToken();
 

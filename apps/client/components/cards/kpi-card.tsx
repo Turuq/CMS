@@ -10,7 +10,12 @@ import AnimatedNumber from '../display/animated-number';
 import Link from 'next/link';
 import { icons } from '../icons/icons';
 
-import { SparkAreaChart, SparkBarChart, SparkLineChart } from '@tremor/react';
+import {
+  SparkAreaChart,
+  SparkBarChart,
+  SparkLineChart,
+  Tracker,
+} from '@tremor/react';
 import { Moment } from 'moment';
 import 'moment/locale/ar';
 import { useTranslations } from 'next-intl';
@@ -48,7 +53,7 @@ interface IKpiCardProps {
   link?: string;
   chart?: boolean;
   chartConfig?: {
-    chart: 'area' | 'bar' | 'line';
+    chart: 'area' | 'bar' | 'line' | 'tracker';
     data: Array<{ [key: string]: string }>;
     index: string;
     categories: Array<string>;
@@ -132,13 +137,21 @@ export default function KpiCard({
                 colors={chartConfig.colors}
                 stack
               />
-            ) : (
+            ) : chartConfig?.chart === 'line' ? (
               <SparkLineChart
                 data={chartConfig.data}
                 categories={chartConfig.categories}
                 index={chartConfig.index}
                 colors={chartConfig.colors}
               />
+            ) : (
+              <div className="min-w-40 max-w-40 lg:max-w-80 w-full h-5">
+                <Tracker
+                  dir="ltr"
+                  data={chartConfig.data}
+                  className="mt-2 h-5"
+                />
+              </div>
             )}
           </>
         )}

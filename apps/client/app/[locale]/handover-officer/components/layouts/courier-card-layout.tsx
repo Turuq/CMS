@@ -1,26 +1,12 @@
 'use client';
 
 import { CourierWithStatistics } from '@/api/validation/courier';
-import { api } from '@/app/actions/api';
 import CourierCard from '@/components/cards/courier-card';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useQuery } from '@tanstack/react-query';
-import { toast } from 'sonner';
-import { CourierStatisticsIcons } from '../icons/courier-statistics-icons';
 import CourierCardSkeleton from '@/components/feedback/courier-card-skeleton';
-
-async function getCouriers(): Promise<{
-  active: CourierWithStatistics[];
-  inactive: CourierWithStatistics[];
-}> {
-  const res = await api.courier.withStatistics.$get();
-  if (!res.ok) {
-    toast.error('Failed to get Couriers, please try again later!');
-  }
-  const data = await res.json();
-
-  return data;
-}
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { getCouriersOptions } from '@/utils/query-options/courier-options';
+import { useQuery } from '@tanstack/react-query';
+import { CourierStatisticsIcons } from '../icons/courier-statistics-icons';
 
 export default function CourierCardLayout({
   locale,
@@ -33,10 +19,8 @@ export default function CourierCardLayout({
   };
 }) {
   const { error, data, isPending } = useQuery({
-    queryKey: ['get-couriers'],
-    queryFn: getCouriers,
+    ...getCouriersOptions,
     initialData: initial,
-    staleTime: 1000 * 60 * 5, // 5 minutes
   });
 
   if (isPending) {
@@ -80,26 +64,26 @@ export default function CourierCardLayout({
                     <div className="flex flex-col w-full gap-1 items-center justify-center">
                       {CourierStatisticsIcons['outForDelivery']}
                       <p className="text-xs font-bold">
-                        {courier.statistics[0]?.outForDelivery ?? 0}
+                        {courier.statistics?.outForDelivery ?? 0}
                       </p>
                     </div>
                     <div className="flex flex-col w-full gap-1 items-center justify-center">
                       {CourierStatisticsIcons['delivered']}
                       <p className="text-xs font-bold">
-                        {courier.statistics[0]?.delivered ?? 0}
+                        {courier.statistics?.delivered ?? 0}
                       </p>
                     </div>
                     <div className="flex flex-col w-full gap-1 items-center justify-center">
                       {CourierStatisticsIcons['toBeReshipped']}
                       <p className="text-xs font-bold">
-                        {courier.statistics[0]?.toBeReshipped ?? 0}
+                        {courier.statistics?.toBeReshipped ?? 0}
                       </p>
                     </div>
                     <div className="flex flex-col w-full gap-1 items-center justify-center">
                       {CourierStatisticsIcons['collectedAmount']}
                       <p className="text-xs font-bold">
                         {(
-                          courier.statistics[0]?.courierCollected ?? 0
+                          courier.statistics?.courierCollected ?? 0
                         ).toLocaleString('en-EG', {
                           style: 'currency',
                           currency: 'EGP',
@@ -124,41 +108,7 @@ export default function CourierCardLayout({
                   tooltip: 'Hand Over',
                   label: 'handover',
                 }}
-              >
-                <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">
-                  <div className="grid grid-cols-4 w-full h-auto px-5 py-2 rounded-xl bg-muted items-center justify-between">
-                    <div className="flex flex-col w-full gap-1 items-center justify-center">
-                      {CourierStatisticsIcons['outForDelivery']}
-                      <p className="text-xs font-bold">
-                        {courier.statistics[0]?.outForDelivery ?? 0}
-                      </p>
-                    </div>
-                    <div className="flex flex-col w-full gap-1 items-center justify-center">
-                      {CourierStatisticsIcons['delivered']}
-                      <p className="text-xs font-bold">
-                        {courier.statistics[0]?.delivered ?? 0}
-                      </p>
-                    </div>
-                    <div className="flex flex-col w-full gap-1 items-center justify-center">
-                      {CourierStatisticsIcons['toBeReshipped']}
-                      <p className="text-xs font-bold">
-                        {courier.statistics[0]?.toBeReshipped ?? 0}
-                      </p>
-                    </div>
-                    <div className="flex flex-col w-full gap-1 items-center justify-center">
-                      {CourierStatisticsIcons['collectedAmount']}
-                      <p className="text-xs font-bold">
-                        {(
-                          courier.statistics[0]?.courierCollected ?? 0
-                        ).toLocaleString('en-EG', {
-                          style: 'currency',
-                          currency: 'EGP',
-                        })}
-                      </p>
-                    </div>
-                  </div>
-                </div>
-              </CourierCard>
+              />
             ))}
           </div>
         </TabsContent>

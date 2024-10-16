@@ -350,7 +350,7 @@ export function SelectableOrdersDataTable<TValue>({
           </button>
           <button
             onClick={() => onPageChange(page + 1)}
-            // disabled={}
+            disabled={page === totalPages}
             className="text-accent/50 hover:text-accent disabled:text-muted disabled:cursor-not-allowed disabled:hover:text-muted"
           >
             {locale === 'ar' ? (

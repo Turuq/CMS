@@ -1,6 +1,6 @@
 import type { PipelineStage } from 'mongoose';
-import type { ObjectIdArray } from '../validation/inspector';
-import { CourierBatchSequenceModel } from '../models/courier-batch';
+import type { ObjectIdArray } from '../../validation/inspector';
+import { CourierBatchSequenceModel } from '../../models/courier-batch';
 
 export const generateDailyOrderPipeline = (ids: ObjectIdArray) => {
   const pipeline: Array<PipelineStage> = [

@@ -1,16 +1,20 @@
-import { Hono } from 'hono';
-import { getUser } from '../lib/supabase/supabaseClient';
 import { zValidator } from '@hono/zod-validator';
-import { validateObjectId } from '../utils/validation';
+import { Hono } from 'hono';
+import type { Document } from 'mongoose';
+import { getUser } from '../lib/supabase/supabaseClient';
+import CourierBatchModel from '../models/courier-batch';
+import { integrationOrderModel } from '../models/integration-order';
+import { orderModel } from '../models/order';
 import { authorizeUser } from '../utils/authorization';
+import { getNextSequence } from '../utils/functions/helpers';
+import { validateObjectId } from '../utils/validation';
 import {
   EndCourierBatchSchema,
   NewCourierBatchSchema,
 } from '../validation/courier-batch';
-import CourierBatchModel from '../models/courier-batch';
-import { getNextSequence } from '../utils/functions';
-import { orderModel } from '../models/order';
-import { integrationOrderModel } from '../models/integration-order';
+import { ObjectId } from 'mongodb';
+import { updateCourierMonthlyStatistics } from '../utils/functions/batch-helpers';
+import moment from 'moment';
 
 const courierBatchRouter = new Hono()
   .post('/', getUser, zValidator('json', NewCourierBatchSchema), async (c) => {
@@ -48,10 +52,79 @@ const courierBatchRouter = new Hono()
   .get('/', getUser, async (c) => {
     authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
     try {
-      const batches = await CourierBatchModel.find().populate({
-        path: 'courier',
-        select: 'name phone zone username',
-      });
+      const batches = await CourierBatchModel.aggregate([
+        {
+          $lookup: {
+            from: 'couriers',
+            localField: 'courier',
+            foreignField: '_id',
+            as: 'courier',
+          },
+        },
+        {
+          $unwind: '$courier',
+        },
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orders',
+            foreignField: '_id',
+            as: 'orders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'shopifyorders',
+            localField: 'integrationOrders',
+            foreignField: '_id',
+            as: 'integrationOrders',
+          },
+        },
+        {
+          $project: {
+            courier: {
+              name: 1,
+              username: 1,
+              phone: 1,
+              zone: 1,
+            },
+            BID: 1,
+            integrationOrders: {
+              status: 1,
+            },
+            startDate: 1,
+            endDate: 1,
+            orders: {
+              status: 1,
+            },
+            progress: {
+              $add: [
+                {
+                  $size: {
+                    $filter: {
+                      input: '$orders',
+                      as: 'order',
+                      cond: { $eq: ['$$order.status', 'delivered'] },
+                    },
+                  },
+                },
+                {
+                  $size: {
+                    $filter: {
+                      input: '$integrationOrders',
+                      as: 'intOrder',
+                      cond: { $eq: ['$$intOrder.status', 'delivered'] },
+                    },
+                  },
+                },
+              ],
+            },
+            numberOfOrders: {
+              $add: [{ $size: '$orders' }, { $size: '$integrationOrders' }],
+            },
+          },
+        },
+      ]);
       if (!batches) {
         c.status(404);
         throw new Error('No Batches Found');
@@ -67,10 +140,27 @@ const courierBatchRouter = new Hono()
     authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
     try {
       const { id } = c.req.valid('param');
-      const batch = await CourierBatchModel.findById(id).populate({
-        path: 'courier',
-        select: 'name phone zone username',
-      });
+      const batch = await CourierBatchModel.findById(id)
+        .populate({
+          path: 'courier',
+          select: 'name phone zone username',
+        })
+        .populate({
+          path: 'orders',
+          select: 'OID client customer products status type total createdAt',
+          populate: {
+            path: 'client',
+            select: 'companyName',
+          },
+        })
+        .populate({
+          path: 'integrationOrders',
+          select: 'OID client customer products status type total createdAt',
+          populate: {
+            path: 'client',
+            select: 'companyName',
+          },
+        });
       if (!batch) {
         c.status(404);
         throw new Error('Batch not found');
@@ -88,7 +178,7 @@ const courierBatchRouter = new Hono()
     zValidator('param', validateObjectId),
     zValidator('json', EndCourierBatchSchema),
     async (c) => {
-      authorizeUser({ c, level: ['HANDOVER_OFFICER'] });
+      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
       try {
         const { id } = c.req.valid('param');
         const { endDate } = c.req.valid('json');
@@ -100,7 +190,39 @@ const courierBatchRouter = new Hono()
           c.status(404);
           throw new Error('Courier batch not found');
         }
-        return c.json(courierBatch, 201);
+
+        const statistics = await updateCourierMonthlyStatistics({
+          courierId: courierBatch.courier.toString(),
+          batchId: id,
+          date: moment(endDate).format('MM-YYYY'),
+        });
+
+        if (!statistics) {
+          c.status(500);
+          throw new Error('Failed to update courier statistics');
+        }
+
+        return c.json({ batch: courierBatch, statistics }, 201);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        throw new Error('Internal Server Error: ', error.message);
+      }
+    }
+  )
+  .get(
+    '/courier/active/:id',
+    getUser,
+    zValidator('param', validateObjectId),
+    async (c) => {
+      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
+      try {
+        const { id } = c.req.valid('param');
+        const batch = await CourierBatchModel.findOne({
+          courier: id,
+          endDate: { $eq: null },
+        }).select('_id');
+        return c.json({ hasActiveBatch: batch ? true : false }, 200);
       } catch (error: any) {
         console.error(error);
         c.status(500);
@@ -116,11 +238,136 @@ const courierBatchRouter = new Hono()
       authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
       try {
         const { id } = c.req.valid('param');
-        const batch = await CourierBatchModel.findOne({
-          courier: id,
-          endDate: { $eq: null },
-        }).select('_id');
-        return c.json({ hasActiveBatch: batch ? true : false }, 200);
+        const batches = await CourierBatchModel.aggregate([
+          {
+            $match: {
+              courier: new ObjectId(id),
+            },
+          },
+          {
+            $lookup: {
+              from: 'couriers',
+              localField: 'courier',
+              foreignField: '_id',
+              as: 'courier',
+            },
+          },
+          {
+            $unwind: '$courier',
+          },
+          {
+            $lookup: {
+              from: 'orders',
+              localField: 'orders',
+              foreignField: '_id',
+              as: 'orders',
+            },
+          },
+          {
+            $lookup: {
+              from: 'shopifyorders',
+              localField: 'integrationOrders',
+              foreignField: '_id',
+              as: 'integrationOrders',
+            },
+          },
+          {
+            $project: {
+              courier: {
+                name: 1,
+                username: 1,
+                phone: 1,
+                zone: 1,
+              },
+              BID: 1,
+              integrationOrders: {
+                status: 1,
+              },
+              startDate: 1,
+              endDate: 1,
+              orders: {
+                status: 1,
+              },
+              progress: {
+                $add: [
+                  {
+                    $size: {
+                      $filter: {
+                        input: '$orders',
+                        as: 'order',
+                        cond: { $eq: ['$$order.status', 'delivered'] },
+                      },
+                    },
+                  },
+                  {
+                    $size: {
+                      $filter: {
+                        input: '$integrationOrders',
+                        as: 'intOrder',
+                        cond: { $eq: ['$$intOrder.status', 'delivered'] },
+                      },
+                    },
+                  },
+                ],
+              },
+              numberOfOrders: {
+                $add: [{ $size: '$orders' }, { $size: '$integrationOrders' }],
+              },
+            },
+          },
+        ]);
+
+        if (!batches) {
+          c.status(404);
+          throw new Error('No Batches Found');
+        }
+        return c.json(batches, 200);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        throw new Error('Internal Server Error: ', error.message);
+      }
+    }
+  )
+  .get(
+    '/outstanding/:id',
+    getUser,
+    zValidator('param', validateObjectId),
+    async (c) => {
+      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
+      try {
+        const { id } = c.req.valid('param');
+        const batch = (await CourierBatchModel.findById(id)
+          .populate({
+            path: 'orders',
+            select: 'isOutstanding',
+          })
+          .populate({
+            path: 'integrationOrders',
+            select: 'isOutstanding',
+          })
+          .select('orders integrationOrders')) as Document & {
+          orders: { isOutstanding: boolean }[];
+          integrationOrders: { isOutstanding: boolean }[];
+        };
+
+        if (!batch) {
+          c.status(404);
+          throw new Error('Batch not found');
+        }
+
+        // check if any order is outstanding
+        const outstandingOrders = batch.orders.some(
+          (order) => order.isOutstanding
+        );
+        const outstandingIntegrationOrders = batch.integrationOrders.some(
+          (order) => order.isOutstanding
+        );
+
+        const hasOutstanding =
+          outstandingOrders || outstandingIntegrationOrders;
+
+        return c.json({ hasOutstanding }, 200);
       } catch (error: any) {
         console.error(error);
         c.status(500);

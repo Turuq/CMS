@@ -52,12 +52,12 @@ export default function TanStackQueryProvider({
   return (
     <QueryClientProvider client={queryClient}>
       {children}
-      {/* <ReactQueryDevtools
+      <ReactQueryDevtools
         initialIsOpen={false}
         buttonPosition="bottom-right"
         position="bottom"
         client={queryClient}
-      /> */}
+      />
     </QueryClientProvider>
   );
 }

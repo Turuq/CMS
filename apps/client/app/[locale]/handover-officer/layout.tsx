@@ -13,9 +13,9 @@ export default async function HandoverOfficerLayout({
   params: { locale: string };
 }) {
   return (
-    <div className="flex justify-normal gap-2 min-h-svh">
+    <div className="flex flex-col lg:flex-row gap-2 min-h-svh">
       <HandoverOfficerSidebar locale={locale} />
-      {children}
+      <div className="w-full lg:mx-5">{children}</div>
     </div>
   );
 }

@@ -248,6 +248,15 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   {
     id: 'status',
     accessorKey: 'status',
+    cell: (row) => (
+      <div className="flex items-center justify-center w-auto">
+        <Badge
+          className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
+        >
+          {getStatusText(row.row.original.status)}
+        </Badge>
+      </div>
+    ),
     header: 'Status',
   },
   {
@@ -290,7 +299,7 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'OID',
-    accessorFn: (row) => parseInt(row?.OID),
+    accessorFn: (row) => parseInt(row.OID),
     header: 'OID',
     filterFn: 'includesString',
   },
@@ -317,9 +326,19 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
     header: '# Products',
     accessorFn: (row) => row?.products?.length, //since we want the number of products only, we can access the row directly and return the length of the product array
   },
+
   {
     id: 'status',
     accessorKey: 'status',
+    cell: (row) => (
+      <div className="flex items-center justify-center w-auto">
+        <Badge
+          className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
+        >
+          {getStatusText(row.row.original.status)}
+        </Badge>
+      </div>
+    ),
     header: 'Status',
   },
   {

@@ -11,6 +11,7 @@ import {
 } from '../validation/courier';
 import { getUser } from '../lib/supabase/supabaseClient';
 import { authorizeUser } from '../utils/authorization';
+import moment from 'moment';
 
 // TODO: Add Route Authorization & Authentication
 
@@ -102,6 +103,10 @@ const courierRouter = new Hono()
     }
   })
   .get('/withStatistics', async (c) => {
+    const currentMonthYear = new Date()
+      .toLocaleString('en-US', { month: '2-digit', year: 'numeric' })
+      .replace('/', '-');
+
     try {
       const grouped = await CourierModel.aggregate([
         {
@@ -110,6 +115,17 @@ const courierRouter = new Hono()
             localField: '_id', // Field in orders collection
             foreignField: 'courierId', // Field in customers collection
             as: 'courierStatistics', // Alias for the joined data
+          },
+        },
+        {
+          $addFields: {
+            courierStatistics: {
+              $filter: {
+                input: '$courierStatistics',
+                as: 'stat',
+                cond: { $eq: ['$$stat.date', currentMonthYear] },
+              },
+            },
           },
         },
         {
@@ -123,7 +139,9 @@ const courierRouter = new Hono()
                 username: '$username',
                 active: '$active',
                 zone: '$zone',
-                statistics: '$courierStatistics.statistics',
+                statistics: {
+                  $arrayElemAt: ['$courierStatistics.statistics', 0], // Only take the first element, assuming there's only one match per month
+                },
               },
             },
           },

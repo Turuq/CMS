@@ -1,43 +1,45 @@
 'use client';
 
 import { courierManagerIcons } from '@/app/[locale]/courier-manager/components/icons/courier-manager-icons';
-import { CourierStatisticsIcons } from '@/app/[locale]/handover-officer/components/icons/courier-statistics-icons';
+// import { CourierStatisticsIcons } from '@/app/[locale]/handover-officer/components/icons/courier-statistics-icons';
+import { CourierBatchSummary } from '@/api/validation/courier-batch';
 import { Avatar, AvatarFallback } from '@/components/ui/avatar';
 import {
   Card,
-  CardContent,
   CardDescription,
   CardFooter,
   CardHeader,
   CardTitle,
 } from '@/components/ui/card';
-import { Separator } from '@/components/ui/separator';
 import {
   Tooltip,
   TooltipContent,
   TooltipProvider,
   TooltipTrigger,
 } from '@/components/ui/tooltip';
+import { getBatchProgress } from '@/utils/helpers/functions';
 import { ProgressBar } from '@tremor/react';
 import moment from 'moment';
-import { Button } from '../ui/button';
+import Link from 'next/link';
 
-interface BatchCardProps {
-  title: string;
-  progress: number;
-  startDate: string;
-  endDate?: string;
-  delivered: number;
-  toBeReshipped: number;
-  collected: number;
-  finished: boolean;
-  courier: string;
-}
+// interface BatchCardProps {
+//   title: string;
+//   progress: number;
+//   startDate: string;
+//   endDate?: string;
+//   delivered: number;
+//   toBeReshipped: number;
+//   collected: number;
+//   finished: boolean;
+//   courier: string;
+// }
 
 export default function BatchCard({
-  information,
+  batch,
+  href
 }: {
-  information: BatchCardProps;
+  batch: CourierBatchSummary;
+  href?: string;
 }) {
   return (
     <Card className="rounded-xl border-muted w-full">
@@ -45,48 +47,52 @@ export default function BatchCard({
         <div className="flex items-center justify-between">
           <div className="flex flex-col space-y-0.5">
             <ProgressBar
-              value={information.progress}
+              value={batch.endDate ? 100 : getBatchProgress(batch.progress, batch.numberOfOrders)}
               color={
-                information.progress <= 25
+                batch.endDate ? "emerald" : 
+                getBatchProgress(batch.progress, batch.numberOfOrders) <= 25
                   ? 'stone'
-                  : information.progress <= 75
+                  : getBatchProgress(batch.progress, batch.numberOfOrders) <= 75
                     ? 'amber'
                     : 'green'
               }
               showAnimation
               className="w-20"
             />
-            <CardTitle className="text-lg font-bold">
-              {information.title}
+            <CardTitle className="text-lg font-bold uppercase">
+              {`${batch.courier.name}'s Batch-${batch.BID.toString().padStart(3, '0')}`}
             </CardTitle>
             <CardDescription className="text-xs font-semibold">
-              {moment(information.startDate).format('MMM DD')} -{' '}
-              {information.endDate && information.finished
-                ? moment(information.endDate).format('MMM DD')
+              {moment(batch.startDate).format('MMM DD')} -{' '}
+              {batch.endDate
+                ? moment(batch.endDate).format('MMM DD')
                 : 'Current'}
             </CardDescription>
           </div>
-          <Button variant={'ghost'} size={'sm'} className="flex items-center">
+          <Link
+            href={href ?? `inspector/${batch._id}`}
+            className="flex items-center justify-center font-semibold text-dark bg-accent hover:bg-accent/80 rounded-xl w-auto h-8 p-2"
+          >
             {courierManagerIcons['inspect']}
             <span className="ml-2">Inspect</span>
-          </Button>
+          </Link>
         </div>
       </CardHeader>
-      <CardContent className="px-6 pb-2">
+      {/* <CardContent className="px-6 pb-2">
         <Separator />
         <div className="grid grid-cols-3 gap-5 my-2 p-2 bg-muted rounded-xl">
           <div className="flex flex-col items-center justify-center gap-1">
             {CourierStatisticsIcons['delivered']}
-            <p className="text-xs font-bold">{information.delivered}</p>
+            <p className="text-xs font-bold">{batch.delivered}</p>
           </div>
           <div className="flex flex-col items-center justify-center gap-1">
             {CourierStatisticsIcons['toBeReshipped']}
-            <p className="text-xs font-bold">{information.toBeReshipped}</p>
+            <p className="text-xs font-bold">{batch.toBeReshipped}</p>
           </div>
           <div className="flex flex-col items-center justify-center gap-1">
             {CourierStatisticsIcons['collectedAmount']}
             <p className="text-xs font-bold">
-              {information.collected.toLocaleString('en-EG', {
+              {batch.collected.toLocaleString('en-EG', {
                 style: 'currency',
                 currency: 'EGP',
               })}
@@ -94,25 +100,26 @@ export default function BatchCard({
           </div>
         </div>
         <Separator />
-      </CardContent>
+      </CardContent> */}
       <CardFooter className="w-full">
         <div className="flex items-center justify-between w-full">
           <p className="text-sm font-semibold text-dark_border/80 dark:text-light/80 italic">
-            {information.endDate && information.finished
-              ? `Batch ended on: ${moment(information.endDate).format('dddd DD, MMMM YYYY')}`
+            {batch.endDate
+              ? `Batch ended on: ${moment(batch.endDate).format('dddd DD, MMMM YYYY')}`
               : 'Batch is still in progress'}
           </p>
+
           <TooltipProvider>
             <Tooltip>
               <TooltipTrigger>
                 <Avatar className="size-7">
-                  <AvatarFallback className="text-xs font-bold">
-                    {information.courier.split(' ')[0][0]}
-                    {information.courier.split(' ')[1][0]}
+                  <AvatarFallback className="text-xs font-bold capitalize">
+                    {batch.courier.name[0]}
+                    {/* {batch.courier.name.split(' ')[1][0]} */}
                   </AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
-              <TooltipContent>{information.courier}</TooltipContent>
+              <TooltipContent>{batch.courier.name}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>

@@ -232,15 +232,23 @@ const orderRouter = new Hono()
           .limit(+pageSize)
           .sort({ createdAt: -1 });
 
+        const totalPages = await orderModel.countDocuments({
+          $and: [
+            { status: 'processing' },
+            { $or: [{ courier: { $exists: false } }, { courier: null }] },
+          ],
+        })
+
         if (!orders) {
           c.status(404);
           throw new Error('No orders found');
         }
 
         // TODO: create order type
-        const response: { len: number; orders: any[] } = {
+        const response: { len: number; orders: any[]; totalPages: number } = {
           len: orders.length,
           orders,
+          totalPages: Math.ceil(totalPages / +pageSize)
         };
 
         c.status(200);
@@ -279,14 +287,22 @@ const orderRouter = new Hono()
           .limit(+pageSize)
           .sort({ createdAt: -1 });
 
+        const totalPages = await integrationOrderModel.countDocuments({
+          $and: [
+            { status: 'processing' },
+            { $or: [{ courier: { $exists: false } }, { courier: null }] },
+          ]
+        })
+
         if (!integrationOrders) {
           c.status(404);
           throw new Error('No integration orders found');
         }
 
-        const response: { len: number; integrationOrders: any[] } = {
+        const response: { len: number; integrationOrders: any[]; totalPages: number } = {
           len: integrationOrders.length,
           integrationOrders,
+          totalPages: Math.ceil(totalPages / +pageSize)
         };
 
         c.status(200);

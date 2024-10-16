@@ -7,7 +7,7 @@ export default async function HandOver({
   params: { locale: string };
 }) {
   const res = await api.courier.withStatistics.$get();
-  const couriers = await res.json();
+  const couriers = await res.json(); 
 
   return (
     <div className="lg:p-2 w-full">

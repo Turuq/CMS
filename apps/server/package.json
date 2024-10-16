@@ -21,6 +21,7 @@
     "@prisma/client": "5.20.0",
     "@supabase/supabase-js": "^2.45.4",
     "hono": "^4.6.2",
+    "moment": "^2.30.1",
     "mongodb": "^6.9.0",
     "mongoose": "^8.6.3",
     "prisma": "^5.20.0",
