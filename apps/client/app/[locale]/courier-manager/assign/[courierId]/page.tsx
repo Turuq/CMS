@@ -1,9 +1,6 @@
 'use client';
 
-import { api } from '@/app/actions/api';
-import { Tabs, TabsList, TabsContent, TabsTrigger } from '@/components/ui/tabs';
-import { useMutation, useQuery } from '@tanstack/react-query';
-import { useEffect, useState } from 'react';
+import { api, ws } from '@/app/actions/api';
 import {
   unassignedColumns,
   unassignedSelectedColumns,
@@ -19,24 +16,36 @@ import {
   AlertDialogTitle,
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { useMutation, useQuery } from '@tanstack/react-query';
+import { useEffect, useState } from 'react';
 
-import { OrderType } from '@/types/order';
-import queryClient from '@/lib/query/query-client';
-import { RowSelectionState } from '@tanstack/react-table';
-import SelectedOrderTable from './selected-orders-table';
-import { Button } from '@/components/ui/button';
-import { toast } from 'sonner';
-import { Loader2 } from 'lucide-react';
-import TableSkeleton from '@/components/feedback/table-skeleton';
-import { SelectableOrdersDataTable } from '@/components/tables/orders/selectable-data-table';
-import { useTranslations } from 'next-intl';
+import { hasActiveBatch } from '@/app/actions/batch-actions';
 import {
   getProcessingUnassignedIntegrationOrders,
   getProcessingUnassignedTuruqOrders,
 } from '@/app/actions/order-actions';
-import { hasActiveBatch } from '@/app/actions/batch-actions';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import TableSkeleton from '@/components/feedback/table-skeleton';
 import { icons } from '@/components/icons/icons';
+import { SelectableOrdersDataTable } from '@/components/tables/orders/selectable-data-table';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import queryClient from '@/lib/query/query-client';
+import { OrderType } from '@/types/order';
+import { ToastStyles } from '@/utils/styles';
+import { RowSelectionState } from '@tanstack/react-table';
+import {
+  CircleCheckIcon,
+  CircleIcon,
+  CircleXIcon,
+  Loader2,
+  ScanBarcodeIcon,
+  Trash2Icon,
+  UsbIcon,
+} from 'lucide-react';
+import { useTranslations } from 'next-intl';
+import { toast } from 'sonner';
+import SelectedOrderTable from './selected-orders-table';
 
 export default function Page({
   params: { locale, courierId },
@@ -45,14 +54,23 @@ export default function Page({
 }) {
   const t = useTranslations('courierManager.tabs');
   const info = useTranslations('batch.info');
+  const scanner = useTranslations('scanner');
+
+  const [scanning, setScanning] = useState(false);
+  const [message, setMessage] = useState<{ [key: string]: boolean | string }>(
+    {}
+  );
+  // const [stopScanning, setStopScanning] = useState(false);
+
   const [turuqPage, setTuruqPage] = useState<number>(1);
   const [integrationPage, setIntegrationPage] = useState<number>(1);
   const [turuqPageSize, setTuruqPageSize] = useState<number>(10);
   const [integrationPageSize, setIntegrationPageSize] = useState<number>(10);
 
-  const [selectedOrders, setSelectedOrders] = useState<OrderType[]>();
-  const [selectedIntegrationOrders, setSelectedIntegrationOrders] =
-    useState<OrderType[]>();
+  const [selectedOrders, setSelectedOrders] = useState<OrderType[]>([]);
+  const [selectedIntegrationOrders, setSelectedIntegrationOrders] = useState<
+    OrderType[]
+  >([]);
 
   const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
   const [integrationRowSelection, onIntegrationRowSelectionChange] =
@@ -243,6 +261,53 @@ export default function Page({
     }
   }
 
+  useEffect(() => {
+    ws.onmessage = (evt) => {
+      console.log(evt.data);
+      const data = JSON.parse(evt.data);
+      if (data) {
+        if (
+          ['openingPort', 'portOpen', 'socketOpened', 'portClosed'].includes(
+            data.message
+          )
+        ) {
+          setMessage((oldVal) => ({ ...oldVal, [data.message]: true }));
+        } else if (data.error) {
+          toast.error(data.error, { style: ToastStyles.error });
+          setScanning(false);
+        } else {
+          const order: OrderType = data.order;
+          if (order) {
+            if (order?.provider) {
+              setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
+              onIntegrationRowSelectionChange((oldVal) => ({
+                ...oldVal,
+                [order._id]: true,
+              }));
+            } else {
+              setSelectedOrders((oldVal) => [...oldVal, order]);
+              onRowSelectionChange((oldVal) => ({
+                ...oldVal,
+                [order._id]: true,
+              }));
+            }
+          }
+          if (scanning) {
+            setMessage({});
+            ws.send(
+              JSON.stringify({ message: 'assign-processing-unassigned' })
+            );
+          }
+        }
+      }
+    };
+  }, [scanning]);
+
+  const handleSocket = async () => {
+    setScanning(true);
+    ws.send(JSON.stringify({ message: 'assign-processing-unassigned' }));
+  };
+
   if (turuqError) {
     return <div>An Error Has Occurred: {turuqError.message}</div>;
   }
@@ -266,22 +331,88 @@ export default function Page({
           </div>
         </Alert>
       )}
+
       <Tabs
         defaultValue="turuq"
         className="w-full"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
       >
-        <TabsList>
-          <TabsTrigger className="" value="turuq">
-            {t('orders.tabs.turuq')}
-          </TabsTrigger>
-          <TabsTrigger className="" value="integrations">
-            {t('orders.tabs.integrations')}
-          </TabsTrigger>
-          <TabsTrigger className="" value="imported" disabled>
-            {t('orders.tabs.imported')}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between w-full gap-5">
+          <TabsList>
+            <TabsTrigger className="" value="turuq">
+              {t('orders.tabs.turuq')}
+            </TabsTrigger>
+            <TabsTrigger className="" value="integrations">
+              {t('orders.tabs.integrations')}
+            </TabsTrigger>
+            <TabsTrigger className="" value="imported" disabled>
+              {t('orders.tabs.imported')}
+            </TabsTrigger>
+          </TabsList>
+          {!scanning && (
+            <Button onClick={handleSocket}>
+              {t('assign.courierAssignPage.ordersTable.buttons.startScanning')}
+            </Button>
+          )}
+          {scanning && (
+            <div className="grid grid-cols-3 w-auto rounded-xl bg-light dark:bg-dark_border p-2">
+              <div className="flex flex-col gap-1 items-center justify-center">
+                {ws.CONNECTING ? (
+                  <Loader2 size={16} className={'text-inherit animate-spin'} />
+                ) : ws.OPEN ? (
+                  <CircleCheckIcon size={16} className={'text-emerald-500'} />
+                ) : (
+                  <CircleXIcon size={16} className={'text-red-500'} />
+                )}
+                {ws.OPEN && (
+                  <p className="text-xs font-bold">
+                    {scanner('connectionEstablished')}
+                  </p>
+                )}
+              </div>
+              <div
+                className={`flex flex-col gap-1 items-center justify-center`}
+              >
+                {!message.openingPort ? (
+                  <CircleIcon size={16} className={'text-inherit'} />
+                ) : (
+                  <UsbIcon size={16} className={'text-emerald-500'} />
+                )}
+                {message.openingPort && (
+                  <p className="text-xs font-bold">{scanner('portReady')}</p>
+                )}
+              </div>
+              <div
+                className={`flex flex-col gap-1 items-center justify-center`}
+              >
+                {!message.portOpen ? (
+                  <CircleIcon size={16} className={'text-inherit'} />
+                ) : (
+                  <ScanBarcodeIcon size={16} className={'text-emerald-500'} />
+                )}
+                {message.portOpen && (
+                  <p className="text-xs font-bold">
+                    {scanner('scannerConnected')}
+                  </p>
+                )}
+              </div>
+              {/* <div
+                className={`flex flex-col gap-1 items-center justify-center ${message.portClosed ? 'text-emerald-500' : 'text-accent'}`}
+              >
+                {!message.portOpen ? (
+                  <CircleIcon size={16} className={'text-muted'} />
+                ) : message.portOpen && !message.portClosed ? (
+                  <Loader2 size={16} className={'text-inherit animate-spin'} />
+                ) : (
+                  <BarcodeIcon size={16} className={'text-inherit'} />
+                )}
+                {message.portOpen && !message.portClosed && (
+                  <p className="text-xs font-bold">Waiting for Barcode Scan</p>
+                )}
+              </div> */}
+            </div>
+          )}
+        </div>
         <TabsContent value="turuq" className="w-full">
           {isLoadingTuruqOrders ? (
             <TableSkeleton />
@@ -307,11 +438,13 @@ export default function Page({
                   totalPages={turuqOrders?.totalPages ?? 1}
                 />
               </div>
-              <h1 className="font-bold text-lg text-foreground">
-                {t(
-                  'assign.courierAssignPage.ordersTable.headers.assignedOrders'
-                )}
-              </h1>
+              <div className="flex items-center justify-between gap-5">
+                <h1 className="font-bold text-lg text-foreground">
+                  {t(
+                    'assign.courierAssignPage.ordersTable.headers.assignedOrders'
+                  )}
+                </h1>
+              </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
                   locale={locale}
@@ -319,6 +452,28 @@ export default function Page({
                   data={selectedOrders ?? []}
                 />
                 {/* <pre>{JSON.stringify(selectedOrders, null, 2)}</pre> */}
+                {Object.keys(rowSelection).length > 0 && (
+                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                    <div className="flex items-center gap-2">
+                      {icons.checkbox}
+                      <p className="text-xs font-bold">
+                        {Object.keys(rowSelection).length} Selected Orders
+                      </p>
+                    </div>
+                    <button
+                      className="flex items-center gap-2 text-red-500 group"
+                      onClick={() => {
+                        setSelectedOrders([]);
+                        onRowSelectionChange({});
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                      <p className="text-xs font-bold hidden group-hover:flex">
+                        Clear Selection
+                      </p>
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-end">
                 <AlertDialog>
@@ -395,18 +550,43 @@ export default function Page({
                   totalPages={integrationOrders?.totalPages ?? 1}
                 />
               </div>
-              <h1 className="font-bold text-lg text-foreground">
-                {t(
-                  'assign.courierAssignPage.ordersTable.headers.assignedOrders'
-                )}
-              </h1>
+              <div className="flex items-center justify-between gap-5">
+                <h1 className="font-bold text-lg text-foreground">
+                  {t(
+                    'assign.courierAssignPage.ordersTable.headers.assignedOrders'
+                  )}
+                </h1>
+              </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
                   locale={locale}
                   columns={unassignedSelectedColumns}
                   data={selectedIntegrationOrders ?? []}
                 />
-                {/* <pre>{JSON.stringify(selectedOrders, null, 2)}</pre> */}
+                {Object.keys(integrationRowSelection).length > 0 && (
+                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                    <div className="flex items-center gap-2">
+                      {icons.checkbox}
+                      <p className="text-xs font-bold">
+                        {Object.keys(integrationRowSelection).length} Selected
+                        Orders
+                      </p>
+                    </div>
+                    <button
+                      className="flex items-center gap-2 text-red-500 group"
+                      onClick={() => {
+                        setSelectedIntegrationOrders([]);
+                        onIntegrationRowSelectionChange({});
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                      <p className="text-xs font-bold hidden group-hover:flex">
+                        Clear Selection
+                      </p>
+                    </button>
+                  </div>
+                )}
+                {/* <pre>{JSON.stringify(selectedIntegrationOrders, null, 2)}</pre> */}
               </div>
               <div className="flex items-center justify-end">
                 <AlertDialog>

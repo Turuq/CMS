@@ -1,6 +1,6 @@
 export const assignmentOfficerLinks = [
   {
-    title: 'Assign',
+    title: 'assign',
     href: '/assignment-officer/assign',
     path: '/assign',
     icon: 'assign',

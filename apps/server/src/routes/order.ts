@@ -1,6 +1,10 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
+import { getUser } from '../lib/clerk/clerkClient';
+import { ClientModel } from '../models/client';
 import { CourierModel } from '../models/courier';
+import { integrationOrderModel } from '../models/integration-order';
+import { orderModel } from '../models/order';
 import {
   validateCourierOrdersPagination,
   validateFilters,
@@ -8,12 +12,7 @@ import {
   validateObjectIdArray,
   validatePagination,
 } from '../utils/validation';
-import { orderModel } from '../models/order';
-import { integrationOrderModel } from '../models/integration-order';
-import prisma from '../../prisma/prismaClient';
-import { ClientModel } from '../models/client';
-import type { orders } from '@prisma/client';
-import { getUser } from '../lib/supabase/supabaseClient';
+import { authorizeUser } from '../utils/authorization';
 
 const orderRouter = new Hono()
   // GET ALL ORDERS, PAGINATED, & FILTERED
@@ -23,11 +22,7 @@ const orderRouter = new Hono()
     zValidator('param', validatePagination),
     zValidator('json', validateFilters),
     async (c) => {
-      const { role } = c.var.user;
-      if (role !== 'COURIER_MANAGER') {
-        c.status(403);
-        throw new Error('Unauthorized');
-      }
+      authorizeUser({ c, level: ['COURIER_MANAGER'] });
       // Validate request params
       const { page, pageSize } = c.req.valid('param');
       const conditions = c.req.valid('json');
@@ -237,7 +232,7 @@ const orderRouter = new Hono()
             { status: 'processing' },
             { $or: [{ courier: { $exists: false } }, { courier: null }] },
           ],
-        })
+        });
 
         if (!orders) {
           c.status(404);
@@ -248,7 +243,7 @@ const orderRouter = new Hono()
         const response: { len: number; orders: any[]; totalPages: number } = {
           len: orders.length,
           orders,
-          totalPages: Math.ceil(totalPages / +pageSize)
+          totalPages: Math.ceil(totalPages / +pageSize),
         };
 
         c.status(200);
@@ -291,18 +286,22 @@ const orderRouter = new Hono()
           $and: [
             { status: 'processing' },
             { $or: [{ courier: { $exists: false } }, { courier: null }] },
-          ]
-        })
+          ],
+        });
 
         if (!integrationOrders) {
           c.status(404);
           throw new Error('No integration orders found');
         }
 
-        const response: { len: number; integrationOrders: any[]; totalPages: number } = {
+        const response: {
+          len: number;
+          integrationOrders: any[];
+          totalPages: number;
+        } = {
           len: integrationOrders.length,
           integrationOrders,
-          totalPages: Math.ceil(totalPages / +pageSize)
+          totalPages: Math.ceil(totalPages / +pageSize),
         };
 
         c.status(200);
@@ -600,5 +599,7 @@ const orderRouter = new Hono()
       }
     }
   );
+
+  
 
 export default orderRouter;

@@ -1,7 +1,8 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import prisma from '../../prisma/prismaClient';
+import { getUser } from '../lib/clerk/clerkClient';
 import { CourierModel } from '../models/courier';
+import { authorizeUser } from '../utils/authorization';
 import { validateObjectId } from '../utils/validation';
 import {
   courierUpdateSchema,
@@ -9,9 +10,6 @@ import {
   type Courier,
   type CourierWithStatistics,
 } from '../validation/courier';
-import { getUser } from '../lib/supabase/supabaseClient';
-import { authorizeUser } from '../utils/authorization';
-import moment from 'moment';
 
 // TODO: Add Route Authorization & Authentication
 
@@ -47,7 +45,7 @@ const courierRouter = new Hono()
   })
   // GET ALL COURIERS
   .get('/', getUser, async (c) => {
-    authorizeUser({ level: ['COURIER_MANAGER'], c });
+    authorizeUser({ level: ['COURIER_MANAGER', 'ASSIGNMENT_OFFICER'], c });
     try {
       const couriers = await CourierModel.find({})
         .select(
@@ -64,11 +62,7 @@ const courierRouter = new Hono()
   // GET ALL COURIERS GROUPED BY ACTIVE STATUS
   .get('/grouped', getUser, async (c) => {
     try {
-      const { role } = c.var.user;
-      if (role !== 'COURIER_MANAGER') {
-        c.status(403);
-        throw new Error('Unauthorized');
-      }
+      authorizeUser({ level: ['COURIER_MANAGER', 'ASSIGNMENT_OFFICER'], c });
       const result = await CourierModel.aggregate([
         {
           $group: {

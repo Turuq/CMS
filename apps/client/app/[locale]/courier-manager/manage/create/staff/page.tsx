@@ -1,6 +1,9 @@
 'use client';
 
-import { api } from '@/app/actions/api';
+import {
+  createAssignmentOfficer,
+  createHandoverOfficer,
+} from '@/app/actions/staff-actions';
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
 import {
@@ -17,13 +20,18 @@ import { zodValidator } from '@tanstack/zod-form-adapter';
 import { Loader2 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
-import { redirect } from 'next/navigation';
 import { useState } from 'react';
 import { toast } from 'sonner';
 import Droppable from '../../../components/forms/droppable';
+import { useRouter } from 'next/navigation';
 
-export default function CreateNewStaffMember() {
+export default function CreateNewStaffMember({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
   const t = useTranslations('authentication');
+  const router = useRouter();
 
   const [uploading, setUploading] = useState<boolean>(false);
   const [loading, setLoading] = useState<boolean>(false);
@@ -90,8 +98,8 @@ export default function CreateNewStaffMember() {
     onSubmit: async ({ value }) => {
       setLoading(true);
       if (value.role === 'HANDOVER_OFFICER') {
-        const res = await api['handover-officer'].create.$post({ json: value });
-        if (!res.ok) {
+        const r = await createHandoverOfficer({ value });
+        if (r?.error) {
           setLoading(false);
           toast.error('Failed to Create Handover Officer', {
             style: {
@@ -100,22 +108,19 @@ export default function CreateNewStaffMember() {
             },
           });
         }
-        const data = await res.json();
-        if (data) {
+        if (r?.data) {
+          setLoading(false);
           toast.success('Handover Officer Created Successfully', {
             style: {
               backgroundColor: '#E6EFEC',
               color: '#4F8A10',
             },
           });
-          redirect('/courier-manager/manage');
+          router.replace(`${locale}/courier-manager/manage`);
         }
-        setLoading(false);
       } else if (value.role === 'ASSIGNMENT_OFFICER') {
-        const res = await api['assignment-officer'].create.$post({
-          json: value,
-        });
-        if (!res.ok) {
+        const r = await createAssignmentOfficer({ value });
+        if (r?.error) {
           setLoading(false);
           toast.error('Failed to Create Assignment Officer', {
             style: {
@@ -124,17 +129,16 @@ export default function CreateNewStaffMember() {
             },
           });
         }
-        const data = await res.json();
-        if (data) {
+        if (r?.data) {
+          setLoading(false);
           toast.success('Assignment Officer Created Successfully', {
             style: {
               backgroundColor: '#E6EFEC',
               color: '#4F8A10',
             },
           });
-          redirect('/courier-manager/manage');
+          router.replace(`${locale}/courier-manager/manage`);
         }
-        setLoading(false);
       }
     },
     validatorAdapter: zodValidator(),

@@ -7,7 +7,7 @@ import { api } from './api';
 import { OrderType } from '@/types/order';
 
 export async function hasActiveBatch({ id }: { id: string }) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.courier.active[':id'].$get(
     { param: { id } },
     {
@@ -27,12 +27,14 @@ export async function startBatch({
   courierId,
   orderIds,
   integrationIds,
+  outsourced,
 }: {
   courierId: string;
   orderIds: string[];
   integrationIds: string[];
+  outsourced: boolean;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.$post(
     {
       json: {
@@ -40,6 +42,7 @@ export async function startBatch({
         orders: orderIds,
         integrationOrders: integrationIds,
         startDate: moment().format('YYYY-MM-DD'),
+        outsourced,
       },
     },
     {
@@ -57,7 +60,7 @@ export async function startBatch({
 }
 
 export async function getAllBatches() {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.$get(
     {},
     {
@@ -74,7 +77,7 @@ export async function getAllBatches() {
 }
 
 export async function getBatchById(id: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch[':id'].$get(
     { param: { id } },
     {
@@ -94,7 +97,7 @@ export async function getBatchById(id: string) {
 }
 
 export async function checkHasOutstanding(id: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.outstanding[':id'].$get(
     {
       param: { id },
@@ -114,7 +117,7 @@ export async function checkHasOutstanding(id: string) {
 }
 
 export async function endBatch(id: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.end[':id'].$put(
     {
       param: { id },
@@ -134,7 +137,7 @@ export async function endBatch(id: string) {
 }
 
 export async function getCourierBatches(id: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.batch.courier[':id'].$get(
     {
       param: { id },

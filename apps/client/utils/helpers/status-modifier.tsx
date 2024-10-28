@@ -41,6 +41,7 @@ export function getStatusTextColor(status: string) {
     case 'cancelled':
     case 'postponed':
     case 'returned':
+    case 'invalidAddress':
       result = 'text-red-200 dark:text-red-200';
       break;
     default:
@@ -64,6 +65,8 @@ export function getStatusText(status: string) {
       return 'out for delivery';
     case 'outOfStock':
       return 'out of stock';
+    case 'invalidAddress':
+      return 'invalid address';
     default:
       return status;
   }

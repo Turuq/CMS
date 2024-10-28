@@ -14,7 +14,7 @@ export async function getTuruqOrders({
   pageSize: string;
   conditions: FilterObject;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.order.turuq[':page'][':pageSize'].$post(
     {
@@ -43,7 +43,7 @@ export async function getIntegrationOrders({
   pageSize: string;
   conditions: FilterObject;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.order.integration[':page'][':pageSize'].$post(
     {
@@ -70,7 +70,7 @@ export async function getProcessingUnassignedTuruqOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.order.turuq.processing.unassigned[':page'][
     ':pageSize'
@@ -96,7 +96,7 @@ export async function getProcessingUnassignedIntegrationOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.order.integration.processing.unassigned[':page'][
     ':pageSize'
@@ -124,7 +124,7 @@ export async function getCourierAssignedOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.order.turuq.assigned[':id'][':page'][':pageSize'].$get(
     { param: { id, page, pageSize } },
     {
@@ -149,7 +149,7 @@ export async function getCourierAssignedIntegrationOrders({
   page: string;
   pageSize: string;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.order.integration.assigned[':id'][':page'][
     ':pageSize'
   ].$get(

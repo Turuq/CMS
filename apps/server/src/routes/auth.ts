@@ -1,11 +1,12 @@
 import { Hono } from 'hono';
 
-import { authSignInSchema, authSignUpSchema } from '../validation/auth';
-import supabase, { getUser } from '../lib/supabase/supabaseClient';
-import { staffMemberModel } from '../models/staff';
 import { zValidator } from '@hono/zod-validator';
+import { clerkClient } from '../lib/clerk/clerkClient';
+import supabase from '../lib/supabase/supabaseClient';
+import { staffMemberModel } from '../models/staff';
+import { validateClerkId } from '../utils/validation';
+import { authSignInSchema, authSignUpSchema } from '../validation/auth';
 import type { AuthenticatedStaffMember } from '../validation/staff-member';
-import { z } from 'zod';
 
 const authRouter = new Hono()
   .post('/sign-up', zValidator('json', authSignUpSchema), async (c) => {
@@ -40,26 +41,32 @@ const authRouter = new Hono()
         );
       }
 
-      // Create a supabase auth user using the email and password & username as an additional property
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      const data = await clerkClient.users.createUser({
+        firstName: staffMember.name,
+        username,
+        emailAddress: [email],
         password,
-        options: {
-          data: {
-            username,
-          },
-        },
       });
+      // Create a supabase auth user using the email and password & username as an additional property
+      // const { data, error } = await supabase.auth.signUp({
+      //   email,
+      //   password,
+      //   options: {
+      //     data: {
+      //       username,
+      //     },
+      //   },
+      // });
 
-      if (error) {
-        console.error(error);
-        return c.json(
-          {
-            message: `Failed to create user: ${error.message}`,
-          },
-          500
-        );
-      }
+      // if (error) {
+      //   console.error(error);
+      //   return c.json(
+      //     {
+      //       message: `Failed to create user: ${error.message}`,
+      //     },
+      //     500
+      //   );
+      // }
 
       return c.json(
         {
@@ -121,28 +128,26 @@ const authRouter = new Hono()
       throw new Error(`Failed to sign in: ${error.message}`);
     }
   })
-  .post(
-    '/me',
-    zValidator('json', z.object({ token: z.string() })),
-    async (c) => {
-      const { token } = c.req.valid('json');
-      if (!token) {
-        c.status(401);
-        throw new Error('Unauthorized');
-      }
-      const { data, error } = await supabase.auth.getUser(token);
-      if (error) {
-        console.error(error);
-        c.status(401);
-        throw new Error('Unauthorized');
-      }
-      const { email } = data.user;
-      const staffMember: AuthenticatedStaffMember | null =
-        await staffMemberModel
-          .findOne({ email })
-          .select('role email username name active _id');
-      return c.json(staffMember, 200);
+  .post('/me', zValidator('json', validateClerkId), async (c) => {
+    const { userId } = c.req.valid('json');
+
+    if (!userId) {
+      c.status(401);
+      throw new Error('Unauthorized');
     }
-  );
+    const data = await clerkClient.users.getUser(userId);
+
+    if (!data) {
+      c.status(401);
+      throw new Error('Unauthorized');
+    }
+
+    const { primaryEmailAddress } = data;
+
+    const staffMember: AuthenticatedStaffMember | null = await staffMemberModel
+      .findOne({ email: primaryEmailAddress?.emailAddress })
+      .select('role email username name active _id');
+    return c.json(staffMember, 200);
+  });
 
 export default authRouter;

@@ -1,6 +1,6 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { getUser } from '../lib/supabase/supabaseClient';
+import { getUser } from '../lib/clerk/clerkClient';
 import { staffMemberModel } from '../models/staff';
 import { authorizeUser } from '../utils/authorization';
 import { validateObjectId } from '../utils/validation';

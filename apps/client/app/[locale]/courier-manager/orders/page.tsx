@@ -118,23 +118,25 @@ export default function Page({
 
   return (
     <div className="w-full bg-light_border dark:bg-dark p-2 rounded-xl space-y-5">
-      <h1 className="text-3xl font-bold opacity-80">{t('header')}</h1>
       <Tabs
         defaultValue="turuq"
         className="w-full"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
       >
-        <TabsList>
-          <TabsTrigger className="capitalize" value="turuq">
-            {t('tabs.turuq')}
-          </TabsTrigger>
-          <TabsTrigger className="capitalize" value="integrations">
-            {t('tabs.integrations')}
-          </TabsTrigger>
-          <TabsTrigger className="capitalize" value="imported" disabled>
-            {t('tabs.imported')}
-          </TabsTrigger>
-        </TabsList>
+        <div className="flex items-center justify-between">
+          <h1 className="text-3xl font-bold opacity-80">{t('header')}</h1>
+          <TabsList>
+            <TabsTrigger className="capitalize" value="turuq">
+              {t('tabs.turuq')}
+            </TabsTrigger>
+            <TabsTrigger className="capitalize" value="integrations">
+              {t('tabs.integrations')}
+            </TabsTrigger>
+            <TabsTrigger className="capitalize" value="imported" disabled>
+              {t('tabs.imported')}
+            </TabsTrigger>
+          </TabsList>
+        </div>
         <TabsContent value="turuq" className="w-full">
           <div className="p-5 rounded-xl bg-light dark:bg-dark_border">
             <OrdersDataTable

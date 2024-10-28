@@ -10,10 +10,10 @@ import { handoverOfficerIcons } from '../icons/handover-officer-icons';
 import { icons } from '@/components/icons/icons';
 import { Sheet, SheetContent, SheetTrigger } from '@/components/ui/sheet';
 import { useTranslations } from 'next-intl';
+import SettingsMenu from './settings-menu';
 
 export default function HandoverOfficerSidebar({ locale }: { locale: string }) {
   const t = useTranslations('handoverOfficer.tabs');
-  const tNav = useTranslations('navigation');
 
   const [isExpanded, toggleExpand] = useState<boolean>(true);
   const [open, setOpen] = useState<boolean>(false);
@@ -72,14 +72,7 @@ export default function HandoverOfficerSidebar({ locale }: { locale: string }) {
           ))}
           <Separator />
         </div>
-        <button className="flex items-center gap-2 justify-self-end text-red-500 p-2">
-          {icons['settings']}
-          {isExpanded && (
-            <p className="text-sm font-semibold capitalize">
-              {tNav('settings')}
-            </p>
-          )}
-        </button>
+        <SettingsMenu isExpanded={isExpanded} locale={locale} />
       </div>
       {/* Small Screen Navigation */}
       <div className="lg:hidden flex items-center justify-start">
@@ -138,12 +131,7 @@ export default function HandoverOfficerSidebar({ locale }: { locale: string }) {
               ))}
               <Separator />
             </div>
-            <button className="flex items-center gap-2 justify-self-end text-red-500 p-2 mt-5">
-              {icons.settings}
-              {isExpanded && (
-                <p className="text-sm font-semibold">{tNav('settings')}</p>
-              )}
-            </button>
+            <SettingsMenu isExpanded={isExpanded} locale={locale} />
           </SheetContent>
         </Sheet>
       </div>

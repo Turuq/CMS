@@ -44,6 +44,8 @@ import { Skeleton } from '@/components/ui/skeleton';
 import DetailedOrderCard from '@/components/cards/detailed-order';
 import { FilterObject } from '@/api/utils/validation';
 import { padOID } from '@/utils/helpers/functions';
+import { getStatusTextColor } from '@/utils/helpers/status-modifier';
+import { statusIcons } from '@/components/icons/status-icons';
 
 interface OrdersDataTableProps<TValue> {
   locale: string;
@@ -78,6 +80,7 @@ export function OrdersDataTable<TValue>({
   loading,
 }: OrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
+  const tStatus = useTranslations('dashboard.statistics.cards');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -265,7 +268,7 @@ export function OrdersDataTable<TValue>({
               t('legend.paidShippingOnly'),
             ]}
             colors={['cyan', 'violet', 'red', 'amber', 'lime']}
-            className={`col-span-5 order-2 ${showOrderDetails ? 'lg:col-span-5 lg:order-3' : 'lg:col-span-3 lg:order-2'} flex justify-center`}
+            className={`col-span-5 order-2 ${showOrderDetails ? 'lg:col-span-5 lg:order-3' : 'lg:col-span-3 lg:order-2'} flex justify-center space-x-2`}
           />
           <div
             className={`col-span-5 order-3 ${showOrderDetails ? 'lg:col-span-2 lg:order-2' : 'lg:col-span-1 lg:order-3'} flex items-center justify-end gap-1`}
@@ -403,14 +406,27 @@ export function OrdersDataTable<TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-center text-xs">
                         <>
-                          {cell.column.columnDef.id === 'createdAt'
-                            ? moment(cell.getValue() as string)
-                                .locale(locale)
-                                .format('LL')
-                            : flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
+                          {cell.column.columnDef.id === 'createdAt' ? (
+                            moment(cell.getValue() as string)
+                              .locale(locale)
+                              .format('LL')
+                          ) : cell.column.columnDef.id === 'status' ? (
+                            <div className="flex items-center justify-center gap-2 w-auto">
+                              <p
+                                className={`${getStatusTextColor(cell.getValue() as string)} flex items-center gap-2 capitalize text-xs font-semibold`}
+                              >
+                                <span>
+                                  {statusIcons[cell.getValue() as string]}
+                                </span>
+                                {tStatus(cell.getValue() as string)}
+                              </p>
+                            </div>
+                          ) : (
+                            flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )
+                          )}
                         </>
                       </TableCell>
                     ))}

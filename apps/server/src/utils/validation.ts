@@ -10,6 +10,10 @@ export const validateObjectId = z.object({
     .refine((id) => ObjectId.isValid(id), { message: 'Invalid ObjectId' }),
 });
 
+export const validateClerkId = z.object({
+  userId: z.string().nullable(),
+});
+
 export const validateObjectIdArray = z.object({
   ids: z.array(
     z

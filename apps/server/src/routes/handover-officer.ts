@@ -7,8 +7,9 @@ import {
   updateHandoverOfficerSchema,
 } from '../validation/handover-officer';
 import { staffMemberModel } from '../models/staff';
-import { getUser } from '../lib/supabase/supabaseClient';
+import { getUser } from '../lib/clerk/clerkClient';
 import { authorizeUser } from '../utils/authorization';
+import { clerkClient } from '../lib/clerk/clerkClient';
 
 const handoverOfficerRouter = new Hono()
   .post(
@@ -17,7 +18,6 @@ const handoverOfficerRouter = new Hono()
     async (c) => {
       // Validate request body
       const data = c.req.valid('json');
-      console.log(data);
       // Check if handover officer already exists
       const existingHandoverOfficer = await staffMemberModel.findOne({
         username: data.username,
@@ -35,6 +35,14 @@ const handoverOfficerRouter = new Hono()
       try {
         // Save new handover officer
         await newHandoverOfficer.save();
+
+        await clerkClient.users.createUser({
+          firstName: data.name,
+          username: data.username,
+          emailAddress: [data.email],
+          password: data.password,
+        });
+
         c.status(201);
         return c.json(newHandoverOfficer);
       } catch (error: any) {

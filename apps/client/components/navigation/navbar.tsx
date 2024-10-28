@@ -1,25 +1,31 @@
-import { cookies } from 'next/headers';
-import { icons } from '../icons/icons';
-import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { SignedIn, SignedOut } from '@clerk/nextjs';
 import { getTranslations } from 'next-intl/server';
 import Image from 'next/image';
+import { icons } from '../icons/icons';
+import { Avatar, AvatarFallback, AvatarImage } from '../ui/avatar';
+import { api } from '@/app/actions/api';
+import { auth } from '@clerk/nextjs/server';
+import Link from 'next/link';
 
 export default async function Navbar({ locale }: { locale: string }) {
   const t = await getTranslations('roles');
 
-  const role = cookies().get('role')?.value;
-  const userCookie = cookies().get('user')?.value;
-  const user = userCookie ? JSON.parse(userCookie) : undefined;
+  const { userId } = await auth();
+
+  let user;
+
+  if (userId) {
+    const res = await api.auth.me.$post({ json: { userId } });
+    user = await res.json();
+  }
 
   return (
-    <nav className="col-span-12 grid grid-cols-6 gap-5 p-5">
-      <div className="col-span-12 lg:col-span-1 flex items-center justify-center">
+    <nav className="flex items-center justify-between gap-5 p-5">
+      <div className="flex items-center justify-center">
         <Image src="/babyblue.png" alt="Turuq.co" width={64} height={64} />
       </div>
-
-      <div className="hidden px-3 col-span-3 lg:flex items-center justify-between gap-2 rounded-full "></div>
-      {user && (
-        <div className="hidden col-span-2 lg:flex items-center justify-center gap-2">
+      <SignedIn>
+        <div className="flex items-center justify-center gap-2">
           <button className="rounded-full bg-light dark:bg-dark_border size-10 flex items-center justify-center">
             {icons.search}
           </button>
@@ -35,16 +41,26 @@ export default async function Navbar({ locale }: { locale: string }) {
                 alt="operator"
               />
               <AvatarFallback className="capitalize">
-                {user.name[0]}
+                {user?.name[0]}
               </AvatarFallback>
             </Avatar>
             <div className="flex flex-col">
-              <h1 className="text-bold text-sm">{user.name}</h1>
-              <h3 className="text-semibold text-xs opacity-50">{t(role)}</h3>
+              <h1 className="text-bold text-sm">{user?.name}</h1>
+              <h3 className="text-semibold text-xs opacity-50">
+                {t(user?.role)}
+              </h3>
             </div>
           </div>
         </div>
-      )}
+      </SignedIn>
+      <SignedOut>
+        <Link
+          href="/sign-in"
+          className="border border-accent/50 bg-transparent hover:bg-accent hover:text-accent-foreground h-8 px-4 py-2 rounded-xl text-xs font-semibold w-40 inline-flex items-center justify-center whitespace-nowrap ring-offset-background transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50"
+        >
+          Login
+        </Link>
+      </SignedOut>
     </nav>
   );
 }

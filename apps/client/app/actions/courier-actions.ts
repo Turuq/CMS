@@ -6,7 +6,7 @@ import { Courier } from '@/api/validation/courier';
 import { EditCourier } from '@/utils/validation/courier';
 
 export async function getGroupedCouriers() {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier.grouped.$get(
     {},
@@ -24,7 +24,7 @@ export async function getGroupedCouriers() {
 }
 
 export async function getCouriersWithStatistics() {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier.withStatistics.$get(
     {},
@@ -42,7 +42,7 @@ export async function getCouriersWithStatistics() {
 }
 
 export async function getCouriers() {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier.$get(
     {},
@@ -60,7 +60,7 @@ export async function getCouriers() {
 }
 
 export async function getCourierById({ id }: { id: string }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier[':id'].$get(
     { param: { id } },
@@ -78,7 +78,7 @@ export async function getCourierById({ id }: { id: string }) {
 }
 
 export async function activateCourier({ id }: { id: string }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier.activate[':id'].$put(
     { param: { id } },
@@ -96,7 +96,7 @@ export async function activateCourier({ id }: { id: string }) {
 }
 
 export async function deactivateCourier({ id }: { id: string }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier.deactivate[':id'].$put(
     { param: { id } },
@@ -120,7 +120,7 @@ export async function updateCourier({
   id: string;
   courier: EditCourier;
 }) {
-  const token = verifyToken();
+  const token = await verifyToken();
 
   const res = await api.courier[':id'].$put(
     { param: { id }, json: courier },

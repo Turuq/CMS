@@ -55,6 +55,10 @@ export default function Page({
                   courier={courier}
                   href={`/${locale}/courier-manager/assign/${courier._id}`}
                   locale={locale}
+                  hrefOptions={{
+                    label: 'assign',
+                    tooltip: 'assign',
+                  }}
                 />
               ))}
           </div>

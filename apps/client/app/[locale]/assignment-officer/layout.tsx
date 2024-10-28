@@ -1,11 +1,13 @@
+import Sidebar from '@/components/navigation/sidebar';
+import { assignmentOfficerLinks } from '@/utils/assignment-officer-links';
 import { Metadata } from 'next';
-import AssignmentOfficerSidebar from './components/assignment-officer-sidebar';
+import { assignmentOfficerIcons } from './components/icons/assignment-officer-icons';
 
 export const metadata: Metadata = {
-  title: 'Turuq CMS | Handover Officer',
+  title: 'Turuq CMS | Assignment Officer',
 };
 
-export default async function HandoverOfficerLayout({
+export default async function AssignmentOfficerLayout({
   children,
   params: { locale },
 }: {
@@ -13,9 +15,15 @@ export default async function HandoverOfficerLayout({
   params: { locale: string };
 }) {
   return (
-    <div className="flex justify-normal gap-2 min-h-svh">
-      <AssignmentOfficerSidebar locale={locale} />
-      {children}
+    <div className="flex flex-col lg:flex-row gap-2 min-h-svh">
+      <Sidebar
+        locale={locale}
+        tKey="assignmentOfficer"
+        variant="assignment-officer"
+        links={assignmentOfficerLinks}
+        iconPack={assignmentOfficerIcons}
+      />
+      <div className="w-full lg:mx-5">{children}</div>
     </div>
   );
 }

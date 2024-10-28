@@ -5,6 +5,8 @@ export type OrderType = {
   _id: string;
   customer: {
     name: string;
+    first_name?: string;
+    last_name?: string;
     phone: string;
     address: string;
     governorate: string;
@@ -58,4 +60,5 @@ export type OrderType = {
   courierAssignedAt: string;
   courierCOD: number;
   paymentMethod: string;
+  provider?: string;
 };

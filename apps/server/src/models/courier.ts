@@ -63,6 +63,10 @@ const courierSchema = new Schema<Courier>(
     commissionPerOrder: {
       type: Number,
     },
+    outSourced: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );

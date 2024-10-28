@@ -6,6 +6,7 @@
   },
   "navigation": {
     "settings": "Settings",
+    "signOut": "Sign Out",
     "orders": {
       "tabs": {
         "turuq": "Turuq",
@@ -167,7 +168,8 @@
             "buttons": {
               "assignSelected": "Assign Selected",
               "finish": "Finish",
-              "remove": "Remove"
+              "remove": "Remove",
+              "startScanning": "Start Scanning"
             },
             "search": {
               "placeholder": "Search by OID",
@@ -341,7 +343,6 @@
           }
         }
       },
-
       "assign": {
         "header": "Assign"
       }
@@ -487,5 +488,11 @@
     "buttons": {
       "start": "Start Batch"
     }
+  },
+  "scanner": {
+    "connectionEstablished": "Connected Established",
+    "portReady": "Port Ready",
+    "scannerConnected": "Barcode Scanner Connected",
+    "startScanning": "Start Scanning"
   }
 }

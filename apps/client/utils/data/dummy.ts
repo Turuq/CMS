@@ -1746,10 +1746,12 @@ export const ordersStatistics = {
   toBeReshipped: 16,
   totalShippingFees: 2990,
   totalToBeReceived: 8659,
-  numberOfCouriers: 23,
+  activeBatches: 23,
   processingAssigned: 220,
   processingUnassigned: 164,
 };
+
+export type OrderStatistics = typeof ordersStatistics;
 
 export const processingOrdersStatisticsPerGovernorate = {
   cairo: 1234,

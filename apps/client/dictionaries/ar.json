@@ -6,6 +6,7 @@
   },
   "navigation": {
     "settings": "الإعدادات",
+    "signOut": "تسجيل الخروج",
     "orders": {
       "tabs": {
         "turuq": "طرق",
@@ -165,7 +166,8 @@
             "buttons": {
               "assignSelected": "تعيين المحدد",
               "finish": "إنهاء",
-              "remove": "حذف"
+              "remove": "حذف",
+              "startScanning": "بدء المسح"
             },
             "search": {
               "placeholder": "ابحث برقم الطلب",
@@ -337,7 +339,6 @@
           }
         }
       },
-
       "assign": {
         "header": "تعيين"
       }
@@ -483,5 +484,11 @@
     "buttons": {
       "start": "بدء التسليم"
     }
+  },
+  "scanner": {
+    "connectionEstablished": "تم الاتصال بنجاح",
+    "portReady": "المنفذ جاهز",
+    "scannerConnected": "تم توصيل ماسح الباركود",
+    "startScanning": "بدء المسح"
   }
 }

@@ -16,6 +16,7 @@ export const courierSchema = z.object({
   nationalIdImage: z.string().url(),
   driverLicenseImage: z.string().url(), // Driver license image
   criminalRecordImage: z.string().url(), // Criminal record image
+  outSourced: z.boolean(),
 });
 
 export const createCourierSchema = z.object({
@@ -27,6 +28,7 @@ export const createCourierSchema = z.object({
   nationalIdImage: z.string().url(),
   driverLicenseImage: z.string().url(), // Driver license image
   criminalRecordImage: z.string().url(), // Criminal record image
+  outSourced: z.boolean().optional(),
 });
 
 export const courierUpdateSchema = z.object({
@@ -40,6 +42,7 @@ export const courierUpdateSchema = z.object({
   nationalIdImage: z.string().url().optional(),
   driverLicenseImage: z.string().url().optional(),
   criminalRecordImage: z.string().url().optional(),
+  outSourced: z.boolean().optional(),
 });
 
 export const statisticsSchema = z.object({

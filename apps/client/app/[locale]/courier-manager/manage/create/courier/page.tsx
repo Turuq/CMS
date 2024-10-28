@@ -2,6 +2,8 @@
 
 import { Button } from '@/components/ui/button';
 import { Input } from '@/components/ui/input';
+import { Label } from '@/components/ui/label';
+import { Switch } from '@/components/ui/switch';
 import { useTranslations } from 'next-intl';
 import Image from 'next/image';
 
@@ -22,8 +24,8 @@ export default function CreateNewCourier() {
             <p className="font-semibold text-sm text-dark_border/80 dark:text-light_border/80">
               {t('signup.courier.description')}
             </p>
-            <div className="grid grid-cols-2 gap-5 my-5 w-full">
-              <div className="flex flex-col gap-2 w-full">
+            <div className="grid grid-cols-4 gap-5 my-5 w-full">
+              <div className="flex flex-col col-span-4 lg:col-span-2 gap-2 w-full">
                 <label htmlFor="name">{t('signup.fields.name')}</label>
                 <Input
                   id="name"
@@ -31,7 +33,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.name')}
                 />
               </div>
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col col-span-4 lg:col-span-2 gap-2 w-full">
                 <label htmlFor="username">{t('signup.fields.username')}</label>
                 <Input
                   id="username"
@@ -39,7 +41,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.username')}
                 />
               </div>
-              <div className="col-span-2 flex flex-col gap-2 w-full">
+              <div className="col-span-4 lg:col-span-3 flex flex-col gap-2 w-full">
                 <label htmlFor="email">{t('signup.fields.email')}</label>
                 <Input
                   id="email"
@@ -47,7 +49,11 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.email')}
                 />
               </div>
-              <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
+              <div className="col-span-4 lg:col-span-1 flex items-center justify-center gap-2 w-full h-full">
+                <Switch id="outsourced" />
+                <Label htmlFor="outsourced">Outsourced</Label>
+              </div>
+              <div className="col-span-4 lg:col-span-2 flex flex-col gap-2 w-full">
                 <label htmlFor="phone">{t('signup.fields.phone')}</label>
                 <Input
                   id="phone"
@@ -55,7 +61,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.phone')}
                 />
               </div>
-              <div className="col-span-2 lg:col-span-1 flex flex-col gap-2 w-full">
+              <div className="col-span-4 lg:col-span-2 flex flex-col gap-2 w-full">
                 <label htmlFor="nationalId">
                   {t('signup.fields.nationalId')}
                 </label>
@@ -65,7 +71,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.nationalId')}
                 />
               </div>
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col col-span-4 lg:col-span-2 gap-2 w-full">
                 <label htmlFor="zone">{t('signup.fields.zone')}</label>
                 <Input
                   id="zone"
@@ -73,7 +79,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.zone')}
                 />
               </div>
-              <div className="flex flex-col gap-2 w-full">
+              <div className="flex flex-col col-span-4 lg:col-span-2 gap-2 w-full">
                 <label htmlFor="password">{t('signup.fields.password')}</label>
                 <Input
                   id="password"
@@ -81,7 +87,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.password')}
                 />
               </div>
-              <div className="col-span-2 flex flex-col gap-2 w-full">
+              <div className="col-span-4 flex flex-col gap-2 w-full">
                 <label htmlFor="nationalIdImage">
                   {t('signup.fields.nationalIdImage')}
                 </label>
@@ -92,7 +98,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.nationalIdImage')}
                 />
               </div>{' '}
-              <div className="col-span-2 flex flex-col gap-2 w-full">
+              <div className="col-span-4 flex flex-col gap-2 w-full">
                 <label htmlFor="driverLicenseImage">
                   {t('signup.fields.driverLicenseImage')}
                 </label>
@@ -103,7 +109,7 @@ export default function CreateNewCourier() {
                   placeholder={t('signup.placeholders.driverLicenseImage')}
                 />
               </div>{' '}
-              <div className="col-span-2 flex flex-col gap-2 w-full">
+              <div className="col-span-4 flex flex-col gap-2 w-full">
                 <label htmlFor="criminalRecordImage">
                   {t('signup.fields.criminalRecordImage')}
                 </label>

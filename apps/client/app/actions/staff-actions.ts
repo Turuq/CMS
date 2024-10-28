@@ -3,9 +3,50 @@
 import { verifyToken } from '@/utils/helpers/get-token';
 import { api } from './api';
 import { EditStaff } from '@/utils/validation/staff';
+import { createHandoverOfficerSchema } from '@/api/validation/handover-officer';
+import { z } from 'zod';
+import { createAssignmentOfficerSchema } from '@/api/validation/assignment-officer';
+
+export async function createHandoverOfficer({
+  value,
+}: {
+  value: z.infer<typeof createHandoverOfficerSchema>;
+}) {
+  try {
+    const res = await api['handover-officer'].create.$post({ json: value });
+    if (!res.ok) {
+      return { error: res.statusText };
+    }
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed to create handover officer' };
+  }
+}
+
+export async function createAssignmentOfficer({
+  value,
+}: {
+  value: z.infer<typeof createAssignmentOfficerSchema>;
+}) {
+  try {
+    const res = await api['assignment-officer'].create.$post({
+      json: value,
+    });
+    if (!res.ok) {
+      return { error: res.statusText };
+    }
+    const data = await res.json();
+    return { data };
+  } catch (error) {
+    console.error(error);
+    return { error: 'Failed to create assignment officer' };
+  }
+}
 
 export async function getHandoverOfficers() {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api['handover-officer'].$get(
     {},
     {
@@ -22,7 +63,7 @@ export async function getHandoverOfficers() {
 }
 
 export async function getAssignmentOfficers() {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api['assignment-officer'].$get(
     {},
     {
@@ -39,7 +80,7 @@ export async function getAssignmentOfficers() {
 }
 
 export async function getStaffById(staffId: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.staff[':id'].$get(
     { param: { id: staffId } },
     {
@@ -56,7 +97,7 @@ export async function getStaffById(staffId: string) {
 }
 
 export async function updateStaff(staffId: string, data: EditStaff) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.staff[':id'].$put(
     { param: { id: staffId }, json: data },
     {
@@ -73,7 +114,7 @@ export async function updateStaff(staffId: string, data: EditStaff) {
 }
 
 export async function activateStaff(staffId: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.staff.activate[':id'].$put(
     { param: { id: staffId } },
     {
@@ -90,7 +131,7 @@ export async function activateStaff(staffId: string) {
 }
 
 export async function deactivateStaff(staffId: string) {
-  const token = verifyToken();
+  const token = await verifyToken();
   const res = await api.staff.deactivate[':id'].$put(
     { param: { id: staffId } },
     {

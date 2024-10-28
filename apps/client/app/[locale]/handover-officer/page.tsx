@@ -1,7 +1,9 @@
-export default async function Page() {
-  return (
-    <div>
-      <h1>Handover Officer</h1>
-    </div>
-  );
+import Dashboard from '@/components/layout/dashboard';
+
+export default async function Page({
+  params: { locale },
+}: {
+  params: { locale: string };
+}) {
+  return <Dashboard locale={locale} />;
 }

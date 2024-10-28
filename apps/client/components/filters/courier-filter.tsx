@@ -57,9 +57,12 @@ export default function CourierFilter({
       ) : (
         <Select value={courierFilter} onValueChange={filterByCourier}>
           <SelectTrigger
-            className={`rounded-xl text-xs font-semibold bg-muted/50 p-2 hover:bg-muted w-40 h-8 border-none`}
+            className={`rounded-xl capitalize text-xs font-semibold bg-muted/50 p-2 hover:bg-muted w-40 h-8 border-none`}
           >
-            <SelectValue placeholder={t('placeholder')} />
+            <SelectValue
+              className="capitalize"
+              placeholder={t('placeholder')}
+            />
           </SelectTrigger>
           <SelectContent>
             {couriers ? (

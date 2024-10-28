@@ -7,6 +7,7 @@ import {
   deactivateCourier,
 } from '@/app/actions/courier-actions';
 import { activateStaff, deactivateStaff } from '@/app/actions/staff-actions';
+import { statusIcons } from '@/components/icons/status-icons';
 import {
   AlertDialog,
   AlertDialogAction,
@@ -34,6 +35,7 @@ import {
   getIndicatorColor,
   getStatusColor,
   getStatusText,
+  getStatusTextColor,
 } from '@/utils/helpers/status-modifier';
 import { ToastStyles } from '@/utils/styles';
 import { Staff } from '@/utils/validation/staff';
@@ -113,6 +115,13 @@ export const columns: ColumnDef<OrderType>[] = [
     accessorKey: 'courier.name',
     header: 'Courier',
     filterFn: 'equalsString',
+    cell: (row) => (
+      <span
+        className={`capitalize ${!row.row.original.courier && 'text-gray-500'}`}
+      >
+        {row.row.original.courier ? row.row.original.courier.name : '-'}
+      </span>
+    ),
   },
   {
     id: 'companyName',
@@ -138,11 +147,19 @@ export const columns: ColumnDef<OrderType>[] = [
     id: 'status',
     accessorKey: 'status',
     cell: (row) => (
-      <Badge
-        className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
-      >
-        {getStatusText(row.row.original.status)}
-      </Badge>
+      <div className="flex items-center justify-center gap-2 w-auto">
+        <p
+          className={`${getStatusTextColor(row.row.original.status)} flex items-center capitalize text-xs font-semibold`}
+        >
+          <span className="mr-2">{statusIcons[row.row.original.status]}</span>
+          {getStatusText(row.row.original.status)}
+        </p>
+      </div>
+      // <Badge
+      //   className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
+      // >
+      //   {getStatusText(row.row.original.status)}
+      // </Badge>
     ),
     header: 'Status',
   },
@@ -229,10 +246,9 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    accessorFn: (row) =>
-      row.customer.name ||
-      // @ts-ignore
-      `${row.customer.first_name} ${row.customer.last_name}`,
+    cell: (row) =>
+      row.row.original.customer.name ||
+      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
     header: 'Customer Name',
   },
   {
@@ -310,10 +326,10 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    accessorFn: (row) =>
-      row.customer.name ||
-      // @ts-ignore
-      `${row.customer.first_name} ${row.customer.last_name}`,
+    cell: (row) =>
+      row.row.original.customer.name ||
+      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
+
     header: 'Customer Name',
   },
   {

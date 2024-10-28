@@ -19,6 +19,7 @@ export const NewCourierBatchSchema = z.object({
       .string()
       .refine((id) => ObjectId.isValid(id), { message: 'Invalid ObjectId' })
   ),
+  outsourced: z.boolean(),
 });
 
 export const CourierBatchSchema = NewCourierBatchSchema.extend({

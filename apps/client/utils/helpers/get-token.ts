@@ -1,11 +1,10 @@
-import { cookies } from 'next/headers';
+import { auth } from '@clerk/nextjs/server';
 import { redirect } from 'next/navigation';
 
-export function verifyToken() {
-  const token = cookies().get('token')?.value;
-  if (!token) {
+export async function verifyToken() {
+  const { userId } = await auth();
+  if (!userId) {
     redirect('/');
   }
-  return token;
+  return userId;
 }
-

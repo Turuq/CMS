@@ -13,6 +13,10 @@ import { Montserrat, Cairo } from 'next/font/google';
 import { getDictionary } from '../dictionaries';
 import '../globals.css';
 import { Separator } from '@/components/ui/separator';
+import { DotIcon } from 'lucide-react';
+import { ws } from '../actions/api';
+import { ClerkProvider } from '@clerk/nextjs';
+import moment from 'moment';
 
 const montserrat = Montserrat({
   subsets: ['latin'],
@@ -40,30 +44,31 @@ export default async function RootLayout({
   return (
     <html lang={locale} dir={locale === 'ar' ? 'rtl' : 'ltr'}>
       <body
-        className={`${locale === 'ar' ? cairo.className : montserrat.className} bg-light_border dark:bg-dark`}
-        // style={{ direction: locale === 'ar' ? 'rtl' : 'ltr' }}
+        className={`${locale === 'ar' ? cairo.className : montserrat.className} bg-light_border dark:bg-dark h-full`}
       >
-        <ThemeProvider
-          attribute="class"
-          defaultTheme="dark"
-
-          // disableTransitionOnChange
-        >
-          <TanStackQueryProvider>
-            <NextIntlClientProvider messages={messages}>
-              <DictionaryProvider dictionary={dict} locale={locale}>
-                <div className="grid grid-cols-12">
-                  <Navbar locale={locale} />
-                  {/* <Sidebar /> */}
-                  <div className="col-span-12 p-5">
-                    <div className="rounded-md bg-light_border dark:bg-dark">
+        <ThemeProvider attribute="class" defaultTheme="dark">
+          <ClerkProvider>
+            <TanStackQueryProvider>
+              <NextIntlClientProvider messages={messages}>
+                <DictionaryProvider dictionary={dict} locale={locale}>
+                  <div className="flex flex-col justify-between gap-5">
+                    <Navbar locale={locale} />
+                    <div className="rounded-md bg-light_border dark:bg-dark h-full px-5">
                       {children}
                       <Toaster />
                     </div>
-                    <footer className="flex flex-col-reverse lg:flex-row items-center justify-between rounded-xl mt-5 gap-5 p-5 bg-light dark:bg-dark_border">
-                      <p className="font-semibold text-[10px] text-dark_border/80 dark:text-light_border/80">
-                        Copyright © 2024 Turuq. All Rights Reserved.
-                      </p>
+                    <footer className="flex flex-col-reverse lg:flex-row items-center justify-between rounded-xl m-5 gap-5 p-5 bg-light dark:bg-dark_border">
+                      <div className="flex items-center gap-1">
+                        <div
+                          className={`${ws.OPEN ? 'text-emerald-500' : ws.CONNECTING ? 'text-amber-500' : 'text-red-500'} flex items-center gap-1`}
+                        >
+                          <DotIcon size={24} className={'text-inherit'} />
+                        </div>
+                        <p className="font-semibold text-[10px] text-dark_border/80 dark:text-light_border/80">
+                          Copyright © {moment().locale('en').format('YYYY')}{' '}
+                          Turuq. All Rights Reserved.
+                        </p>
+                      </div>
                       <div className="flex items-center gap-5">
                         <ThemeToggle />
                         <Separator
@@ -74,10 +79,10 @@ export default async function RootLayout({
                       </div>
                     </footer>
                   </div>
-                </div>
-              </DictionaryProvider>
-            </NextIntlClientProvider>
-          </TanStackQueryProvider>
+                </DictionaryProvider>
+              </NextIntlClientProvider>
+            </TanStackQueryProvider>
+          </ClerkProvider>
         </ThemeProvider>
       </body>
     </html>

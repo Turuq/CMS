@@ -1,7 +1,7 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 import type { Document } from 'mongoose';
-import { getUser } from '../lib/supabase/supabaseClient';
+import { getUser } from '../lib/clerk/clerkClient';
 import CourierBatchModel from '../models/courier-batch';
 import { integrationOrderModel } from '../models/integration-order';
 import { orderModel } from '../models/order';
@@ -22,17 +22,21 @@ const courierBatchRouter = new Hono()
     try {
       // validate request body
       const data = c.req.valid('json');
-      const sequence = await getNextSequence(data.courier);
-      // create new courier batch
-      const newCourierBatch = new CourierBatchModel({
-        ...data,
-        BID: sequence,
-        courier: data.courier,
-      });
-      const courierBatch = await newCourierBatch.save();
-      if (!courierBatch) {
-        c.status(500);
-        throw new Error('Failed to create courier batch');
+      const { outsourced } = data;
+      let courierBatch;
+      if (!outsourced) {
+        const sequence = await getNextSequence(data.courier);
+        // create new courier batch
+        const newCourierBatch = new CourierBatchModel({
+          ...data,
+          BID: sequence,
+          courier: data.courier,
+        });
+        courierBatch = await newCourierBatch.save();
+        if (!courierBatch) {
+          c.status(500);
+          throw new Error('Failed to create courier batch');
+        }
       }
       await orderModel.updateMany(
         { _id: { $in: data.orders } },
@@ -43,6 +47,206 @@ const courierBatchRouter = new Hono()
         { status: 'outForDelivery', isOutstanding: true }
       );
       return c.json(courierBatch, 201);
+    } catch (error: any) {
+      console.error(error);
+      c.status(500);
+      throw new Error('Internal Server Error: ', error.message);
+    }
+  })
+  .get('/dashboard', async (c) => {
+    try {
+      const res = await CourierBatchModel.aggregate([
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orders',
+            foreignField: '_id',
+            as: 'orders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'shopifyorders',
+            localField: 'integrationOrders',
+            foreignField: '_id',
+            as: 'integrationOrders',
+          },
+        },
+        {
+          $project: {
+            allOrders: { $concatArrays: ['$orders', '$integrationOrders'] },
+          },
+        },
+        {
+          $unwind: '$allOrders',
+        },
+        {
+          $group: {
+            _id: null,
+            totalOrders: { $sum: 1 },
+            outForDelivery: {
+              $sum: {
+                $cond: [{ $eq: ['$allOrders.status', 'outForDelivery'] }, 1, 0],
+              },
+            },
+            delivered: {
+              $sum: {
+                $cond: [{ $eq: ['$allOrders.status', 'delivered'] }, 1, 0],
+              },
+            },
+            toBeReshipped: {
+              $sum: {
+                $cond: [{ $eq: ['$allOrders.toBeReshipped', true] }, 1, 0],
+              },
+            },
+            totalShippingFees: { $sum: '$allOrders.shippingFees' },
+            totalToBeReceived: { $sum: '$allOrders.total' },
+            activeBatches: {
+              $sum: {
+                $cond: [{ $eq: ['$endDate', null] }, 1, 0],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 0,
+            outForDelivery: 1,
+            delivered: 1,
+            totalOrders: 1,
+            toBeReshipped: 1,
+            totalShippingFees: 1,
+            activeBatches: 1,
+            totalToBeReceived: 1,
+          },
+        },
+      ]);
+      if (!res) {
+        c.status(404);
+        throw new Error('No Stats Found');
+      }
+      return c.json(res, 200);
+    } catch (error: any) {
+      console.error(error);
+      c.status(500);
+      throw new Error('No Stats Found');
+    }
+  })
+  .get('/dashboard/governorate', async (c) => {
+    // authorizeUser({
+    //   c,
+    //   level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'],
+    // });
+    try {
+      const res = await CourierBatchModel.aggregate([
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orders',
+            foreignField: '_id',
+            as: 'orders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'shopifyorders',
+            localField: 'integrationOrders',
+            foreignField: '_id',
+            as: 'integrationOrders',
+          },
+        },
+        {
+          $project: {
+            allOrders: { $concatArrays: ['$orders', '$integrationOrders'] },
+          },
+        },
+        { $unwind: '$allOrders' },
+        {
+          $group: {
+            _id: '$allOrders.customer.governorate',
+            count: { $sum: 1 },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            count: 1,
+          },
+        },
+      ]);
+      if (!res) {
+        c.status(404);
+        throw new Error('No Stats Found');
+      }
+      return c.json(res, 200);
+    } catch (error: any) {
+      console.error(error);
+      c.status(500);
+      throw new Error('Internal Server Error: ', error.message);
+    }
+  })
+  .get('/dashboard/orders', async (c) => {
+    try {
+      const res = await CourierBatchModel.aggregate([
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orders',
+            foreignField: '_id',
+            as: 'orders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'shopifyorders',
+            localField: 'integrationOrders',
+            foreignField: '_id',
+            as: 'integrationOrders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'couriers',
+            localField: 'courier',
+            foreignField: '_id',
+            as: 'courier',
+          },
+        },
+        {
+          $project: {
+            allOrders: { $concatArrays: ['$orders', '$integrationOrders'] },
+            courier: { $arrayElemAt: ['$courier', 0] },
+          },
+        },
+        { $unwind: '$allOrders' },
+        {
+          $group: {
+            _id: '$courier.name',
+            delivered: {
+              $sum: {
+                $cond: [{ $eq: ['$allOrders.status', 'delivered'] }, 1, 0],
+              },
+            },
+            outForDelivery: {
+              $sum: {
+                $cond: [{ $eq: ['$allOrders.status', 'outForDelivery'] }, 1, 0],
+              },
+            },
+          },
+        },
+        {
+          $project: {
+            _id: 1,
+            delivered: 1,
+            outForDelivery: 1,
+          },
+        },
+      ]);
+      if (!res) {
+        c.status(404);
+        throw new Error('No Stats Found');
+      }
+      return c.json(res, 200);
     } catch (error: any) {
       console.error(error);
       c.status(500);

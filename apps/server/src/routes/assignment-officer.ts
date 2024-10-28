@@ -6,7 +6,7 @@ import {
 } from '../validation/assignment-officer';
 import { staffMemberModel } from '../models/staff';
 import { validateObjectId } from '../utils/validation';
-import { getUser } from '../lib/supabase/supabaseClient';
+import { clerkClient, getUser } from '../lib/clerk/clerkClient';
 
 const assignmentOfficerRouter = new Hono()
   .post(
@@ -36,6 +36,14 @@ const assignmentOfficerRouter = new Hono()
       try {
         // Save new assignment officer
         await newAssignmentOfficer.save();
+
+        await clerkClient.users.createUser({
+          firstName: data.name,
+          username: data.username,
+          emailAddress: [data.email],
+          password: data.password,
+        });
+
         return c.json(newAssignmentOfficer, 201);
       } catch (error: any) {
         console.error(error);

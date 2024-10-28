@@ -1,41 +1,79 @@
-import createMiddleware from "next-intl/middleware";
-import { cookies } from 'next/headers';
-import { NextRequest } from 'next/server';
+import createMiddleware from 'next-intl/middleware';
 import { api } from './app/actions/api';
 import { getPathFromRole } from './utils/helpers/get-path-from-role';
-export default async function middleware(request: NextRequest) {
-  const { pathname } = request.nextUrl;
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextRequest, NextResponse } from 'next/server';
+
+const handleI18nRouting = createMiddleware({
+  // A list of all locales that are supported
+  locales: ['en', 'ar'],
+
+  // Used when no locale matches
+  defaultLocale: 'en',
+});
+
+const isProtectedRoute = createRouteMatcher([
+  '/:locale/courier-manager(.*)',
+  '/:locale/handover-officer(.*)',
+  '/:locale/assignment-officer(.*)',
+]);
+
+export default clerkMiddleware(async (auth, req) => {
+  const { userId } = await auth();
+
+  const { pathname } = req.nextUrl;
   const [, locale] = pathname.split('/');
 
-  const token = cookies().get('token')?.value;
-  if (!token) {
-    request.nextUrl.pathname = `/${locale}`;
+  if (!userId) {
+    req.nextUrl.pathname = `/${locale}`;
   } else {
-    const res = await api.auth.me.$post({ json: { token: token ?? '' } });
+    const res = await api.auth.me.$post({ json: { userId } });
     const data = await res.json();
     if (data) {
-      const path = getPathFromRole(data.role);
-      if (!pathname.includes(path)) {
-        console.log(`unauthorized: redirecting to ${locale}/${path}`);
-        request.nextUrl.pathname = `/${locale}/${path}`;
+      const role = getPathFromRole(data.role);
+      if (isProtectedRoute(req)) {
+        if (pathname.includes(role)) {
+          NextResponse.next();
+        } else {
+          req.nextUrl.pathname = `/${locale}/${role}`;
+        }
+      } else {
+        NextResponse.next();
       }
-    } else {
-      request.nextUrl.pathname = `/${locale}`;
     }
   }
 
-  const handleI18nRouting = createMiddleware({
-    // A list of all locales that are supported
-    locales: ['en', 'ar'],
+  // if (userId && isProtectedRoute(req)) {
+  //   console.log(`user is authenticated, route is protected`);
+  //   const res = await api.auth.me.$post({ json: { userId } });
+  //   const data = await res.json();
+  //   if (data) {
+  //     const role = getPathFromRole(data.role);
+  //     if (pathname.includes(role)) {
+  //       NextResponse.next();
+  //     } else {
+  //       req.nextUrl.pathname = `/${locale}/${role}`;
+  //     }
+  //   }
+  // } else if (userId && !isProtectedRoute(req)) {
+  //   console.log(`user is authenticated, route is not protected`);
+  //   const res = await api.auth.me.$post({ json: { userId } });
+  //   const data = await res.json();
+  //   if (data) {
+  //     const role = getPathFromRole(data.role);
+  //     req.nextUrl.pathname = `/${locale}/${role}`;
+  //   } else {
+  //     req.nextUrl.pathname = `/${locale}`;
+  //   }
+  // } else {
+  //   req.nextUrl.pathname = `/${locale}`;
+  // }
 
-    // Used when no locale matches
-    defaultLocale: 'en',
-  });
-  const response = handleI18nRouting(request);
+  const response = handleI18nRouting(req as unknown as NextRequest);
   return response;
-}
+});
 
 export const config = {
   // Match only internationalized pathnames
-  matcher: ["/", "/(ar|en)/:path*"],
+  matcher: ['/', '/(ar|en)/:path*'],
 };
