@@ -43,7 +43,7 @@ export default function CreateNewStaffMember({
   }: {
     e: React.MouseEvent<HTMLButtonElement, MouseEvent>;
     file: File | null;
-    field: 'nationalIdImage' | 'criminalRecordImage';
+    field: 'nationalIdImage' | 'driverLicenseImage' | 'criminalRecordImage';
   }) {
     e.preventDefault();
     if (file) {
@@ -94,6 +94,7 @@ export default function CreateNewStaffMember({
       password: '',
       nationalIdImage: '',
       criminalRecordImage: '',
+      driverLicenseImage: '',
     },
     onSubmit: async ({ value }) => {
       setLoading(true);

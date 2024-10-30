@@ -1,41 +1,35 @@
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { Badge } from "@/components/ui/badge";
-import { Button } from "@/components/ui/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import DownloadButton from '@/components/buttons/download-button';
+import { icons } from '@/components/icons/icons';
 import {
   Accordion,
   AccordionContent,
   AccordionItem,
   AccordionTrigger,
-} from "@/components/ui/accordion";
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+} from '@/components/ui/accordion';
+import { Avatar, AvatarFallback, AvatarImage } from '@/components/ui/avatar';
+import { Badge } from '@/components/ui/badge';
+import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card';
+import { Separator } from '@/components/ui/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
+import { OrderType } from '@/types/order';
+import { getStatusColor } from '@/utils/helpers/status-modifier';
 import {
-  CreditCard,
-  MapPin,
-  Package,
-  Calendar,
-  Clock,
-  FileText,
-  User,
-  Phone,
-  Download,
   BanknoteIcon,
-  ReceiptTextIcon,
-  ImageIcon,
+  Clock,
+  CreditCard,
   InfoIcon,
-} from "lucide-react";
-import { getStatusColor, getStatusText } from "@/utils/helpers/status-modifier";
-import moment from "moment";
-import { icons } from "@/components/icons/icons";
-import Link from "next/link";
-import DownloadButton from "@/components/buttons/download-button";
-import { Separator } from "@/components/ui/separator";
-import Image from "next/image";
-import { OrderType } from "@/types/order";
+  MapPin,
+  Phone,
+  User,
+} from 'lucide-react';
+import moment from 'moment';
+import Image from 'next/image';
+import Link from 'next/link';
 
 interface DetailedOrderCardProps {
   order: OrderType;
   orderCardDictionary: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
   locale: string;
@@ -66,7 +60,7 @@ export default function DetailedOrderCard({
         <Tabs
           defaultValue="details"
           className="w-full"
-          style={{ direction: locale === "en" ? "ltr" : "rtl" }}
+          style={{ direction: locale === 'en' ? 'ltr' : 'rtl' }}
         >
           <TabsList className="grid grid-cols-2 sm:grid-cols-4 gap-2 h-fit">
             <TabsTrigger value="details">
@@ -100,13 +94,13 @@ export default function DetailedOrderCard({
                 </Link>
               </div>
               <div className="flex items-center gap-2">
-                {order.paymentMethod === "VISA" ? (
+                {order.paymentMethod === 'VISA' ? (
                   <CreditCard size={16} className="text-muted-foreground" />
-                ) : order.paymentMethod === "CASH" ? (
+                ) : order.paymentMethod === 'CASH' ? (
                   <BanknoteIcon size={16} className="text-muted-foreground" />
                 ) : (
                   <Image
-                    src={"/instapay.png"}
+                    src={'/instapay.png'}
                     alt="instapay"
                     width={24}
                     height={24}
@@ -114,8 +108,8 @@ export default function DetailedOrderCard({
                   />
                 )}
                 <span className="text-sm capitalize">
-                  {order.paymentMethod.toLowerCase()}{" "}
-                  {order.paymentMethod === "VISA" && "•••• 4242"}
+                  {order.paymentMethod.toLowerCase()}{' '}
+                  {order.paymentMethod === 'VISA' && '•••• 4242'}
                 </span>
               </div>
               <div className="col-span-1 sm:col-span-3 flex items-center gap-2">
@@ -136,19 +130,19 @@ export default function DetailedOrderCard({
                     {product.itemDescription}
                   </h3>
                   <p className="text-sm text-muted-foreground">
-                    {product.price.toLocaleString("en-EG", {
-                      style: "currency",
-                      currency: "EGP",
-                      roundingMode: "halfCeil",
-                    })}{" "}
+                    {product.price.toLocaleString('en-EG', {
+                      style: 'currency',
+                      currency: 'EGP',
+                      roundingMode: 'halfCeil',
+                    })}{' '}
                     x {product.quantity}
                   </p>
                 </div>
                 <p className="text-sm font-medium">
-                  {(product.price * product.quantity).toLocaleString("en-EG", {
-                    style: "currency",
-                    currency: "EGP",
-                    roundingMode: "halfCeil",
+                  {(product.price * product.quantity).toLocaleString('en-EG', {
+                    style: 'currency',
+                    currency: 'EGP',
+                    roundingMode: 'halfCeil',
                   })}
                 </p>
               </div>
@@ -159,10 +153,10 @@ export default function DetailedOrderCard({
                   {orderCardDictionary.details.subtotal}
                 </span>
                 <span className="text-sm font-medium">
-                  {order.subtotal.toLocaleString("en-EG", {
-                    style: "currency",
-                    currency: "EGP",
-                    roundingMode: "halfCeil",
+                  {order.subtotal.toLocaleString('en-EG', {
+                    style: 'currency',
+                    currency: 'EGP',
+                    roundingMode: 'halfCeil',
                   })}
                 </span>
               </div>
@@ -172,10 +166,10 @@ export default function DetailedOrderCard({
                   {icons.question}
                 </span>
                 <span className="text-sm font-medium">
-                  {order.shippingFees.toLocaleString("en-EG", {
-                    style: "currency",
-                    currency: "EGP",
-                    roundingMode: "halfCeil",
+                  {order.shippingFees.toLocaleString('en-EG', {
+                    style: 'currency',
+                    currency: 'EGP',
+                    roundingMode: 'halfCeil',
                   })}
                 </span>
               </div>
@@ -184,10 +178,10 @@ export default function DetailedOrderCard({
                   {orderCardDictionary.details.total}
                 </span>
                 <span className="text-sm font-medium">
-                  {order.total.toLocaleString("en-EG", {
-                    style: "currency",
-                    currency: "EGP",
-                    roundingMode: "halfCeil",
+                  {order.total.toLocaleString('en-EG', {
+                    style: 'currency',
+                    currency: 'EGP',
+                    roundingMode: 'halfCeil',
                   })}
                 </span>
               </div>
@@ -214,13 +208,12 @@ export default function DetailedOrderCard({
             <div className="space-y-4">
               {Object.keys(order.statusHistory)
                 .reverse()
-                .map((key: string, index) => (
+                .map((key, index) => (
                   <>
-                    {key !== "_id" && (
+                    {key !== '_id' && (
                       <div key={index} className="flex flex-col gap-2">
                         <div className="flex items-center gap-2">
-                          {/* @ts-ignore */}
-                          {icons[key] ?? (
+                          {icons[key as keyof typeof icons] ?? (
                             <InfoIcon size={16} className="text-gray-300" />
                           )}
                           <p className="text-sm font-medium capitalize">
@@ -229,31 +222,32 @@ export default function DetailedOrderCard({
                         </div>
                         <div
                           className={`${
-                            locale === "en" ? "ml-2 pl-4" : "mr-2 pr-4"
+                            locale === 'en' ? 'ml-2 pl-4' : 'mr-2 pr-4'
                           } border-muted-foreground ${
                             index ===
                               Object.keys(order.statusHistory).length - 1 &&
-                            "border-l-0"
-                          } ${locale === "ar" ? "border-r" : "border-l"}`}
+                            'border-l-0'
+                          } ${locale === 'ar' ? 'border-r' : 'border-l'}`}
                         >
                           <p className="text-xs text-muted-foreground">
-                            {/* @ts-ignore */}
-                            {moment(order.statusHistory[key]).format(
-                              "dddd, MMMM Do, YYYY hh:mm A",
-                            )}
+                            {moment(
+                              order.statusHistory[
+                                key as keyof typeof order.statusHistory
+                              ]
+                            ).format('dddd, MMMM Do, YYYY hh:mm A')}
                           </p>
-                          {key === "postponed" && (
+                          {key === 'postponed' && (
                             <p className="text-balance text-sm italic text-yellow-500 dark:text-amber-300 font-semibold">
                               {`The customer postponed the order to ${moment(
-                                order.postponedDate,
-                              ).format("MMMM Do, YYYY")}`}
+                                order.postponedDate
+                              ).format('MMMM Do, YYYY')}`}
                             </p>
                           )}
-                          {key === "cancelled" && (
+                          {key === 'cancelled' && (
                             <p className="text-balance text-sm italic text-red-500 dark:text-red-300 font-semibold">
                               {`Cancellation Reason: ${order.cancellationReason?.replaceAll(
-                                "_",
-                                " ",
+                                '_',
+                                ' '
                               )}`}
                             </p>
                           )}
@@ -294,10 +288,10 @@ export default function DetailedOrderCard({
               <div className="flex items-center gap-2">
                 <Clock size={16} className="text-muted-foreground" />
                 <span className="text-sm">
-                  {orderCardDictionary.courier.estimatedDelivery}:{" "}
+                  {orderCardDictionary.courier.estimatedDelivery}:{' '}
                   {moment(order.createdAt)
-                    .add(3, "days")
-                    .format("MMM DD, YYYY")}
+                    .add(3, 'days')
+                    .format('MMM DD, YYYY')}
                 </span>
               </div>
             </div>
@@ -316,8 +310,11 @@ export default function DetailedOrderCard({
               {Object.keys(order.orderImages).map((attachment) => (
                 <DownloadButton
                   key={attachment}
-                  // @ts-ignore
-                  fileUrl={order.orderImages[attachment] ?? ""}
+                  fileUrl={
+                    order.orderImages[
+                      attachment as keyof typeof order.orderImages
+                    ] ?? ''
+                  }
                   fileName={attachment}
                 />
               ))}

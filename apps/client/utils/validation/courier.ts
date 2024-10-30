@@ -15,7 +15,7 @@ export const EditCourierSchema = z.object({
     .string()
     .min(14, { message: 'National Id has to be exactly 14 digits' })
     .max(14, { message: 'National Id has to be exactly 14 digits' }),
-  zone: z.string().nullable(),
+  zone: z.string().optional(),
   nationalIdImage: z.string().url(),
   criminalRecordImage: z.string().url(),
   driverLicenseImage: z.string().url(),

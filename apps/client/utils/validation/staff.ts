@@ -7,7 +7,7 @@ export type Staff = {
   active: boolean;
   nationalId: string;
   zone?: string;
-  commissionPerOrder?: string;
+  commissionPerOrder?: number;
 };
 
 export const NewStaffSchema = z.object({

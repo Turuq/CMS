@@ -139,7 +139,7 @@ export default function EditCourierForm({
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -166,7 +166,7 @@ export default function EditCourierForm({
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -194,7 +194,7 @@ export default function EditCourierForm({
                       onBlur={field.handleBlur}
                       type="email"
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -224,7 +224,7 @@ export default function EditCourierForm({
                       minLength={11}
                       maxLength={11}
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -254,7 +254,7 @@ export default function EditCourierForm({
                       minLength={14}
                       maxLength={14}
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">
@@ -277,12 +277,12 @@ export default function EditCourierForm({
                       id={field.name}
                       type="text"
                       name={field.name}
-                      value={field.state.value}
+                      value={field.state.value ?? ''}
                       required
                       onChange={(e) => field.handleChange(e.target.value)}
                       onBlur={field.handleBlur}
                       className={`w-full rounded-xl bg-light_border dark:bg-muted border-none ring-0 outline-none ${field.state.value !== defaultValues[field.name] && 'ring-1 ring-amber-500 dark:ring-amber-300'}`}
-                      placeholder={defaultValues[field.name]}
+                      placeholder={defaultValues[field.name] ?? ''}
                     />
                     {field.state.meta.errors && (
                       <p className="text-xs italic font-semibold text-red-500">

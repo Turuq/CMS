@@ -9,7 +9,7 @@ import {
 } from '@/components/ui/select';
 import { Dispatch, SetStateAction } from 'react';
 import { useTranslations } from 'next-intl';
-import { FilterObject } from '@/utils/validation/filters';
+import { FilterObject } from '@/api/utils/validation';
 
 interface StatusFilterProps {
   onServerColumnFilterChange: Dispatch<SetStateAction<FilterObject>>;

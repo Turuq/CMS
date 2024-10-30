@@ -302,6 +302,20 @@
               "criminalRecord": "السجل الجنائي"
             }
           }
+        },
+        "edit": {
+          "title": "تعديل"
+        },
+        "delete": {
+          "title": "حذف"
+        },
+        "activate": {
+          "aboutToActivate": "أنت على وشك تفعيل {name}. هل أنت متأكد؟",
+          "aboutToDeactivate": "أنت على وشك إلغاء تفعيل {name}. هل أنت متأكد؟",
+          "activate": "تفعيل",
+          "deactivate": "إلغاء تفعيل",
+          "confirm": "تأكيد",
+          "cancel": "إلغاء"
         }
       }
     }
@@ -398,6 +412,11 @@
         "driverLicenseImage": "صورة الرخصة",
         "criminalRecordImage": "صورة السجل الجنائي",
         "confirmPassword": "تأكيد كلمة المرور",
+        "type": {
+          "label": "نوع الموظف",
+          "outsourced": "مندوب خارجي",
+          "internal": "مندوب طرق"
+        },
         "role": {
           "label": "دور الموظف",
           "manager": "مدير المناديب",

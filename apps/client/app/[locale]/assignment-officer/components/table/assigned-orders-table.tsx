@@ -29,15 +29,16 @@ import { Trash } from 'lucide-react';
 
 interface DataTableProps {
   data: OrderType[];
-  columns: ColumnDef<OrderType, any>[];
+  columns: ColumnDef<OrderType>[];
   onRemove: (id: string) => void;
   tableDictionary: {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
     [key: string]: any;
   };
   locale: string;
 }
 
-export default function DataTable<TData extends OrderType, TValue>({
+export default function DataTable({
   data,
   columns,
   onRemove,

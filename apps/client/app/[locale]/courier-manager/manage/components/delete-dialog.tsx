@@ -1,15 +1,13 @@
-import { useState } from "react";
+import { Button } from '@/components/ui/button'; // Assuming you have a button component
 import {
   Dialog,
-  DialogTrigger,
+  DialogClose,
   DialogContent,
-  DialogHeader,
-  DialogTitle,
   DialogDescription,
   DialogFooter,
-  DialogClose,
-} from "@/components/ui/dialog";
-import { Button } from "@/components/ui/button"; // Assuming you have a button component
+  DialogHeader,
+  DialogTitle,
+} from '@/components/ui/dialog';
 
 interface DeleteConfirmationDialogProps {
   isOpen: boolean;

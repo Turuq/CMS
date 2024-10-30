@@ -5,6 +5,7 @@ import { CourierModel } from '../models/courier';
 import { authorizeUser } from '../utils/authorization';
 import { validateObjectId } from '../utils/validation';
 import {
+  activeCourierSchema,
   courierUpdateSchema,
   createCourierSchema,
   type Courier,
@@ -28,8 +29,17 @@ const courierRouter = new Hono()
         message: 'Courier already exists',
       });
     }
+
+    const encryptedPassword = await Bun.password.hash(data.password, {
+      algorithm: 'bcrypt',
+      cost: 12,
+    });
+
     // Create new courier
-    const newCourier = new CourierModel(data);
+    const newCourier = new CourierModel({
+      ...data,
+      password: encryptedPassword,
+    });
     try {
       // Save new courier
       await newCourier.save();
@@ -255,14 +265,19 @@ const courierRouter = new Hono()
     'activate/:id',
     getUser,
     zValidator('param', validateObjectId),
+    zValidator('json', activeCourierSchema),
     async (c) => {
       authorizeUser({ c, level: ['COURIER_MANAGER'] });
       try {
         // Verify that id is a valid ObjectId
         const { id } = c.req.valid('param');
+        const { salary, commissionPerOrder, zone } = c.req.valid('json');
         // Find courier by id and activate
         const activatedCourier = await CourierModel.findByIdAndUpdate(id, {
           active: true,
+          salary,
+          commissionPerOrder,
+          zone,
         });
         if (!activatedCourier) {
           c.status(404);

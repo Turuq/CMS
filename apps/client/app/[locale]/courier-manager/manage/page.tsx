@@ -171,39 +171,6 @@ export default function Page({
           </div>
         </TabsContent>
       </Tabs>
-
-      {/* {isAdding && !selectedRow && (
-        <Form
-          isAdding={isAdding}
-          setIsAdding={setIsAdding}
-          dict={formDictionary}
-          tabs={tabs}
-          activeTab={''}
-        />
-      )}
-
-      {!isAdding && selectedRow && (
-        <Form
-          isAdding={isAdding}
-          setIsAdding={setIsAdding}
-          selectedRow={selectedRow}
-          setSelectedRow={setSelectedRow}
-          dict={formDictionary}
-          tabs={tabs}
-          activeTab={''}
-        />
-      )}
-
-      {!isAdding && !selectedRow && (
-        <RoleTable
-          tabs={tabs}
-          activeTab={''}
-          tableDictionary={tableDictionary}
-          locale={locale}
-          setSelectedRow={(row: any) => setSelectedRow(row)}
-          setIsAdding={setIsAdding}
-        />
-      )} */}
     </div>
   );
 }

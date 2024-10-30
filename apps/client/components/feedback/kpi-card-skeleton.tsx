@@ -1,12 +1,4 @@
-import {
-  Card,
-  CardContent,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "../ui/card";
-import Link from "next/link";
-import { icons } from "../icons/icons";
+import { Card, CardContent, CardHeader, CardTitle } from '../ui/card';
 import { Skeleton } from "../ui/skeleton";
 
 export default function KpiCardSkeleton() {

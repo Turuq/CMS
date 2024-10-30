@@ -21,6 +21,7 @@ import {
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+import TableActions from './table-actions';
 
 interface SelectedOrderTableProps {
   locale: string;
@@ -78,6 +79,12 @@ export default function StaffManagementTable({
                   </TableHead>
                 );
               })}
+              <TableHead
+                key={'courier-actions'}
+                className={`text-sm text-center font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl last:border-l-0' : 'first:rounded-l-xl last:rounded-r-xl last:border-r-0'}`}
+              >
+                {t('manage.table.columns.actions')}
+              </TableHead>
             </TableRow>
           ))}
         </TableHeader>
@@ -105,6 +112,17 @@ export default function StaffManagementTable({
                     )}
                   </TableCell>
                 ))}
+                <TableCell
+                  key={'courier-actions'}
+                  className="text-center text-sm"
+                >
+                  <TableActions
+                    type={type}
+                    id={row.original._id}
+                    active={row.original.active}
+                    name={row.original.name}
+                  />
+                </TableCell>
               </TableRow>
             ))
           ) : (

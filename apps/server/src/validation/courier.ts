@@ -9,7 +9,7 @@ export const courierSchema = z.object({
   nationalId: z.string().min(14).max(14),
   phone: z.string().min(11).max(11),
   salary: z.number().positive().min(0),
-  zone: z.string().nullable(),
+  zone: z.string().optional(),
   reshippedOrders: z.number().positive().min(0),
   commissionPerOrder: z.number().positive().min(0),
   active: z.boolean(),
@@ -23,6 +23,7 @@ export const createCourierSchema = z.object({
   name: z.string(),
   username: z.string(),
   phone: z.string().min(11).max(11),
+  password: z.string(),
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
   nationalIdImage: z.string().url(),
@@ -61,12 +62,18 @@ export const statisticsSchema = z.object({
   unreachable: z.number().positive(),
 });
 
+export const activeCourierSchema = z.object({
+  salary: z.number().positive().min(0),
+  commissionPerOrder: z.number().positive().min(0),
+  zone: z.string(),
+});
+
 export type Courier = z.infer<typeof courierSchema>;
 export type CourierCardType = Pick<
   Courier,
   'username' | 'email' | 'name' | 'phone' | 'zone'
 > & { id: string };
-
+export type CreateCourier = z.infer<typeof createCourierSchema>;
 export type CourierWithStatistics = Courier & {
   statistics: z.infer<typeof statisticsSchema>;
 };

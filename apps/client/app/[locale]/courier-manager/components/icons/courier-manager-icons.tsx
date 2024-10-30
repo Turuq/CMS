@@ -176,7 +176,7 @@ export const courierManagerIcons: { [key: string]: JSX.Element } = {
         stroke="currentColor"
         strokeWidth="2"
         strokeLinejoin="round"
-        className="text-inherit group-hover:scale-110 group-hover:text-accent"
+        className="text-gray-400"
       />
     </svg>
   ),
@@ -195,7 +195,7 @@ export const courierManagerIcons: { [key: string]: JSX.Element } = {
         strokeWidth="2"
         strokeLinecap="round"
         strokeLinejoin="round"
-        className="text-inherit group-hover:scale-110 group-hover:text-accent"
+        className="text-gray-400"
       />
       <path
         d="M13 22H6.59087C5.04549 22 3.81631 21.248 2.71266 20.1966C0.453365 18.0441 4.1628 16.324 5.57757 15.4816C8.75591 13.5891 12.7529 13.5096 16 15.2432"

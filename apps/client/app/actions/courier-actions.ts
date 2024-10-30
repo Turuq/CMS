@@ -2,7 +2,7 @@
 
 import { verifyToken } from '@/utils/helpers/get-token';
 import { api } from './api';
-import { Courier } from '@/api/validation/courier';
+import { Courier, CreateCourier } from '@/api/validation/courier';
 import { EditCourier } from '@/utils/validation/courier';
 
 export async function getGroupedCouriers() {
@@ -77,11 +77,21 @@ export async function getCourierById({ id }: { id: string }) {
   return data;
 }
 
-export async function activateCourier({ id }: { id: string }) {
+export async function activateCourier({
+  id,
+  salary,
+  commissionPerOrder,
+  zone,
+}: {
+  id: string;
+  salary: number;
+  commissionPerOrder: number;
+  zone: string;
+}) {
   const token = await verifyToken();
 
   const res = await api.courier.activate[':id'].$put(
-    { param: { id } },
+    { param: { id }, json: { salary, commissionPerOrder, zone } },
     {
       headers: {
         Authorization: `Bearer ${token}`,
@@ -136,4 +146,30 @@ export async function updateCourier({
   }
   const data = await res.json();
   return data;
+}
+
+export async function createNewCourier({
+  courier,
+}: {
+  courier: CreateCourier;
+}) {
+  const token = await verifyToken();
+  try {
+    const res = await api.courier.create.$post(
+      {
+        json: courier,
+      },
+      { headers: { Authorization: `Bearer ${token}` } }
+    );
+
+    if (!res.ok) {
+      throw new Error('Failed to create courier');
+    }
+
+    const data = await res.json();
+    return data;
+  } catch (error) {
+    console.error(error);
+    throw new Error('Failed to create courier');
+  }
 }

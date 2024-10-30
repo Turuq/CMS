@@ -306,6 +306,20 @@
               "criminalRecord": "Criminal Record"
             }
           }
+        },
+        "edit": {
+          "title": "Edit"
+        },
+        "delete": {
+          "title": "Delete"
+        },
+        "activate": {
+          "aboutToActivate": "You are about to activate {name}. Are you sure?",
+          "aboutToDeactivate": "You are about to deactivate {name}. Are you sure?",
+          "activate": "Activate",
+          "deactivate": "Deactivate",
+          "confirm": "Confirm",
+          "cancel": "Cancel"
         }
       }
     }
@@ -397,6 +411,11 @@
         "phone": "Phone",
         "nationalId": "National ID",
         "zone": "Zone",
+        "type": {
+          "label": "Courier Type",
+          "outsourced": "OutSourced",
+          "internal": "Turuq Courier"
+        },
         "password": "Password",
         "confirmPassword": "Confirm Password",
         "nationalIdImage": "National ID Image",

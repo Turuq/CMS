@@ -1,18 +1,17 @@
 "use client";
 
 import { cn } from "@/lib/utils";
+import { motion } from 'framer-motion';
+import Link from 'next/link';
+import AnimatedNumber from '../display/animated-number';
+import { icons } from '../icons/icons';
 import {
   Card,
   CardContent,
   CardFooter,
   CardHeader,
   CardTitle,
-} from "../ui/card";
-import AnimatedNumber from "../display/animated-number";
-import AnimatedNumberExample from "../display/animated-number-example";
-import Link from "next/link";
-import { icons } from "../icons/icons";
-import { motion } from "framer-motion";
+} from '../ui/card';
 
 import { SparkAreaChart, SparkBarChart, SparkLineChart } from "@tremor/react";
 import { useState } from "react";
@@ -106,49 +105,49 @@ export default function ExpandableKpiCard({
 
   return (
     <motion.div
-      key={"expanded-kpi-card"}
+      key={'expanded-kpi-card'}
       variants={cardVariants}
-      animate={expand ? "expand" : "collapse"}
+      animate={expand ? 'expand' : 'collapse'}
     >
       <Card
         className={cn(
-          `rounded-xl drop-shadow-sm relative shadow-accent/10 min-h-20`,
+          `rounded-xl drop-shadow-sm relative shadow-accent/10 min-h-20`
         )}
       >
         <CardHeader
           className={`px-6 pt-3 pb-1 flex flex-row items-center justify-between gap-2`}
         >
-          <CardTitle className={"flex items-center gap-5"}>
+          <CardTitle className={'flex items-center gap-5'}>
             {icon}
-            <div className={"flex items-center justify-between gap-5 w-full"}>
+            <div className={'flex items-center justify-between gap-5 w-full'}>
               {!animated ? (
-                <h1 className={"text-3xl lg:text-4xl font-bold"}>
+                <h1 className={'text-3xl lg:text-4xl font-bold'}>
                   {statistic
                     ? financial
-                      ? statistic.toLocaleString("en-EG", {
+                      ? statistic.toLocaleString('en-EG', {
                           notation: notation,
-                          style: "currency",
-                          currency: "EGP",
+                          style: 'currency',
+                          currency: 'EGP',
                         })
-                      : statistic.toLocaleString("en-EG", {
+                      : statistic.toLocaleString('en-EG', {
                           notation: notation,
                         })
                     : 0}
                 </h1>
               ) : (
                 // use this in your actual code
-                //   <AnimatedNumber
-                //     value={statistic}
-                //     financial={financial}
-                //     locale="en-EG"
-                //       notation={notation}
-                //   />
-                // This is just an example
-                <AnimatedNumberExample
+                <AnimatedNumber
                   value={statistic}
                   financial={financial}
+                  locale="en-EG"
                   notation={notation}
                 />
+                // This is just an example
+                // <AnimatedNumberExample
+                //   value={statistic}
+                //   financial={financial}
+                //   notation={notation}
+                // />
               )}
             </div>
           </CardTitle>
@@ -161,14 +160,14 @@ export default function ExpandableKpiCard({
             </button>
             {chart && chartConfig && (
               <>
-                {chartConfig?.chart === "area" ? (
+                {chartConfig?.chart === 'area' ? (
                   <SparkAreaChart
                     data={chartConfig.data}
                     categories={chartConfig.categories}
                     index={chartConfig.index}
                     colors={chartConfig.colors}
                   />
-                ) : chartConfig?.chart === "bar" ? (
+                ) : chartConfig?.chart === 'bar' ? (
                   <SparkBarChart
                     data={chartConfig.data}
                     categories={chartConfig.categories}
@@ -187,16 +186,16 @@ export default function ExpandableKpiCard({
               </>
             )}
             {action && !chart && (
-              <div className={"flex items-center gap-5"}>{action}</div>
+              <div className={'flex items-center gap-5'}>{action}</div>
             )}
           </div>
         </CardHeader>
         <CardContent className={`flex flex-col gap-2 px-6 pt-0 pb-1`}>
           <p className="text-xs capitalize">{title}</p>
           <motion.div
-            key={"expanded-kpi-card-children"}
+            key={'expanded-kpi-card-children'}
             variants={childrenVariants}
-            animate={expand ? "show" : "hide"}
+            animate={expand ? 'show' : 'hide'}
           >
             {children}
           </motion.div>
@@ -221,13 +220,13 @@ export default function ExpandableKpiCard({
         {description && (
           <CardFooter
             className={
-              "text-xs lg:text-sm font-bold text-dark/50 dark:text-light/50 italic py-2 px-6"
+              'text-xs lg:text-sm font-bold text-dark/50 dark:text-light/50 italic py-2 px-6'
             }
           >
             {description}
           </CardFooter>
         )}
-        {dotted && <div className={"dot-background hidden lg:block"}></div>}
+        {dotted && <div className={'dot-background hidden lg:block'}></div>}
       </Card>
     </motion.div>
   );

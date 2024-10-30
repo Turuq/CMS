@@ -23,21 +23,21 @@ import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import moment, { Moment } from 'moment';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { useEffect, useState } from 'react';
+import { useState } from 'react';
 
 export default function InspectionCalendar({
-  params: { locale, courierId },
+  params: { courierId },
 }: {
   params: { locale: string; courierId: string };
 }) {
   const router = useRouter();
   const [date, setDate] = useState<Moment>(moment().startOf('month'));
-  const [monthDays, setMonthDays] = useState<Array<number>>();
+  // const [monthDays, setMonthDays] = useState<Array<number>>();
 
-  useEffect(() => {
-    const days = moment(date).daysInMonth();
-    setMonthDays(new Array(days).fill(0).map((_, i) => i + 1));
-  }, [date]);
+  // useEffect(() => {
+  //   const days = moment(date).daysInMonth();
+  //   setMonthDays(new Array(days).fill(0).map((_, i) => i + 1));
+  // }, [date]);
 
   const generateCalendarGrid = () => {
     const daysInMonth = date.daysInMonth();

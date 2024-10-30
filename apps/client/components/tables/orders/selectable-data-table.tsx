@@ -42,6 +42,7 @@ import { OrderType } from '@/types/order';
 import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
+import { FilterObject } from '@/api/utils/validation';
 
 interface SelectableOrdersDataTableProps<TValue> {
   locale: string;
@@ -79,8 +80,9 @@ export function SelectableOrdersDataTable<TValue>({
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  const [serverColumnFilters, setServerColumnFilters] =
-    useState<ColumnFiltersState>([]);
+  const [serverColumnFilters, setServerColumnFilters] = useState<FilterObject>(
+    {}
+  );
   const [courierFilter, setCourierFilter] = useState<string | undefined>();
   const [statusFilter, setStatusFilter] = useState<string | undefined>();
   const [searchValue, setSearchValue] = useState('');
@@ -104,7 +106,7 @@ export function SelectableOrdersDataTable<TValue>({
   function handleServerFilterReset() {
     setCourierFilter('');
     setStatusFilter('');
-    setServerColumnFilters([]);
+    setServerColumnFilters({});
   }
 
   function handleClientFilterReset() {
@@ -140,7 +142,7 @@ export function SelectableOrdersDataTable<TValue>({
               />
             </div>
             {(clientColumnFilters.length > 0 ||
-              serverColumnFilters.length > 0) && (
+              Object.keys(serverColumnFilters).length > 0) && (
               <div className="flex items-center gap-2">
                 <Button
                   variant={'default'}

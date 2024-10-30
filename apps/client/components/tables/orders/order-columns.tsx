@@ -1,35 +1,9 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // This file is used to define the columns of the table
 
-import { courierManagerIcons } from '@/app/[locale]/courier-manager/components/icons/courier-manager-icons';
-import {
-  activateCourier,
-  deactivateCourier,
-} from '@/app/actions/courier-actions';
-import { activateStaff, deactivateStaff } from '@/app/actions/staff-actions';
 import { statusIcons } from '@/components/icons/status-icons';
-import {
-  AlertDialog,
-  AlertDialogAction,
-  AlertDialogCancel,
-  AlertDialogContent,
-  AlertDialogDescription,
-  AlertDialogFooter,
-  AlertDialogHeader,
-  AlertDialogTitle,
-  AlertDialogTrigger,
-} from '@/components/ui/alert-dialog';
 import { Badge } from '@/components/ui/badge';
-import { Button } from '@/components/ui/button';
 import { Checkbox } from '@/components/ui/checkbox';
-import {
-  DropdownMenu,
-  DropdownMenuContent,
-  DropdownMenuItem,
-  DropdownMenuLabel,
-  DropdownMenuSeparator,
-  DropdownMenuTrigger,
-} from '@/components/ui/dropdown-menu';
 import { OrderType } from '@/types/order';
 import {
   getIndicatorColor,
@@ -37,48 +11,9 @@ import {
   getStatusText,
   getStatusTextColor,
 } from '@/utils/helpers/status-modifier';
-import { ToastStyles } from '@/utils/styles';
 import { Staff } from '@/utils/validation/staff';
 import { ColumnDef } from '@tanstack/react-table';
-import { AlertOctagonIcon, MoreHorizontalIcon } from 'lucide-react';
-import Link from 'next/link';
-import { toast } from 'sonner';
-
-function toggleActive({ id, active }: { id: string; active: boolean }) {
-  if (!active) {
-    activateStaff(id)
-      .then(() =>
-        toast.success('Staff member activated', { style: ToastStyles.success })
-      )
-      .catch((err) => toast.error(err.message, { style: ToastStyles.error }));
-  } else {
-    deactivateStaff(id)
-      .then(() =>
-        toast.success('Staff member deactivated', {
-          style: ToastStyles.success,
-        })
-      )
-      .catch((err) => toast.error(err.message, { style: ToastStyles.error }));
-  }
-}
-
-function toggleActiveCourier({ id, active }: { id: string; active: boolean }) {
-  if (!active) {
-    activateCourier({ id })
-      .then(() =>
-        toast.success('Courier activated', { style: ToastStyles.success })
-      )
-      .catch((err) => toast.error(err.message, { style: ToastStyles.error }));
-  } else {
-    deactivateCourier({ id })
-      .then(() =>
-        toast.success('Courier deactivated', {
-          style: ToastStyles.success,
-        })
-      )
-      .catch((err) => toast.error(err.message, { style: ToastStyles.error }));
-  }
-}
+import { AlertOctagonIcon } from 'lucide-react';
 
 // There are two way to populate the table with data
 // 1. By providing the accessorKey and the table will automatically populate the data
@@ -407,79 +342,6 @@ export const courierStaffColumns: ColumnDef<Staff>[] = [
     accessorKey: 'active',
     header: 'Active',
   },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const { _id, active } = row.original;
-
-      return (
-        <AlertDialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem asChild>
-                <Link href={`manage/edit/courier/${_id}`} className="group">
-                  <div className="flex items-center">
-                    {courierManagerIcons['editStaff']}
-                    <p className="ml-2 font-semibold">Edit</p>
-                  </div>
-                </Link>
-              </DropdownMenuItem>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="group">
-                  {!active ? (
-                    <div className="flex items-center">
-                      {courierManagerIcons['activateStaff']}
-                      <p className="ml-2 font-semibold">Activate</p>
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      {courierManagerIcons['deactivateStaff']}
-                      <p className="ml-2 font-semibold">Deactivate</p>
-                    </div>
-                  )}
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="group" disabled>
-                <div className="flex items-center text-red-500/50 group-hover:text-red-500">
-                  {courierManagerIcons['deleteStaff']}
-                  <p className="ml-2 font-semibold">Delete</p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you want to {!active ? 'activate' : 'deactivate'} this
-                courier?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                You are about to {!active ? 'activate' : 'deactivate'} a
-                courier, please make sure that you are selecting the correct
-                account.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => toggleActiveCourier({ id: _id, active })}
-              >
-                {!active ? 'Activate' : 'Deactivate'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      );
-    },
-  },
 ];
 
 export const staffMemberColumns: ColumnDef<Staff>[] = [
@@ -507,78 +369,5 @@ export const staffMemberColumns: ColumnDef<Staff>[] = [
     id: 'active',
     accessorKey: 'active',
     header: 'Active',
-  },
-  {
-    id: 'actions',
-    cell: ({ row }) => {
-      const { _id, active } = row.original;
-
-      return (
-        <AlertDialog>
-          <DropdownMenu>
-            <DropdownMenuTrigger asChild>
-              <Button variant="ghost" className="h-8 w-8 p-0">
-                <span className="sr-only">Open menu</span>
-                <MoreHorizontalIcon className="h-4 w-4" />
-              </Button>
-            </DropdownMenuTrigger>
-            <DropdownMenuContent align="end">
-              <DropdownMenuLabel>Actions</DropdownMenuLabel>
-              <DropdownMenuItem asChild>
-                <Link href={`manage/edit/staff/${_id}`} className="group">
-                  <div className="flex items-center">
-                    {courierManagerIcons['editStaff']}
-                    <p className="ml-2 font-semibold">Edit</p>
-                  </div>
-                </Link>
-              </DropdownMenuItem>
-              <AlertDialogTrigger asChild>
-                <DropdownMenuItem className="group">
-                  {!active ? (
-                    <div className="flex items-center">
-                      {courierManagerIcons['activateStaff']}
-                      <p className="ml-2 font-semibold">Activate</p>
-                    </div>
-                  ) : (
-                    <div className="flex items-center">
-                      {courierManagerIcons['deactivateStaff']}
-                      <p className="ml-2 font-semibold">Deactivate</p>
-                    </div>
-                  )}
-                </DropdownMenuItem>
-              </AlertDialogTrigger>
-              <DropdownMenuSeparator />
-              <DropdownMenuItem className="group" disabled>
-                <div className="flex items-center text-red-500/50 group-hover:text-red-500">
-                  {courierManagerIcons['deleteStaff']}
-                  <p className="ml-2 font-semibold">Delete</p>
-                </div>
-              </DropdownMenuItem>
-            </DropdownMenuContent>
-          </DropdownMenu>
-          <AlertDialogContent>
-            <AlertDialogHeader>
-              <AlertDialogTitle>
-                Are you want to {!active ? 'activate' : 'deactivate'} this staff
-                member?
-              </AlertDialogTitle>
-              <AlertDialogDescription>
-                You are about to {!active ? 'activate' : 'deactivate'} a staff
-                member, please make sure that you are selecting the correct
-                account.
-              </AlertDialogDescription>
-            </AlertDialogHeader>
-            <AlertDialogFooter>
-              <AlertDialogCancel>Cancel</AlertDialogCancel>
-              <AlertDialogAction
-                onClick={() => toggleActive({ id: _id, active })}
-              >
-                {!active ? 'Activate' : 'Deactivate'}
-              </AlertDialogAction>
-            </AlertDialogFooter>
-          </AlertDialogContent>
-        </AlertDialog>
-      );
-    },
   },
 ];
