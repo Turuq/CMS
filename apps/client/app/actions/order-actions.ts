@@ -167,3 +167,39 @@ export async function getCourierAssignedIntegrationOrders({
     await res.json();
   return data;
 }
+
+export async function assignTuruqOrders({
+  id,
+  ids,
+}: {
+  id: string;
+  ids: string[];
+}) {
+  const res = await api.order.turuq.assign[':id'].$put({
+    param: { id },
+    json: { ids },
+  });
+  if (!res.ok) {
+    return { error: 'Failed to assign orders' };
+  }
+  const data = await res.json();
+  return { data };
+}
+
+export async function assignIntegrationOrders({
+  id,
+  ids,
+}: {
+  id: string;
+  ids: string[];
+}) {
+  const res = await api.order.integration.assign[':id'].$put({
+    param: { id },
+    json: { ids },
+  });
+  if (!res.ok) {
+    return { error: 'Failed to assign orders' };
+  }
+  const data = await res.json();
+  return { data };
+}
