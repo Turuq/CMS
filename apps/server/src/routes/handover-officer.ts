@@ -7,6 +7,9 @@ import {
   updateHandoverOfficerSchema,
 } from '../validation/handover-officer';
 import { staffMemberModel } from '../models/staff';
+import { getUser } from '../lib/clerk/clerkClient';
+import { authorizeUser } from '../utils/authorization';
+import { clerkClient } from '../lib/clerk/clerkClient';
 
 const handoverOfficerRouter = new Hono()
   .post(
@@ -22,9 +25,7 @@ const handoverOfficerRouter = new Hono()
       });
       if (existingHandoverOfficer) {
         c.status(409);
-        return c.json({
-          message: 'Handover Officer already exists',
-        });
+        throw new Error('Handover officer already exists');
       }
       // Create new handover officer
       const newHandoverOfficer = new staffMemberModel({
@@ -34,36 +35,39 @@ const handoverOfficerRouter = new Hono()
       try {
         // Save new handover officer
         await newHandoverOfficer.save();
+
+        await clerkClient.users.createUser({
+          firstName: data.name,
+          username: data.username,
+          emailAddress: [data.email],
+          password: data.password,
+        });
+
         c.status(201);
         return c.json(newHandoverOfficer);
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to create handover officer: ${error.message}`,
-        });
+        throw new Error(`Failed to create handover officer: ${error.message}`);
       }
     }
   )
-  .get('/', async (c) => {
+  .get('/', getUser, async (c) => {
+    authorizeUser({ c, level: ['COURIER_MANAGER'] });
     try {
       const handoverOfficers = await staffMemberModel
         .find({ role: 'HANDOVER_OFFICER' })
-        .select('name username phone active');
+        .select('name username phone active nationalId');
       if (!handoverOfficers) {
         c.status(404);
-        return c.json({
-          message: 'No handover officers found',
-        });
+        throw new Error('Handover officers not found');
       }
       c.status(200);
       return c.json(handoverOfficers);
     } catch (error: any) {
       console.error(error);
       c.status(500);
-      return c.json({
-        message: `Failed to get handover officers: ${error.message}`,
-      });
+      throw new Error(`Failed to get handover officers: ${error.message}`);
     }
   })
   .get('/:id', zValidator('param', validateObjectId), async (c) => {

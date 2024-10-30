@@ -12,12 +12,6 @@ const staffMemberSchema = new Schema(
       required: false,
       unique: true,
     },
-    password: {
-      type: String,
-      private: true,
-      required: true,
-      select: false,
-    },
     role: {
       type: String,
       required: true,
@@ -42,7 +36,7 @@ const staffMemberSchema = new Schema(
       required: true,
       unique: true,
     },
-    criminalRecord: {
+    criminalRecordImage: {
       type: String,
       required: true,
     },

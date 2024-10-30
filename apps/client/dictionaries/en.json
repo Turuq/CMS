@@ -1,0 +1,517 @@
+{
+  "greetingOp": "Good Morning, {name}",
+  "LocaleSwitcher": {
+    "label": "Change Language",
+    "locale": "{locale, select, ar {العربية} en {English} other {Unknown}}"
+  },
+  "navigation": {
+    "settings": "Settings",
+    "signOut": "Sign Out",
+    "orders": {
+      "tabs": {
+        "turuq": "Turuq",
+        "integrations": "Integrations",
+        "imported": "Imported"
+      }
+    }
+  },
+  "dashboard": {
+    "statistics": {
+      "title": "Order Statistics",
+      "cards": {
+        "delivered": "Delivered",
+        "totalOrders": "Total Orders",
+        "processing": "Processing",
+        "reshipped": "Reshipped",
+        "collected": "Collected",
+        "cancelled": "Cancelled",
+        "outForDelivery": "Out For Delivery",
+        "postponed": "Postponed",
+        "pending": "Pending",
+        "returned": "Returned",
+        "unreachable": "Unreachable",
+        "outOfStock": "Out Of Stock",
+        "invalidAddress": "Invalid Address",
+        "toBeReshipped": "To Be Reshipped",
+        "totalToBeReceived": "Total To Be Received",
+        "totalShippingFees": "Total Shipping Fees",
+        "numberOfCouriers": "Couriers in a batch",
+        "viewMore": "View More",
+        "processingAssigned": "Processing Assigned",
+        "processingUnassigned": "Processing Unassigned"
+      }
+    }
+  },
+  "courierManager": {
+    "tabs": {
+      "home": {
+        "header": "Home"
+      },
+      "orders": {
+        "header": "Orders",
+        "tabs": {
+          "turuq": "Turuq",
+          "integrations": "Integrations",
+          "imported": "Imported"
+        },
+        "ordersTable": {
+          "columns": {
+            "OID": "OID",
+            "companyName": "Company Name",
+            "courier": "Courier",
+            "customerName": "Customer Name",
+            "phoneNumber": "Phone Number",
+            "products": "# Products",
+            "status": "Status",
+            "type": "Type",
+            "subtotal": "Subtotal",
+            "shippingFees": "Shipping Fees",
+            "total": "Total",
+            "createdAt": "Created At"
+          },
+          "empty": "No orders found",
+          "filters": {
+            "courier": {
+              "placeholder": "Filter by Courier"
+            },
+            "status": {
+              "placeholder": "Filter by Status",
+              "values": {
+                "delivered": "Delivered",
+                "processing": "Processing",
+                "reshipped": "Reshipped",
+                "cancelled": "Cancelled",
+                "outForDelivery": "Out For Delivery",
+                "postponed": "Postponed",
+                "pending": "Pending",
+                "returned": "Returned",
+                "unreachable": "Unreachable",
+                "outOfStock": "Out Of Stock",
+                "invalidAddress": "Invalid Address"
+              }
+            },
+            "type": {
+              "placeholder": "Filter by Type"
+            },
+            "governorate": {
+              "placeholder": "Filter by Governorate"
+            },
+            "company": {
+              "placeholder": "Filter by Company"
+            },
+            "otherFilters": {
+              "placeholder": "Other Filters"
+            },
+            "buttons": {
+              "apply": "Apply Filters",
+              "reset": "Reset Filters"
+            }
+          },
+          "search": {
+            "placeholder": "Search by OID",
+            "buttons": {
+              "clear": "clear"
+            }
+          },
+          "legend": {
+            "reshipped": "Reshipped",
+            "instaPay": "InstaPay",
+            "gotGhosted": "Got Ghosted",
+            "returnedItems": "Returned Items",
+            "paidShippingOnly": "Paid Shipping Only"
+          },
+          "dataResults": {
+            "noResults": "No results found"
+          },
+          "pagination": {
+            "header": {
+              "showing": "Showing",
+              "of": "of",
+              "results": "results"
+            },
+            "footer": {
+              "page": "Page",
+              "of": "of"
+            }
+          }
+        }
+      },
+      "assign": {
+        "header": "Assign",
+        "courierAssignPage": {
+          "tabs": {
+            "turuq": "Turuq",
+            "integrations": "Integrations",
+            "imported": "Imported"
+          },
+
+          "ordersTable": {
+            "headers": {
+              "processingOrders": "Processing Orders",
+              "assignedOrders": "Assigned Orders"
+            },
+            "columns": {
+              "OID": "OID",
+              "companyName": "Company Name",
+              "courier": "Courier",
+              "customerName": "Customer Name",
+              "phoneNumber": "Phone Number",
+              "products": "# Products",
+              "status": "Status",
+              "type": "Type",
+              "subtotal": "Subtotal",
+              "shippingFees": "Shipping Fees",
+              "total": "Total",
+              "createdAt": "Created At",
+              "actions": "Actions"
+            },
+            "buttons": {
+              "assignSelected": "Assign Selected",
+              "finish": "Finish",
+              "remove": "Remove",
+              "startScanning": "Start Scanning"
+            },
+            "search": {
+              "placeholder": "Search by OID",
+              "buttons": {
+                "clear": "clear"
+              }
+            },
+            "dataResults": {
+              "noProcessingOrders": "No Processing Orders.",
+              "noAssignedOrders": "No Assigned Orders."
+            },
+            "pagination": {
+              "header": {
+                "showing": "Showing",
+                "of": "of",
+                "results": "results"
+              },
+              "footer": {
+                "page": "Page",
+                "of": "of"
+              }
+            }
+          },
+          "toast": {
+            "success": {
+              "header": "Orders assigned successfully",
+              "description": "Orders have been assigned to the courier successfully"
+            },
+            "error": {
+              "header": "Error assigning orders",
+              "description": "An error occurred while assigning orders to the courier"
+            }
+          }
+        },
+        "tabs": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "inspect": {
+        "header": "Inspect"
+      },
+      "manage": {
+        "header": "Manage",
+        "tabs": {
+          "handoverOfficers": "Handover Officers",
+          "assignmentOfficers": "Assignment Officers",
+          "couriers": "Couriers"
+        },
+        "table": {
+          "columns": {
+            "name": "Name",
+            "username": "Username",
+            "phone": "Phone",
+            "nationalId": "National ID",
+            "commissionPerOrder": "Commission Per Order",
+            "zone": "Zone",
+            "active": "Status",
+            "badge": {
+              "true": "Active",
+              "false": "Inactive"
+            },
+            "actions": "Actions"
+          },
+          "buttons": {
+            "addHandoverOfficer": "Add New Handover Officer",
+            "addAssignmentOfficer": "Add New Assignment Officer",
+            "addCourier": "Add New Courier"
+          },
+          "dataResults": {
+            "noHandoverOfficers": "No Handover Officers.",
+            "noAssignmentOfficers": "No Assignment Officers.",
+            "noCouriers": "No Couriers."
+          },
+          "pagination": {
+            "header": {
+              "showing": "Showing",
+              "of": "of",
+              "results": "results"
+            },
+            "footer": {
+              "page": "Page",
+              "of": "of"
+            }
+          }
+        },
+        "form": {
+          "couriers": {
+            "headers": {
+              "addCourier": "Add New Courier",
+              "editCourier": "Edit Courier"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "username": "Username",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "licenseImage": "License Image",
+              "criminalRecord": "Criminal Record"
+            }
+          },
+          "handoverOfficers": {
+            "headers": {
+              "addHandoverOfficer": "Add New Handover Officer",
+              "editHandoverOfficer": "Edit Handover Officer"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "email": "Email",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "criminalRecord": "Criminal Record"
+            }
+          },
+          "assignmentOfficers": {
+            "headers": {
+              "addAssignmentOfficer": "Add New Assignment Officer",
+              "editAssignmentOfficer": "Edit Assignment Officer"
+            },
+            "fields": {
+              "name": "Name",
+              "phoneNumber": "Phone Number",
+              "email": "Email",
+              "salary": "Salary",
+              "zone": "Zone",
+              "commissionPerOrder": "Commission Per Order",
+              "nationalIDImage": "National ID Image",
+              "criminalRecord": "Criminal Record"
+            }
+          }
+        },
+        "edit": {
+          "title": "Edit"
+        },
+        "delete": {
+          "title": "Delete"
+        },
+        "activate": {
+          "aboutToActivate": "You are about to activate {name}. Are you sure?",
+          "aboutToDeactivate": "You are about to deactivate {name}. Are you sure?",
+          "activate": "Activate",
+          "deactivate": "Deactivate",
+          "confirm": "Confirm",
+          "cancel": "Cancel"
+        }
+      }
+    }
+  },
+  "assignmentOfficer": {
+    "tabs": {
+      "home": {
+        "header": "Home",
+        "processingOrdersStatistics": {
+          "header": "Processing Orders",
+          "governorate": {
+            "cairo": "Cairo",
+            "giza": "Giza",
+            "alexandria": "Alexandria",
+            "luxor": "Luxor",
+            "aswan": "Aswan",
+            "dakahlia": "Dakahlia",
+            "sharqia": "Sharqia",
+            "beheira": "Beheira",
+            "gharbia": "Gharbia"
+          }
+        },
+        "outForDeliveryOrdersStatistics": {
+          "header": "Out For Delivery Orders",
+          "zone": {
+            "cairo": "Cairo",
+            "giza": "Giza",
+            "alexandria": "Alexandria",
+            "luxor": "Luxor",
+            "aswan": "Aswan",
+            "dakahlia": "Dakahlia",
+            "sharqia": "Sharqia",
+            "beheira": "Beheira",
+            "gharbia": "Gharbia"
+          }
+        }
+      },
+      "assign": {
+        "header": "Assign"
+      }
+    }
+  },
+  "handoverOfficer": {
+    "tabs": {
+      "home": {
+        "header": "Home"
+      },
+      "hand over": {
+        "header": "Hand Over"
+      },
+      "hand in": {
+        "header": "Hand In"
+      }
+    }
+  },
+  "authentication": {
+    "dontHaveAnAccount": "Don't have an account?",
+    "alreadyHaveAnAccount": "Already have an account?",
+    "login": {
+      "header": "Sign in to Turuq",
+      "description": "Welcome back! Please sign in to continue.",
+      "fields": {
+        "email": "Email",
+        "username": "Username",
+        "password": "Password"
+      },
+      "placeholders": {
+        "email": "Enter your email",
+        "username": "Enter your username",
+        "password": "Enter your password"
+      },
+      "buttons": {
+        "login": "Sign in"
+      }
+    },
+    "signup": {
+      "courier": {
+        "header": "Create courier account",
+        "description": "Please enter the courier's information, to create a new account."
+      },
+      "staff": {
+        "header": "Create staff member account",
+        "description": "Please enter the staff member's information, to create a new account."
+      },
+      "fields": {
+        "name": "Name",
+        "username": "Username",
+        "email": "Email",
+        "phone": "Phone",
+        "nationalId": "National ID",
+        "zone": "Zone",
+        "type": {
+          "label": "Courier Type",
+          "outsourced": "OutSourced",
+          "internal": "Turuq Courier"
+        },
+        "password": "Password",
+        "confirmPassword": "Confirm Password",
+        "nationalIdImage": "National ID Image",
+        "driverLicenseImage": "Driver License Image",
+        "criminalRecordImage": "Criminal Record",
+        "role": {
+          "label": "Staff Member Role",
+          "manager": "Courier Manager",
+          "handover": "Handover Officer",
+          "assignment": "Assignment Officer"
+        }
+      },
+      "placeholders": {
+        "name": "Enter the staff member's name",
+        "username": "Enter the staff member's username",
+        "email": "Enter the staff member's email",
+        "phone": "Enter the staff member's phone",
+        "nationalId": "Enter the staff member's national ID",
+        "zone": "Enter the staff member's zone",
+        "password": "Enter the staff member's password",
+        "confirmPassword": "Confirm the staff member's password",
+        "role": "Select the staff member's role"
+      },
+      "buttons": {
+        "signup": "Create account"
+      }
+    }
+  },
+  "roles": {
+    "HANDOVER_OFFICER": "Handover Officer",
+    "ASSIGNMENT_OFFICER": "Assignment Officer",
+    "COURIER_MANAGER": "Courier Manager"
+  },
+  "forms": {
+    "edit": {
+      "staff": {
+        "header": "Edit {name}'s Information",
+        "description": "Please change the information you want to edit.",
+        "fields": {
+          "name": "Name",
+          "username": "Username",
+          "email": "Email",
+          "phone": "Phone",
+          "nationalId": "National ID",
+          "zone": "Zone",
+          "nationalIdImage": "National ID Image",
+          "driverLicenseImage": "Driver License Image",
+          "criminalRecordImage": "Criminal Record",
+          "role": {
+            "label": "Staff Member Role",
+            "manager": "Courier Manager",
+            "handover": "Handover Officer",
+            "assignment": "Assignment Officer"
+          }
+        },
+        "buttons": {
+          "save": "Save Changes",
+          "uploadImage": "Upload Image"
+        },
+        "feedback": {
+          "dragNDrop": "Drag & Drop or",
+          "chooseFile": "Choose File",
+          "toUpload": "to Upload",
+          "dropHere": "Drop here"
+        }
+      }
+    }
+  },
+  "courierCard": {
+    "href": {
+      "handover": "Handover",
+      "assign": "Assign",
+      "inspect": "Inspect"
+    }
+  },
+  "batch": {
+    "warning": {
+      "title": "Heads Up!",
+      "description": "This courier is currently delivering a batch, Please check back later!"
+    },
+    "outstanding-warn": {
+      "title": "Heads Up!",
+      "description": "The courier has outstanding orders. You can end the batch once all orders are fulfilled."
+    },
+    "info": {
+      "title": "Disclaimer",
+      "description": "This courier is currently delivering a batch. You can assign new orders to them, but they will not be able to deliver them until they finish their current batch."
+    },
+    "buttons": {
+      "start": "Start Batch"
+    }
+  },
+  "scanner": {
+    "connectionEstablished": "Connected Established",
+    "portReady": "Port Ready",
+    "scannerConnected": "Barcode Scanner Connected",
+    "startScanning": "Start Scanning"
+  }
+}

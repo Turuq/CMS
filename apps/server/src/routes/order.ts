@@ -1,159 +1,200 @@
 import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
-import { courierModel } from '../models/courier';
+import { getUser } from '../lib/clerk/clerkClient';
+import { ClientModel } from '../models/client';
+import { CourierModel } from '../models/courier';
+import { integrationOrderModel } from '../models/integration-order';
+import { orderModel } from '../models/order';
 import {
+  validateCourierOrdersPagination,
+  validateFilters,
   validateObjectId,
   validateObjectIdArray,
   validatePagination,
 } from '../utils/validation';
-import { orderModel } from '../models/order';
-import { integrationOrderModel } from '../models/integration-order';
+import { authorizeUser } from '../utils/authorization';
 
 const orderRouter = new Hono()
-  // FIXME: Merge the following two endpoints into a single endpoint after the restructuring phase
-  .get(
+  // GET ALL ORDERS, PAGINATED, & FILTERED
+  .post(
     '/turuq/:page/:pageSize',
+    getUser,
     zValidator('param', validatePagination),
+    zValidator('json', validateFilters),
     async (c) => {
+      authorizeUser({ c, level: ['COURIER_MANAGER'] });
       // Validate request params
       const { page, pageSize } = c.req.valid('param');
+      const conditions = c.req.valid('json');
       try {
         const orders = await orderModel
-          .find()
-          .select(
-            'OID client customer products status type subtotal shippingFees total createdAt'
-          )
-          .skip((+page - 1) * +pageSize)
-          .limit(+pageSize)
+          .find(conditions)
+          .populate({
+            path: 'client',
+            model: ClientModel,
+            select: '_id companyName',
+          })
+          .populate({
+            path: 'courier',
+            select: '_id name phone',
+          })
+          .limit(Number(pageSize))
+          .skip((Number(page) - 1) * Number(pageSize))
           .sort({ createdAt: -1 });
-
+        const totalPages =
+          (await orderModel.countDocuments(conditions)) / Number(pageSize);
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
-        return c.json({ len: orders.length, orders });
+        return c.json({ len: orders.length, totalPages, orders });
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
-  .get(
+  .post(
     '/integration/:page/:pageSize',
+    getUser,
     zValidator('param', validatePagination),
+    zValidator('json', validateFilters),
     async (c) => {
+      const { role } = c.var.user;
+      if (role !== 'COURIER_MANAGER') {
+        c.status(403);
+        throw new Error('Unauthorized');
+      }
       // Validate request params
       const { page, pageSize } = c.req.valid('param');
+      const conditions = c.req.valid('json');
       try {
         const integrationOrders = await integrationOrderModel
-          .find()
-          .select(
-            'OID client customer products status type subtotal shippingFees total createdAt'
-          )
-          .skip((+page - 1) * +pageSize)
-          .limit(+pageSize)
+          .find(conditions)
+          .populate({
+            path: 'client',
+            model: ClientModel,
+            select: '_id companyName',
+          })
+          .populate({
+            path: 'courier',
+            select: '_id name phone',
+          })
+          .limit(Number(pageSize))
+          .skip((Number(page) - 1) * Number(pageSize))
           .sort({ createdAt: -1 });
-
+        const totalPages =
+          (await integrationOrderModel.countDocuments(conditions)) /
+          Number(pageSize);
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No integration orders found',
-          });
+          throw new Error('No integration orders found');
         }
 
         c.status(200);
-        return c.json({ len: integrationOrders.length, integrationOrders });
+        return c.json({
+          len: integrationOrders.length,
+          totalPages,
+          integrationOrders,
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get integration orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get integration orders: ${error.message}`);
       }
     }
   )
   // FIXME: Merge the following two endpoints into a single endpoint after the restructuring phase
   .get(
-    '/turuq/assigned/:id',
-    zValidator('param', validateObjectId),
+    '/turuq/assigned/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
     async (c) => {
       // Validate request params
-      const { id } = c.req.valid('param');
+      const { id, page, pageSize } = c.req.valid('param');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
-          return c.json({
-            message: 'Courier not found',
-          });
+          throw new Error('Courier not found');
         }
+
         // Find Processing Orders Assigned to Courier
-        const orders = await orderModel.find({
+        const orders = await orderModel
+          .find({ courier: id, status: 'processing' })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await orderModel.countDocuments({
           courier: id,
           status: 'processing',
         });
 
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
-        return c.json(orders);
+        return c.json({
+          orders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
   .get(
-    '/integration/assigned/:id',
-    zValidator('param', validateObjectId),
+    '/integration/assigned/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
     async (c) => {
       // Validate request params
-      const { id } = c.req.valid('param');
+      const { id, page, pageSize } = c.req.valid('param');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
-          return c.json({
-            message: 'Courier not found',
-          });
+          throw new Error('Courier not found');
         }
 
         // Find Processing Integration Orders Assigned to Courier
-        const integrationOrders = await integrationOrderModel.find({
+        const integrationOrders = await integrationOrderModel
+          .find({ courier: id, status: 'processing' })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await integrationOrderModel.countDocuments({
           courier: id,
           status: 'processing',
         });
 
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
         c.status(200);
-        return c.json(integrationOrders);
+        return c.json({
+          integrationOrders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -175,6 +216,10 @@ const orderRouter = new Hono()
               { $or: [{ courier: { $exists: false } }, { courier: null }] },
             ],
           })
+          .populate({
+            path: 'client',
+            select: 'companyName',
+          })
           .select(
             'OID client customer products status type subtotal shippingFees total createdAt'
           )
@@ -182,21 +227,31 @@ const orderRouter = new Hono()
           .limit(+pageSize)
           .sort({ createdAt: -1 });
 
+        const totalPages = await orderModel.countDocuments({
+          $and: [
+            { status: 'processing' },
+            { $or: [{ courier: { $exists: false } }, { courier: null }] },
+          ],
+        });
+
         if (!orders) {
           c.status(404);
-          return c.json({
-            message: 'No orders found',
-          });
+          throw new Error('No orders found');
         }
 
+        // TODO: create order type
+        const response: { len: number; orders: any[]; totalPages: number } = {
+          len: orders.length,
+          orders,
+          totalPages: Math.ceil(totalPages / +pageSize),
+        };
+
         c.status(200);
-        return c.json({ len: orders.length, orders });
+        return c.json(response);
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get orders: ${error.message}`);
       }
     }
   )
@@ -216,6 +271,10 @@ const orderRouter = new Hono()
               { $or: [{ courier: { $exists: false } }, { courier: null }] },
             ],
           })
+          .populate({
+            path: 'client',
+            select: 'companyName',
+          })
           .select(
             'OID client customer products status type subtotal shippingFees total createdAt'
           )
@@ -223,21 +282,34 @@ const orderRouter = new Hono()
           .limit(+pageSize)
           .sort({ createdAt: -1 });
 
+        const totalPages = await integrationOrderModel.countDocuments({
+          $and: [
+            { status: 'processing' },
+            { $or: [{ courier: { $exists: false } }, { courier: null }] },
+          ],
+        });
+
         if (!integrationOrders) {
           c.status(404);
-          return c.json({
-            message: 'No integration orders found',
-          });
+          throw new Error('No integration orders found');
         }
 
+        const response: {
+          len: number;
+          integrationOrders: any[];
+          totalPages: number;
+        } = {
+          len: integrationOrders.length,
+          integrationOrders,
+          totalPages: Math.ceil(totalPages / +pageSize),
+        };
+
         c.status(200);
-        return c.json({ len: integrationOrders.length, integrationOrders });
+        return c.json(response);
       } catch (error: any) {
         console.error(error);
         c.status(500);
-        return c.json({
-          message: `Failed to get integration orders: ${error.message}`,
-        });
+        throw new Error(`Failed to get integration orders: ${error.message}`);
       }
     }
   )
@@ -346,7 +418,7 @@ const orderRouter = new Hono()
       // Validate request body
       const data = c.req.valid('json');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
           return c.json({
@@ -392,7 +464,7 @@ const orderRouter = new Hono()
       // Validate request body
       const data = c.req.valid('json');
       try {
-        const courier = await courierModel.findById(id).select('_id');
+        const courier = await CourierModel.findById(id).select('_id');
         if (!courier) {
           c.status(404);
           return c.json({
@@ -527,5 +599,7 @@ const orderRouter = new Hono()
       }
     }
   );
+
+  
 
 export default orderRouter;

@@ -1,6 +1,7 @@
-import { model, Schema } from 'mongoose';
+import { model, Schema, type ObjectId } from 'mongoose';
+import type { Courier } from '../validation/courier';
 
-const courierSchema = new Schema(
+const courierSchema = new Schema<Courier>(
   {
     username: {
       type: String,
@@ -37,11 +38,11 @@ const courierSchema = new Schema(
       required: true,
       unique: true,
     },
-    criminalRecord: {
+    criminalRecordImage: {
       type: String,
       required: true,
     },
-    driverLicense: {
+    driverLicenseImage: {
       type: String,
       required: true,
     },
@@ -62,8 +63,12 @@ const courierSchema = new Schema(
     commissionPerOrder: {
       type: Number,
     },
+    outSourced: {
+      type: Boolean,
+      default: false,
+    },
   },
   { timestamps: true }
 );
 
-export const courierModel = model('Courier', courierSchema);
+export const CourierModel = model<Courier>('Courier', courierSchema);

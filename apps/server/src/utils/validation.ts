@@ -10,6 +10,10 @@ export const validateObjectId = z.object({
     .refine((id) => ObjectId.isValid(id), { message: 'Invalid ObjectId' }),
 });
 
+export const validateClerkId = z.object({
+  userId: z.string().nullable(),
+});
+
 export const validateObjectIdArray = z.object({
   ids: z.array(
     z
@@ -30,3 +34,17 @@ export const validatePagination = z.object({
       message: 'PageSize has to be a positive integer',
     }),
 });
+
+export const validateCourierOrdersPagination = validatePagination.extend({
+  id: z
+    .string()
+    .refine((id) => ObjectId.isValid(id), { message: 'Invalid ObjectId' }),
+});
+
+export const validateFilters = z.object({
+  courier: z.string().optional(),
+  status: z.string().optional(),
+  OID: z.string().optional(),
+});
+
+export type FilterObject = z.infer<typeof validateFilters>;

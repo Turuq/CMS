@@ -1,55 +1,14 @@
-import { zValidator } from '@hono/zod-validator';
 import { Hono } from 'hono';
 
-import { authSignInSchema, authSignUpSchema } from '../validation/auth';
+import { zValidator } from '@hono/zod-validator';
 import { clerkClient } from '../lib/clerk/clerkClient';
-import supabase from '../lib/supabase/auth';
+import supabase from '../lib/supabase/supabaseClient';
 import { staffMemberModel } from '../models/staff';
+import { validateClerkId } from '../utils/validation';
+import { authSignInSchema, authSignUpSchema } from '../validation/auth';
+import type { AuthenticatedStaffMember } from '../validation/staff-member';
 
 const authRouter = new Hono()
-  // .post('/sign-up', zValidator('json', authSignUpSchema), async (c) => {
-  //   try {
-  //     // Validate request body
-  //     const data = c.req.valid('json');
-  //     console.log(data);
-  //     // Extract email and password from request body
-  //     const { email, username, password } = data;
-  //     // Create user with Clerk
-  //     const user = await clerkClient.users.createUser({
-  //       emailAddress: [email],
-  //       password,
-  //       username,
-  //     });
-
-  //     // Check if user was created
-  //     if (!user) {
-  //       c.status(400);
-  //       return c.json({
-  //         message: 'Failed to create user',
-  //       });
-  //     }
-
-  //     // Create session for user
-  //     const token = await clerkClient.signInTokens.createSignInToken({
-  //       userId: user.id,
-  //       expiresInSeconds: 60 * 60, // 1 hour
-  //     });
-
-  //     // Respond with user data
-  //     c.status(201);
-  //     return c.json({
-  //       message: 'User created',
-  //       token,
-  //       user,
-  //     });
-  //   } catch (error: any) {
-  //     c.status(500);
-  //     console.error(error);
-  //     return c.json({
-  //       message: `Failed to create user: ${error.message}`,
-  //     });
-  //   }
-  // })
   .post('/sign-up', zValidator('json', authSignUpSchema), async (c) => {
     // Validate request body
     const body = c.req.valid('json');
@@ -82,26 +41,32 @@ const authRouter = new Hono()
         );
       }
 
-      // Create a supabase auth user using the email and password & username as an additional property
-      const { data, error } = await supabase.auth.signUp({
-        email,
+      const data = await clerkClient.users.createUser({
+        firstName: staffMember.name,
+        username,
+        emailAddress: [email],
         password,
-        options: {
-          data: {
-            username,
-          },
-        },
       });
+      // Create a supabase auth user using the email and password & username as an additional property
+      // const { data, error } = await supabase.auth.signUp({
+      //   email,
+      //   password,
+      //   options: {
+      //     data: {
+      //       username,
+      //     },
+      //   },
+      // });
 
-      if (error) {
-        console.error(error);
-        return c.json(
-          {
-            message: `Failed to create user: ${error.message}`,
-          },
-          500
-        );
-      }
+      // if (error) {
+      //   console.error(error);
+      //   return c.json(
+      //     {
+      //       message: `Failed to create user: ${error.message}`,
+      //     },
+      //     500
+      //   );
+      // }
 
       return c.json(
         {
@@ -134,12 +99,8 @@ const authRouter = new Hono()
 
       if (error) {
         console.error(error);
-        return c.json(
-          {
-            message: `Failed to sign in: ${error.message}`,
-          },
-          500
-        );
+        c.status(500);
+        throw new Error(`Failed to sign in using supabase: ${error}`);
       }
 
       const token = data.session.access_token;
@@ -147,76 +108,46 @@ const authRouter = new Hono()
       const staffMember = await staffMemberModel.findOne({ email });
 
       if (!staffMember) {
-        return c.json(
-          {
-            message: 'User not found',
-          },
-          404
-        );
+        c.status(404);
+        throw new Error('Staff Member not found');
       }
 
+      const { role, email: emailAddress, username, name, active } = staffMember;
       return c.json(
         {
           message: 'User signed in',
           token,
-          staffMember,
-          role: staffMember.role,
+          staffMember: { email: emailAddress, username, name, active },
+          role,
         },
         200
       );
     } catch (error: any) {
       console.error(error);
-      return c.json(
-        {
-          message: `Failed to sign in: ${error.message}`,
-        },
-        500
-      );
+      c.status(500);
+      throw new Error(`Failed to sign in: ${error.message}`);
     }
   })
-  .get('/me', async (c) => {
-    try {
-      const token: string | undefined = c.req
-        .header('Authorization')
-        ?.split(' ')[1];
+  .post('/me', zValidator('json', validateClerkId), async (c) => {
+    const { userId } = c.req.valid('json');
 
-      if (!token) {
-        return c.json(
-          {
-            message: 'Unauthorized: No Token Provided',
-          },
-          401
-        );
-      }
-
-      const { data, error } = await supabase.auth.getUser(token);
-
-      if (error) {
-        return c.json(
-          {
-            message: `Session Expired: ${error.message}`,
-          },
-          401
-        );
-      }
-
-      if (data.user) {
-        return c.json({
-          message: 'Session is Valid',
-          staffMember: data.user,
-        });
-      }
-
-      return c.json({ token }, 200);
-    } catch (error: any) {
-      console.error(error);
-      return c.json(
-        {
-          message: `Failed to get signed-in user: ${error.message}`,
-        },
-        500
-      );
+    if (!userId) {
+      c.status(401);
+      throw new Error('Unauthorized');
     }
+    const data = await clerkClient.users.getUser(userId);
+
+    if (!data) {
+      c.status(401);
+      throw new Error('Unauthorized');
+    }
+
+    const { primaryEmailAddress } = data;
+
+    const staffMember: AuthenticatedStaffMember | null = await staffMemberModel
+      .findOne({ email: primaryEmailAddress?.emailAddress })
+      .select('role email username name active _id');
+    return c.json(staffMember, 200);
   });
 
 export default authRouter;

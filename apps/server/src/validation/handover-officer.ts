@@ -4,7 +4,6 @@ import { z } from 'zod';
 export const handoverOfficerSchema = z.object({
   _id: z.instanceof(ObjectId),
   username: z.string(),
-  password: z.string(),
   name: z.string(),
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
@@ -12,17 +11,18 @@ export const handoverOfficerSchema = z.object({
   salary: z.number().positive().min(0),
   active: z.boolean(),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const createHandoverOfficerSchema = z.object({
   name: z.string(),
   username: z.string(),
   phone: z.string().min(11).max(11),
-  email: z.string().email().optional(),
+  password: z.string(),
+  email: z.string().email(),
   nationalId: z.string().min(14).max(14),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const updateHandoverOfficerSchema = z.object({
@@ -35,7 +35,4 @@ export const updateHandoverOfficerSchema = z.object({
   criminalRecord: z.string().url().optional(),
 });
 
-export type HandoverOfficer = Omit<
-  z.infer<typeof handoverOfficerSchema>,
-  'password'
->;
+export type HandoverOfficer = z.infer<typeof handoverOfficerSchema>;

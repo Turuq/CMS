@@ -4,7 +4,6 @@ import { z } from 'zod';
 export const assignmentOfficerSchema = z.object({
   _id: z.instanceof(ObjectId),
   username: z.string(),
-  password: z.string(),
   name: z.string(),
   email: z.string().email().optional(),
   nationalId: z.string().min(14).max(14),
@@ -19,10 +18,11 @@ export const createAssignmentOfficerSchema = z.object({
   name: z.string(),
   username: z.string(),
   phone: z.string().min(11).max(11),
-  email: z.string().email().optional(),
+  email: z.string().email(),
   nationalId: z.string().min(14).max(14),
+  password: z.string(),
   nationalIdImage: z.string().url(),
-  criminalRecord: z.string().url(), // Criminal record image
+  criminalRecordImage: z.string().url(), // Criminal record image
 });
 
 export const updateAssignmentOfficerSchema = z.object({
@@ -35,7 +35,4 @@ export const updateAssignmentOfficerSchema = z.object({
   criminalRecord: z.string().url().optional(),
 });
 
-export type AssignmentOfficer = Omit<
-  z.infer<typeof assignmentOfficerSchema>,
-  'password'
->;
+export type AssignmentOfficer = z.infer<typeof assignmentOfficerSchema>;
