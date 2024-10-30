@@ -28,7 +28,7 @@ export default async function Dashboard({ locale }: { locale: string }) {
           <KpiCard
             locale={locale}
             title={tKpi('cards.totalOrders')}
-            statistic={dashData[0].totalOrders}
+            statistic={dashData[0]?.totalOrders ?? 0}
             dotted
             link="courier-manager/orders"
           />
@@ -38,28 +38,28 @@ export default async function Dashboard({ locale }: { locale: string }) {
             <KpiCard
               locale={locale}
               title={tKpi('cards.outForDelivery')}
-              statistic={dashData[0].outForDelivery}
+              statistic={dashData[0]?.outForDelivery ?? 0}
             />
           </div>
           <div className="col-span-3 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.toBeReshipped')}
-              statistic={dashData[0].toBeReshipped}
+              statistic={dashData[0]?.toBeReshipped ?? 0}
             />
           </div>
           <div className="col-span-3 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.delivered')}
-              statistic={dashData[0].delivered}
+              statistic={dashData[0]?.delivered ?? 0}
             />
           </div>
           <div className="col-span-3 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.totalShippingFees')}
-              statistic={dashData[0].totalShippingFees}
+              statistic={dashData[0]?.totalShippingFees ?? 0}
               financial
             />
           </div>
@@ -67,7 +67,7 @@ export default async function Dashboard({ locale }: { locale: string }) {
             <KpiCard
               locale={locale}
               title={tKpi('cards.totalToBeReceived')}
-              statistic={dashData[0].totalToBeReceived}
+              statistic={dashData[0]?.totalToBeReceived ?? 0}
               financial
             />
           </div>
@@ -75,7 +75,7 @@ export default async function Dashboard({ locale }: { locale: string }) {
             <KpiCard
               locale={locale}
               title={tKpi('cards.numberOfCouriers')}
-              statistic={dashData[0].activeBatches}
+              statistic={dashData[0]?.activeBatches ?? 0}
               date={moment()}
             />
           </div>
@@ -100,27 +100,31 @@ export default async function Dashboard({ locale }: { locale: string }) {
         </div>
       </div> */}
       <div className="grid grid-cols-3 gap-5">
-        <GovernorateRadarChart
-          title={tChart('outForDeliveryOrdersStatistics.header')}
-          description="Showing Out For Delivery orders by governorate"
-          chartData={data}
-        />
-        <div className="col-span-2">
-          <StepChart
-            chartData={deliveredCouriers}
-            title="Delivered Orders"
-            description="Showing Top 10 couriers with the most delivered orders"
-            chartConfig={{
-              delivered: {
-                label: 'Delivered',
-                color: 'hsl(var(--accent))',
-              },
-              outForDelivery: {
-                label: 'Out For Delivery',
-                color: 'hsl(var(--chart-4))',
-              },
-            }}
+        {data && (
+          <GovernorateRadarChart
+            title={tChart('outForDeliveryOrdersStatistics.header')}
+            description="Showing Out For Delivery orders by governorate"
+            chartData={data}
           />
+        )}
+        <div className="col-span-2">
+          {deliveredCouriers && (
+            <StepChart
+              chartData={deliveredCouriers}
+              title="Delivered Orders"
+              description="Showing Top 10 couriers with the most delivered orders"
+              chartConfig={{
+                delivered: {
+                  label: 'Delivered',
+                  color: 'hsl(var(--accent))',
+                },
+                outForDelivery: {
+                  label: 'Out For Delivery',
+                  color: 'hsl(var(--chart-4))',
+                },
+              }}
+            />
+          )}
         </div>
       </div>
     </main>
