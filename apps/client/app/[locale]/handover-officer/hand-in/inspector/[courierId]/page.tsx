@@ -28,7 +28,7 @@ export default function Page({
     <div className="w-full flex flex-col gap-10">
       {batches && (
         <h1 className="text-3xl font-black uppercase">
-          {`${batches[0].courier.name}'s Batches`}
+          {`${batches[0].courier?.name}'s Batches`}
         </h1>
       )}
       {/* Batch Card */}

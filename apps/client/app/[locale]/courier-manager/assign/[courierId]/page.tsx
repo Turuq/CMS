@@ -48,6 +48,8 @@ import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
 import SelectedOrderTable from './selected-orders-table';
 
+// const ws = client.ws.$ws();
+
 export default function Page({
   params: { locale, courierId },
 }: {

@@ -47,20 +47,26 @@ export default function BatchCard({
         <div className="flex items-center justify-between">
           <div className="flex flex-col space-y-0.5">
             <ProgressBar
-              value={batch.endDate ? 100 : getBatchProgress(batch.progress, batch.numberOfOrders)}
+              value={
+                batch.endDate
+                  ? 100
+                  : getBatchProgress(batch.progress, batch.numberOfOrders)
+              }
               color={
-                batch.endDate ? "emerald" : 
-                getBatchProgress(batch.progress, batch.numberOfOrders) <= 25
-                  ? 'stone'
-                  : getBatchProgress(batch.progress, batch.numberOfOrders) <= 75
-                    ? 'amber'
-                    : 'green'
+                batch.endDate
+                  ? 'emerald'
+                  : getBatchProgress(batch.progress, batch.numberOfOrders) <= 25
+                    ? 'stone'
+                    : getBatchProgress(batch.progress, batch.numberOfOrders) <=
+                        75
+                      ? 'amber'
+                      : 'green'
               }
               showAnimation
               className="w-20"
             />
             <CardTitle className="text-lg font-bold uppercase">
-              {`${batch.courier.name}'s Batch-${batch.BID.toString().padStart(3, '0')}`}
+              {`${batch.courier?.name}'s Batch-${batch.BID.toString().padStart(3, '0')}`}
             </CardTitle>
             <CardDescription className="text-xs font-semibold">
               {moment(batch.startDate).format('MMM DD')} -{' '}
@@ -114,12 +120,12 @@ export default function BatchCard({
               <TooltipTrigger>
                 <Avatar className="size-7">
                   <AvatarFallback className="text-xs font-bold capitalize">
-                    {batch.courier.name[0]}
-                    {/* {batch.courier.name.split(' ')[1][0]} */}
+                    {batch.courier?.name[0]}
+                    {/* {batch.courier?.name.split(' ')[1][0]} */}
                   </AvatarFallback>
                 </Avatar>
               </TooltipTrigger>
-              <TooltipContent>{batch.courier.name}</TooltipContent>
+              <TooltipContent>{batch.courier?.name}</TooltipContent>
             </Tooltip>
           </TooltipProvider>
         </div>
