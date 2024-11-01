@@ -7,7 +7,7 @@ const client = hc<AppType>(process.env.API_URL!);
 export const api = client.api;
 // export const ws = socket;
 
-export const ws = new WebSocket(`ws://${process.env.SOCKET_URI!}/ws`)
+export const ws = new WebSocket(process.env.SOCKET_URI!);
 
 ws.onopen = () => {
   console.log("opened")
