@@ -95,64 +95,120 @@ app.get('/api/check', getUser, (c) => {
   });
 });
 
-const wsApp = app.get(
+// const wsApp = app.get(
+//   '/ws',
+//   upgradeWebSocket(() => {
+//     return {
+//       onOpen(_, ws) {
+//         console.log('WebSocket Connection Opened');
+//         ws.send(JSON.stringify({ message: 'socketOpened' }));
+//       },
+//       async onMessage(evt, ws) {
+//         const message: { message: string; [key: string]: string } = JSON.parse(
+//           evt.data.toString()
+//         ); // { message: '', ...props? }
+
+//         if (message.message === 'assign-processing-unassigned') {
+//           const proc = createIPC(
+//             ['node', './src/scanner.js'],
+//             ws,
+//             async (message, _, ws) =>
+//               checkUnassignedProcessingOrder({
+//                 evt: message,
+//                 ws,
+//                 process: proc,
+//               })
+//           );
+//         }
+//         if (message.message === 'handover-processing-assigned') {
+//           if (message.courierId) {
+//             const { courierId } = message;
+//             const proc = createIPC(
+//               ['node', './src/scanner.js'],
+//               ws,
+//               async (message, _, ws) =>
+//                 checkAssignedProcessingOrder({
+//                   evt: message,
+//                   ws,
+//                   process: proc,
+//                   courierId,
+//                 })
+//             );
+//           } else {
+//             ws.send(JSON.stringify({ message: 'No courier ID provided' }));
+//           }
+//         }
+//       },
+//       onClose() {
+//         console.log('Connection closed');
+//       },
+//     };
+//   })
+// );
+
+// Hono RPC
+
+app.get(
   '/ws',
   upgradeWebSocket((c) => {
     return {
-      onOpen(_, ws) {
-        console.log('WebSocket Connection Opened');
-        ws.send(JSON.stringify({ message: 'socketOpened' }));
-      },
-      async onMessage(evt, ws) {
-        const message: { message: string; [key: string]: string } = JSON.parse(
-          evt.data.toString()
-        ); // { message: '', ...props? }
+      
+    }
+  })
+);
 
-        if (message.message === 'assign-processing-unassigned') {
+export type HttpApp = typeof apiRoutes;
+// export type WebSocketApp = typeof wsApp;
+export type AppType = HttpApp;
+
+Bun.serve({
+  port: process.env.PORT! || 8080,
+  fetch: app.fetch,
+  websocket: {
+    open(ws) {
+      console.log('WebSocket Connection Opened');
+      ws.send(JSON.stringify({ message: 'socketOpened' }));
+    },
+    message(ws, msg) {
+      const message: { message: string; [key: string]: string } = JSON.parse(
+        msg.toString()
+      ); // { message: '', ...props? }
+      if (message.message === 'assign-processing-unassigned') {
+        const proc = createIPC(
+          ['node', './src/scanner.js'],
+          ws,
+          async (message, _, ws) =>
+            checkUnassignedProcessingOrder({
+              evt: message,
+              ws,
+              process: proc,
+            })
+        );
+      }
+      if (message.message === 'handover-processing-assigned') {
+        if (message.courierId) {
+          const { courierId } = message;
           const proc = createIPC(
             ['node', './src/scanner.js'],
             ws,
             async (message, _, ws) =>
-              checkUnassignedProcessingOrder({
+              checkAssignedProcessingOrder({
                 evt: message,
                 ws,
                 process: proc,
+                courierId,
               })
           );
+        } else {
+          ws.send(JSON.stringify({ message: 'No courier ID provided' }));
         }
-        if (message.message === 'handover-processing-assigned') {
-          if (message.courierId) {
-            const { courierId } = message;
-            const proc = createIPC(
-              ['node', './src/scanner.js'],
-              ws,
-              async (message, _, ws) =>
-                checkAssignedProcessingOrder({
-                  evt: message,
-                  ws,
-                  process: proc,
-                  courierId,
-                })
-            );
-          } else {
-            ws.send(JSON.stringify({ message: 'No courier ID provided' }));
-          }
-        }
-      },
-      onClose() {
-        console.log('Connection closed');
-      },
-    };
-  })
-);
+      }
+    },
+  },
+});
 
-// Hono RPC
-export type HttpApp = typeof apiRoutes;
-export type WebSocketApp = typeof wsApp;
-export type AppType = HttpApp & WebSocketApp;
-
-export default {
-  port: process.env.PORT || 8080,
-  fetch: app.fetch,
-  websocket,
-};
+// export default {
+//   port: process.env.PORT || 8080,
+//   fetch: app.fetch,
+//   websocket,
+// };

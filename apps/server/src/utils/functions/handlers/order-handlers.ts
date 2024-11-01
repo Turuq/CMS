@@ -9,7 +9,7 @@ export async function checkUnassignedProcessingOrder({
   process,
 }: {
   evt: { message: string; error?: string };
-  ws: WSContext<ServerWebSocket>;
+  ws: ServerWebSocket<unknown>;
   process: Subprocess;
 }) {
   if (evt) {
@@ -82,7 +82,7 @@ export async function checkAssignedProcessingOrder({
   courierId,
 }: {
   evt: { message: string; error?: string };
-  ws: WSContext<ServerWebSocket>;
+  ws: ServerWebSocket<unknown>;
   process: Subprocess;
   courierId: string;
 }) {

@@ -7,7 +7,7 @@
   "scripts": {
     "dev": "bun --watch src/index.ts",
     "build": "bun build --minify --sourcemap --bytecode --entrypoints src/index.ts --outdir ./build --target bun",
-    "start": "./build/cmsbe.exe"
+    "start": "bun src/index.ts"
   },
   "devDependencies": {
     "@types/bun": "latest"

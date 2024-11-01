@@ -419,7 +419,10 @@ const courierBatchRouter = new Hono()
     getUser,
     zValidator('param', validateObjectId),
     async (c) => {
-      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
+      authorizeUser({
+        c,
+        level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'],
+      });
       try {
         const { id } = c.req.valid('param');
         const batch = await CourierBatchModel.findOne({
@@ -439,7 +442,7 @@ const courierBatchRouter = new Hono()
     getUser,
     zValidator('param', validateObjectId),
     async (c) => {
-      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
+      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'] });
       try {
         const { id } = c.req.valid('param');
         const batches = await CourierBatchModel.aggregate([
@@ -538,7 +541,10 @@ const courierBatchRouter = new Hono()
     getUser,
     zValidator('param', validateObjectId),
     async (c) => {
-      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER'] });
+      authorizeUser({
+        c,
+        level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'],
+      });
       try {
         const { id } = c.req.valid('param');
         const batch = (await CourierBatchModel.findById(id)

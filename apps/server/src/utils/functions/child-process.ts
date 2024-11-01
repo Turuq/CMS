@@ -3,11 +3,11 @@ import type { WSContext } from 'hono/ws';
 
 export function createIPC(
   cmd: string[],
-  ws: WSContext<ServerWebSocket>,
+  ws: ServerWebSocket<unknown>,
   messageHandler: (
     message: any,
     process: Subprocess,
-    ws: WSContext<ServerWebSocket>
+    ws: ServerWebSocket<unknown>
   ) => Promise<void>
 ) {
   const process = Bun.spawn({

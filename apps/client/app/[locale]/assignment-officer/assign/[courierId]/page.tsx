@@ -1,6 +1,6 @@
 'use client';
 
-import { api, ws } from '@/app/actions/api';
+import { ws } from '@/app/actions/api';
 import {
   unassignedColumns,
   unassignedSelectedColumns,
@@ -17,11 +17,14 @@ import {
   AlertDialogTrigger,
 } from '@/components/ui/alert-dialog';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useMutation, useQuery } from '@tanstack/react-query';
+import { useQuery } from '@tanstack/react-query';
 import { useEffect, useState } from 'react';
 
+import SelectedOrderTable from '@/app/[locale]/courier-manager/assign/[courierId]/selected-orders-table';
 import { hasActiveBatch } from '@/app/actions/batch-actions';
 import {
+  assignIntegrationOrders,
+  assignTuruqOrders,
   getProcessingUnassignedIntegrationOrders,
   getProcessingUnassignedTuruqOrders,
 } from '@/app/actions/order-actions';
@@ -45,7 +48,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import SelectedOrderTable from '@/app/[locale]/courier-manager/assign/[courierId]/selected-orders-table';
 
 export default function Page({
   params: { locale, courierId },
@@ -75,6 +77,10 @@ export default function Page({
   const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
   const [integrationRowSelection, onIntegrationRowSelectionChange] =
     useState<RowSelectionState>({});
+
+  const [assigningTuruqLoading, setAssigningTuruqLoading] = useState(false);
+  const [assigningIntegrationLoading, setAssigningIntegrationLoading] =
+    useState(false);
 
   const {
     isPending: isLoadingTuruqOrders,
@@ -179,59 +185,41 @@ export default function Page({
     });
   }, [integrationPage, integrationPageSize, integrationOrders]);
 
-  const { isPending: isPendingTuruq, mutate: assignTuruqOrders } = useMutation({
-    mutationKey: ['assign-orders'],
-    mutationFn: handleAssignOrders,
-    onSuccess: () => {
-      refetchTuruqOrders();
-    },
-  });
-
-  const { isPending: isPendingIntegrations, mutate: assignIntegrationOrders } =
-    useMutation({
-      mutationKey: ['assign-integration-orders'],
-      mutationFn: handleAssignIntegrationOrders,
-      onSuccess: () => {
-        refetchIntegrationOrders();
-      },
-    });
-
   async function handleAssignOrders() {
+    setAssigningTuruqLoading(true);
     const ids = Object.keys(rowSelection);
-    const res = await api.order.turuq.assign[':id'].$put({
-      param: { id: courierId },
-      json: { ids },
+    const res = await assignTuruqOrders({
+      id: courierId,
+      ids,
     });
-    if (!res.ok) {
+    if (res.error) {
+      setAssigningTuruqLoading(false);
       toast.error(t('assign.courierAssignPage.toast.error.header'), {
         description: t('assign.courierAssignPage.toast.error.description'),
-        style: {
-          backgroundColor: '#FEEFEE',
-          color: '#D8000C',
-        },
+        style: ToastStyles.error,
       });
-    }
-    const data = await res.json();
-    if (data) {
+    } else {
+      setAssigningTuruqLoading(false);
       setSelectedOrders([]);
       onRowSelectionChange({});
+      refetchTuruqOrders();
       toast.success(t('assign.courierAssignPage.toast.success.header'), {
         description: t('assign.courierAssignPage.toast.success.description'),
-        style: {
-          backgroundColor: '#F3FBEF',
-          color: '#3B8C2A',
-        },
+        style: ToastStyles.success,
       });
     }
   }
 
   async function handleAssignIntegrationOrders() {
+    setAssigningIntegrationLoading(true);
     const ids = Object.keys(integrationRowSelection);
-    const res = await api.order.integration.assign[':id'].$put({
-      param: { id: courierId },
-      json: { ids },
+    const res = await assignIntegrationOrders({
+      id: courierId,
+      ids,
     });
-    if (!res.ok) {
+
+    if (res.error) {
+      setAssigningIntegrationLoading(false);
       toast.error(t('assign.courierAssignPage.toast.error.header'), {
         description: t('assign.courierAssignPage.toast.error.description'),
         style: {
@@ -239,18 +227,11 @@ export default function Page({
           color: '#D8000C',
         },
       });
-    }
-    const data = await res.json();
-    if (data) {
+    } else {
+      setAssigningIntegrationLoading(false);
       setSelectedIntegrationOrders([]);
       onIntegrationRowSelectionChange({});
-      queryClient.refetchQueries({
-        queryKey: [
-          'get-processing-unassigned-integration-orders',
-          integrationPage,
-          integrationPageSize,
-        ],
-      });
+      refetchIntegrationOrders();
       toast.success(t('assign.courierAssignPage.toast.success.header'), {
         description: t('assign.courierAssignPage.toast.success.description'),
         style: {
@@ -479,9 +460,11 @@ export default function Page({
                 <AlertDialog>
                   <AlertDialogTrigger asChild>
                     <Button
-                      disabled={selectedOrders?.length === 0 || isPendingTuruq}
+                      disabled={
+                        selectedOrders?.length === 0 || assigningTuruqLoading
+                      }
                     >
-                      {isPendingTuruq ? (
+                      {assigningTuruqLoading ? (
                         <Loader2
                           size={16}
                           className={'text-inherit animate-spin'}
@@ -505,8 +488,8 @@ export default function Page({
                     </AlertDialogHeader>
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
-                      <AlertDialogAction onClick={() => assignTuruqOrders()}>
-                        {isPendingTuruq ? (
+                      <AlertDialogAction onClick={handleAssignOrders}>
+                        {assigningTuruqLoading ? (
                           <Loader2
                             size={16}
                             className={'text-inherit animate-spin'}
@@ -594,10 +577,10 @@ export default function Page({
                     <Button
                       disabled={
                         selectedIntegrationOrders?.length === 0 ||
-                        isPendingIntegrations
+                        assigningIntegrationLoading
                       }
                     >
-                      {isPendingIntegrations ? (
+                      {assigningIntegrationLoading ? (
                         <Loader2
                           size={16}
                           className={'text-inherit animate-spin'}
@@ -622,9 +605,9 @@ export default function Page({
                     <AlertDialogFooter>
                       <AlertDialogCancel>Cancel</AlertDialogCancel>
                       <AlertDialogAction
-                        onClick={() => assignIntegrationOrders()}
+                        onClick={handleAssignIntegrationOrders}
                       >
-                        {isPendingIntegrations ? (
+                        {assigningIntegrationLoading ? (
                           <Loader2
                             size={16}
                             className={'text-inherit animate-spin'}
