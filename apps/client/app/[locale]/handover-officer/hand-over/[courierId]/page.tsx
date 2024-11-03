@@ -224,7 +224,9 @@ export default function Page({
         ) {
           setMessage((oldVal) => ({ ...oldVal, [data.message]: true }));
         } else if (data.error) {
-          toast.error(data.error, { style: ToastStyles.error });
+          toast.error(scanner(data.error), {
+            style: ToastStyles.error,
+          });
           setScanning(false);
         } else {
           const order: OrderType = data.order;

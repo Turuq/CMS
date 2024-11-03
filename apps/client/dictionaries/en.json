@@ -118,7 +118,7 @@
             "instaPay": "InstaPay",
             "gotGhosted": "Got Ghosted",
             "returnedItems": "Returned Items",
-            "paidShippingOnly": "Paid Shipping Only"
+            "toBeReshipped": "To Be Reshipped"
           },
           "dataResults": {
             "noResults": "No results found"
@@ -425,7 +425,8 @@
           "label": "Staff Member Role",
           "manager": "Courier Manager",
           "handover": "Handover Officer",
-          "assignment": "Assignment Officer"
+          "assignment": "Assignment Officer",
+          "roleRequired": "You must select a role"
         }
       },
       "placeholders": {
@@ -441,6 +442,11 @@
       },
       "buttons": {
         "signup": "Create account"
+      },
+      "validations": {
+        "nationalIdImageRequired": "National ID Image is required",
+        "criminalRecordImageRequired": "Criminal Record Image is required",
+        "driverLicenseImageRequired": "Driver License Image is required"
       }
     }
   },
@@ -512,6 +518,9 @@
     "connectionEstablished": "Connected Established",
     "portReady": "Port Ready",
     "scannerConnected": "Barcode Scanner Connected",
-    "startScanning": "Start Scanning"
+    "startScanning": "Start Scanning",
+    "portAlreadyOpen": "Port Already Open",
+    "unexpectedError": "An Unexpected Error Occurred",
+    "scannerNotConnected": "Barcode Scanner Not Connected"
   }
 }

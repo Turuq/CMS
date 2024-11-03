@@ -52,9 +52,9 @@ export function getStatusTextColor(status: string) {
 }
 
 export function getIndicatorColor(order: OrderType) {
-  if (order?.paidShippingOnly) return 'text-lime-500';
+  if (order?.toBeReshipped) return 'text-lime-500';
   if (order?.paymentMethod === 'INSTAPAY') return 'text-violet-500';
-  if (order?.toBeReshipped) return 'text-cyan-500';
+  if (order?.reshipped) return 'text-cyan-500';
   if (order?.gotGhosted) return 'text-red-500';
   if (order?.hasReturnedItems) return 'text-amber-500';
 }

@@ -10,6 +10,12 @@ const binding = bindings.find(
   (binding) => binding.pnpId === 'USB\\VID_05F9&PID_4204\\S/N_G21N69335'
 );
 
+if (!binding) {
+  console.log('Scanner not connected');
+  process.send({ error: 'scannerNotConnected' });
+  process.kill(process.pid);
+}
+
 const port = new SerialPortStream({
   path: binding?.path,
   baudRate: 9600,
@@ -46,8 +52,8 @@ parser.on('data', (data) => {
 parser.on('error', (err) => {
   console.error(err);
   port.close();
-  process.send({ error: 'Parser error' });
-  process.exit(1);
+  process.send({ error: 'unexpectedError' });
+  process.kill(process.pid);
 });
 
 port.on('close', () => {
@@ -56,8 +62,8 @@ port.on('close', () => {
 });
 
 port.on('error', (err) => {
-  console.error(err);
+  console.error(err.message);
   port.close();
-  process.send({ error: 'Port already open' });
-  process.exit(1);
+  process.send({ error: 'portAlreadyOpen' });
+  process.kill(process.pid);
 });

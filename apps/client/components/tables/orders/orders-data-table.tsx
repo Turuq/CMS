@@ -265,7 +265,7 @@ export function OrdersDataTable<TValue>({
               t('legend.instaPay'),
               t('legend.gotGhosted'),
               t('legend.returnedItems'),
-              t('legend.paidShippingOnly'),
+              t('legend.toBeReshipped'),
             ]}
             colors={['cyan', 'violet', 'red', 'amber', 'lime']}
             className={`col-span-5 order-2 ${showOrderDetails ? 'lg:col-span-5 lg:order-3' : 'lg:col-span-3 lg:order-2'} flex justify-center space-x-2`}
