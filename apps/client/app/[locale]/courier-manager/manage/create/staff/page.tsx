@@ -149,7 +149,7 @@ export default function CreateNewStaffMember({
   });
   return (
     <div className="flex items-center justify-center">
-      <div className="bg-light dark:bg-dark_border rounded-xl w-1/2 h-full p-2 shadow-md dark:shadow-light_border/10 shadow-dark_border/30">
+      <div className="bg-light dark:bg-dark_border rounded-xl w-full lg:w-1/2 h-full p-2 shadow-md dark:shadow-light_border/10 shadow-dark_border/30">
         <div className="w-full flex flex-col items-center justify-between gap-10 p-5">
           <Image
             src={'/babyblue.png'}
@@ -357,9 +357,9 @@ export default function CreateNewStaffMember({
                         </SelectItem>
                       </SelectContent>
                     </Select>
-                    {field.state.meta.errors && (
+                    {field.state.meta.errors.length > 0 && (
                       <p className="text-xs italic font-semibold text-red-500">
-                        {field.state.meta.errors.join(', ')}
+                        {t('signup.fields.role.roleRequired')}
                       </p>
                     )}
                   </div>
@@ -395,28 +395,56 @@ export default function CreateNewStaffMember({
                   </div>
                 )}
               </form.Field>
-
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <label htmlFor="nationalIdImage">
-                  {t('signup.fields.nationalIdImage')}
-                </label>
-                <Droppable
-                  field="nationalIdImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
-
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <label htmlFor={'criminalRecordImage'}>
-                  {t('signup.fields.criminalRecordImage')}
-                </label>
-                <Droppable
-                  field="criminalRecordImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
+              <form.Field
+                name="nationalIdImage"
+                validators={{
+                  onChange: NewStaffSchema.shape.nationalIdImage,
+                }}
+              >
+                {(field) => (
+                  <div className="col-span-2 flex flex-col gap-2 w-full">
+                    <label htmlFor={field.name}>
+                      {t('signup.fields.nationalIdImage')}
+                    </label>
+                    <Droppable
+                      field={'nationalIdImage'}
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                    />
+                    {!field.state.value &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs italic font-semibold text-red-500">
+                          {t('signup.validations.nationalIdImageRequired')}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
+              <form.Field
+                name="criminalRecordImage"
+                validators={{
+                  onChange: NewStaffSchema.shape.criminalRecordImage,
+                }}
+              >
+                {(field) => (
+                  <div className="col-span-2 flex flex-col gap-2 w-full">
+                    <label htmlFor={field.name}>
+                      {t('signup.fields.criminalRecordImage')}
+                    </label>
+                    <Droppable
+                      field="criminalRecordImage"
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                    />
+                    {!field.state.value &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs italic font-semibold text-red-500">
+                          {t('signup.validations.criminalRecordImageRequired')}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
               <Button
                 disabled={loading || uploading}
                 type="submit"

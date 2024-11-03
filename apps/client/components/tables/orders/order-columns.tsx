@@ -41,7 +41,7 @@ export const columns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'OID',
-    accessorFn: (row) => parseInt(row?.OID),
+    accessorFn: (row) => (row.OID ? parseInt(row?.OID) : '-'),
     header: 'OID',
     filterFn: 'includesString',
   },
@@ -65,7 +65,9 @@ export const columns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    accessorKey: 'customer.name',
+    cell: (row) =>
+      row.row.original.customer.name ||
+      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
     header: 'Customer Name',
   },
   {
@@ -100,7 +102,7 @@ export const columns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'type',
-    accessorKey: 'type',
+    cell: (row) => row.row.original.type || row.row.original.provider,
     header: 'Type',
   },
   {

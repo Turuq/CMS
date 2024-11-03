@@ -118,7 +118,7 @@
             "instaPay": "إنستا باي",
             "gotGhosted": "تم تجاهلها",
             "returnedItems": "العناصر المرتجعة",
-            "paidShippingOnly": "الشحن المدفوع فقط"
+            "toBeReshipped": "يجب إعادة شحنها"
           },
           "dataResults": {
             "noResults": "لا توجد نتائج"
@@ -421,7 +421,8 @@
           "label": "دور الموظف",
           "manager": "مدير المناديب",
           "handover": "ضابط التسليم",
-          "assignment": "ضابط التعيين"
+          "assignment": "ضابط التعيين",
+          "roleRequired": "يجب اختيار دور الموظف"
         }
       },
       "placeholders": {
@@ -437,6 +438,11 @@
       },
       "buttons": {
         "signup": "إنشاء حساب"
+      },
+      "validations": {
+        "nationalIdImageRequired": "صورة البطاقة مطلوبة",
+        "criminalRecordImageRequired": "صورة السجل الجنائي مطلوبة",
+        "driverLicenseImageRequired": "صورة الرخصة مطلوبة"
       }
     }
   },
@@ -508,6 +514,9 @@
     "connectionEstablished": "تم الاتصال بنجاح",
     "portReady": "المنفذ جاهز",
     "scannerConnected": "تم توصيل ماسح الباركود",
-    "startScanning": "بدء المسح"
+    "startScanning": "بدء المسح",
+    "portAlreadyOpen": "المنفذ مفتوح",
+    "unexpectedError": "حدث خطأ غير متوقع",
+    "scannerNotConnected": "ماسح الباركود غير متصل"
   }
 }

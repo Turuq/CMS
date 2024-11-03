@@ -309,38 +309,66 @@ export default function CreateNewCourier() {
                   </div>
                 )}
               </form.Field>
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <Label htmlFor="nationalIdImage">
-                  {t('signup.fields.nationalIdImage')}
-                </Label>
-                <Droppable
-                  field="nationalIdImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
-
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <Label htmlFor={'criminalRecordImage'}>
-                  {t('signup.fields.criminalRecordImage')}
-                </Label>
-                <Droppable
-                  field="criminalRecordImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
-
-              <div className="col-span-2 flex flex-col gap-2 w-full">
-                <Label htmlFor={'driverLicenseImage'}>
-                  {t('signup.fields.driverLicenseImage')}
-                </Label>
-                <Droppable
-                  field="driverLicenseImage"
-                  uploading={uploading}
-                  handleUpload={uploadToSupabase}
-                />
-              </div>
+              <form.Field name="nationalIdImage">
+                {(field) => (
+                  <div className="col-span-2 flex flex-col gap-2 w-full">
+                    <Label htmlFor={field.name}>
+                      {t('signup.fields.nationalIdImage')}
+                    </Label>
+                    <Droppable
+                      field="nationalIdImage"
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                    />
+                    {!field.state.value &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs italic font-semibold text-red-500">
+                          {t('signup.validations.criminalRecordImageRequired')}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
+              <form.Field name="criminalRecordImage">
+                {(field) => (
+                  <div className="col-span-2 flex flex-col gap-2 w-full">
+                    <Label htmlFor={'criminalRecordImage'}>
+                      {t('signup.fields.criminalRecordImage')}
+                    </Label>
+                    <Droppable
+                      field="criminalRecordImage"
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                    />
+                    {!field.state.value &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs italic font-semibold text-red-500">
+                          {t('signup.validations.criminalRecordImageRequired')}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
+              <form.Field name="driverLicenseImage">
+                {(field) => (
+                  <div className="col-span-2 flex flex-col gap-2 w-full">
+                    <Label htmlFor={'driverLicenseImage'}>
+                      {t('signup.fields.driverLicenseImage')}
+                    </Label>
+                    <Droppable
+                      field="driverLicenseImage"
+                      uploading={uploading}
+                      handleUpload={uploadToSupabase}
+                    />
+                    {!field.state.value &&
+                      field.state.meta.errors.length > 0 && (
+                        <p className="text-xs italic font-semibold text-red-500">
+                          {t('signup.validations.criminalRecordImageRequired')}
+                        </p>
+                      )}
+                  </div>
+                )}
+              </form.Field>
               <Button
                 disabled={loading || uploading}
                 type="submit"

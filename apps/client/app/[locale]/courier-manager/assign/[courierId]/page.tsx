@@ -243,7 +243,7 @@ export default function Page({
 
   useEffect(() => {
     ws.onmessage = (evt) => {
-      console.log(evt.data);
+      console.log(evt);
       const data = JSON.parse(evt.data);
       if (data) {
         if (
@@ -253,7 +253,9 @@ export default function Page({
         ) {
           setMessage((oldVal) => ({ ...oldVal, [data.message]: true }));
         } else if (data.error) {
-          toast.error(data.error, { style: ToastStyles.error });
+          toast.error(scanner(data.error), {
+            style: ToastStyles.error,
+          });
           setScanning(false);
         } else {
           const order: OrderType = data.order;
@@ -285,9 +287,7 @@ export default function Page({
 
   const handleSocket = async () => {
     setScanning(true);
-    if (ws?.OPEN) {
-      ws.send(JSON.stringify({ message: 'assign-processing-unassigned' }));
-    }
+    ws.send(JSON.stringify({ message: 'assign-processing-unassigned' }));
   };
 
   if (turuqError) {

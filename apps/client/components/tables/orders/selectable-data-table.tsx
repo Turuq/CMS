@@ -197,7 +197,7 @@ export function SelectableOrdersDataTable<TValue>({
             t('legend.instaPay'),
             t('legend.gotGhosted'),
             t('legend.returnedItems'),
-            t('legend.paidShippingOnly'),
+            t('legend.toBeReshipped'),
           ]}
           colors={['cyan', 'violet', 'red', 'amber', 'lime']}
         />
