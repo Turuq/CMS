@@ -1,4 +1,14 @@
 FROM oven/bun:1.1.13
+
+# Install Node.js 
+RUN apt-get update && \ 
+    apt-get install -y curl && \ 
+    curl -fsSL https://deb.nodesource.com/setup_21.x | bash - && \ 
+    apt-get install -y nodejs
+
+# Install udev 
+RUN apt-get install -y udev
+
 WORKDIR /server
 COPY . .
 RUN bun install
