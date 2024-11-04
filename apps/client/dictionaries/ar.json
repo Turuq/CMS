@@ -517,6 +517,7 @@
     "startScanning": "بدء المسح",
     "portAlreadyOpen": "المنفذ مفتوح",
     "unexpectedError": "حدث خطأ غير متوقع",
-    "scannerNotConnected": "ماسح الباركود غير متصل"
+    "scannerNotConnected": "ماسح الباركود غير متصل",
+    "unableToAssign": "لا يمكن تعيين هذا الطلب"
   }
 }

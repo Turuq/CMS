@@ -34,6 +34,7 @@ import {
   CircleXIcon,
   Loader2Icon,
   ScanBarcodeIcon,
+  Trash2Icon,
   UsbIcon,
 } from 'lucide-react';
 import { ws } from '@/app/actions/api';
@@ -489,12 +490,34 @@ export default function Page({
                   </p>
                 )}
               </div>
-              <div className="w-full">
+              <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
                   columns={unassignedSelectedColumns}
                   data={selectedOrders}
                   locale={locale}
                 />
+                {Object.keys(rowSelection).length > 0 && (
+                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                    <div className="flex items-center gap-2">
+                      {icons.checkbox}
+                      <p className="text-xs font-bold">
+                        {Object.keys(rowSelection).length} Selected Orders
+                      </p>
+                    </div>
+                    <button
+                      className="flex items-center gap-2 text-red-500 group"
+                      onClick={() => {
+                        setSelectedOrders([]);
+                        onRowSelectionChange({});
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                      <p className="text-xs font-bold hidden group-hover:flex">
+                        Clear Selection
+                      </p>
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-end w-full">
                 <Button
@@ -571,12 +594,35 @@ export default function Page({
                   </p>
                 )}
               </div>
-              <div className="w-full">
+              <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectedOrderTable
                   columns={unassignedSelectedColumns}
                   data={selectedIntegrationOrders}
                   locale={locale}
                 />
+                {Object.keys(rowSelectionIntegration).length > 0 && (
+                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                    <div className="flex items-center gap-2">
+                      {icons.checkbox}
+                      <p className="text-xs font-bold">
+                        {Object.keys(rowSelectionIntegration).length} Selected
+                        Orders
+                      </p>
+                    </div>
+                    <button
+                      className="flex items-center gap-2 text-red-500 group"
+                      onClick={() => {
+                        setSelectedIntegrationOrders([]);
+                        onRowSelectionIntegrationChange({});
+                      }}
+                    >
+                      <Trash2Icon size={16} />
+                      <p className="text-xs font-bold hidden group-hover:flex">
+                        Clear Selection
+                      </p>
+                    </button>
+                  </div>
+                )}
               </div>
               <div className="flex items-center justify-end w-full">
                 <Button
