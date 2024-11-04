@@ -521,6 +521,7 @@
     "startScanning": "Start Scanning",
     "portAlreadyOpen": "Port Already Open",
     "unexpectedError": "An Unexpected Error Occurred",
-    "scannerNotConnected": "Barcode Scanner Not Connected"
+    "scannerNotConnected": "Barcode Scanner Not Connected",
+    "unableToAssign": "Unable to Assign Order"
   }
 }
