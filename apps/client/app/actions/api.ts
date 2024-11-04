@@ -7,7 +7,7 @@ const client = hc<AppType>(process.env.API_URL!);
 export const api = client.api;
 // export const ws = socket;
 
-export const ws = new WebSocket("ws://uncomfortable-bison-turuq-1cf13144.koyeb.app/ws");
+export const ws = new WebSocket("wss://uncomfortable-bison-turuq-1cf13144.koyeb.app/ws");
 
 ws.onopen = () => {
   console.log("opened")
