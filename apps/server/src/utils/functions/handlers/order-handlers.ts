@@ -60,7 +60,7 @@ export async function checkUnassignedProcessingOrder({
         );
       if (!integrationOrder && !order) {
         console.log('Order Not Found');
-        ws.send(JSON.stringify({ message: 'Order Not Found' }));
+        ws.send(JSON.stringify({ message: 'unableToAssign' }));
         process.kill();
       } else {
         console.log('Order Matched');
@@ -132,7 +132,7 @@ export async function checkAssignedProcessingOrder({
         );
       if (!integrationOrder && !order) {
         console.log('Order Not Found');
-        ws.send(JSON.stringify({ message: 'Order Not Found' }));
+        ws.send(JSON.stringify({ message: 'unableToAssign' }));
         process.kill();
       } else {
         console.log('Order Matched');
