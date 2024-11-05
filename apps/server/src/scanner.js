@@ -6,7 +6,6 @@ console.log(`Scanner process started with PID: ${process.pid}`);
 
 const Binding = autoDetect();
 const bindings = await Binding.list();
-console.log(JSON.stringify(bindings, null, 2));
 const binding = bindings.find(
   (binding) => binding.pnpId === 'USB\\VID_05F9&PID_4204\\S/N_G21N69335'
 );

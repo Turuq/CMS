@@ -522,6 +522,9 @@
     "portAlreadyOpen": "Port Already Open",
     "unexpectedError": "An Unexpected Error Occurred",
     "scannerNotConnected": "Barcode Scanner Not Connected",
-    "unableToAssign": "Unable to Assign Order"
+    "unableToAssign": "Unable to Assign Order",
+    "orderAlreadySelected": "Order Already Selected",
+    "selectedOrders": "Selected Orders",
+    "clearSelection": "Clear Selection"
   }
 }
