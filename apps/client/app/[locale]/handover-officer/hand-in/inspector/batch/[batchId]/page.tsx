@@ -182,6 +182,8 @@ export default function Page({
                   columns={unassignedSelectedColumns}
                   data={batch.orders}
                   locale={locale}
+                  isStatic={true}
+                  handleRemoveOrder={() => {}}
                 />
               </div>
             </TabsContent>
@@ -191,6 +193,8 @@ export default function Page({
                   columns={unassignedSelectedColumns}
                   data={batch.integrationOrders}
                   locale={locale}
+                  isStatic={true}
+                  handleRemoveOrder={() => {}}
                 />
               </div>
             </TabsContent>

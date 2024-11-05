@@ -28,6 +28,7 @@ interface SelectedOrderTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
   handleRemoveOrder: (id: string) => void;
+  isStatic?: boolean;
 }
 
 export default function SelectedOrderTable<TValue>({
@@ -35,6 +36,7 @@ export default function SelectedOrderTable<TValue>({
   columns,
   data,
   handleRemoveOrder,
+  isStatic = false,
 }: SelectedOrderTableProps<OrderType, TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
   const [pagination, setPagination] = useState<{
@@ -63,12 +65,14 @@ export default function SelectedOrderTable<TValue>({
               key={headerGroup.id}
               className="border-none bg-light_border dark:bg-[#202122] rounded-md"
             >
-              <TableHead
-                key="remove"
-                className={`${locale === 'ar' ? 'rounded-r-xl' : 'rounded-l-xl'}`}
-              >
-                {icons.remove}
-              </TableHead>
+              {!isStatic && (
+                <TableHead
+                  key="remove"
+                  className={`${locale === 'ar' ? 'rounded-r-xl' : 'rounded-l-xl'}`}
+                >
+                  {icons.remove}
+                </TableHead>
+              )}
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
@@ -96,14 +100,16 @@ export default function SelectedOrderTable<TValue>({
                 key={row.id}
                 turuqOrders-state={row.getIsSelected() && 'selected'}
               >
-                <TableCell key="remove" className="text-start">
-                  <button
-                    onClick={() => handleRemoveOrder(row.id)}
-                    className="hover:text-red-500"
-                  >
-                    {icons.remove}
-                  </button>
-                </TableCell>
+                {!isStatic && (
+                  <TableCell key="remove" className="text-start">
+                    <button
+                      onClick={() => handleRemoveOrder(row.id)}
+                      className="hover:text-red-500"
+                    >
+                      {icons.remove}
+                    </button>
+                  </TableCell>
+                )}
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-center text-xs">
                     {cell.column.columnDef.id === 'createdAt'
