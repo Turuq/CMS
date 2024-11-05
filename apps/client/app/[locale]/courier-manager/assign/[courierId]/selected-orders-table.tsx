@@ -1,5 +1,6 @@
 'use client';
 
+import { icons } from '@/components/icons/icons';
 import { Separator } from '@/components/ui/separator';
 import {
   Table,
@@ -9,6 +10,7 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { OrderType } from '@/types/order';
 import {
   ColumnDef,
   flexRender,
@@ -25,13 +27,15 @@ interface SelectedOrderTableProps<TData, TValue> {
   locale: string;
   columns: ColumnDef<TData, TValue>[];
   data: TData[];
+  handleRemoveOrder: (id: string) => void;
 }
 
-export default function SelectedOrderTable<TData, TValue>({
+export default function SelectedOrderTable<TValue>({
   locale,
   columns,
   data,
-}: SelectedOrderTableProps<TData, TValue>) {
+  handleRemoveOrder,
+}: SelectedOrderTableProps<OrderType, TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
   const [pagination, setPagination] = useState<{
     pageIndex: number;
@@ -47,6 +51,7 @@ export default function SelectedOrderTable<TData, TValue>({
       pagination,
     },
     onPaginationChange: setPagination,
+    getRowId: (row) => row._id,
   });
 
   return (
@@ -58,11 +63,17 @@ export default function SelectedOrderTable<TData, TValue>({
               key={headerGroup.id}
               className="border-none bg-light_border dark:bg-[#202122] rounded-md"
             >
+              <TableHead
+                key="remove"
+                className={`${locale === 'ar' ? 'rounded-r-xl' : 'rounded-l-xl'}`}
+              >
+                {icons.remove}
+              </TableHead>
               {headerGroup.headers.map((header) => {
                 return (
                   <TableHead
                     key={header.id}
-                    className={`text-xs text-center w-auto font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl' : 'first:rounded-l-xl last:rounded-r-xl'} last:border-r-0`}
+                    className={`text-xs text-center w-auto font-bold ${locale === 'ar' ? 'last:rounded-l-xl' : 'last:rounded-r-xl'} last:border-r-0`}
                   >
                     {header.isPlaceholder
                       ? null
@@ -85,6 +96,14 @@ export default function SelectedOrderTable<TData, TValue>({
                 key={row.id}
                 turuqOrders-state={row.getIsSelected() && 'selected'}
               >
+                <TableCell key="remove" className="text-start">
+                  <button
+                    onClick={() => handleRemoveOrder(row.id)}
+                    className="hover:text-red-500"
+                  >
+                    {icons.remove}
+                  </button>
+                </TableCell>
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-center text-xs">
                     {cell.column.columnDef.id === 'createdAt'

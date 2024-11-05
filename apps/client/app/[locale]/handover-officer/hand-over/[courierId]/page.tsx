@@ -23,7 +23,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { ToastStyles } from '@/utils/styles';
 import { OrderType } from '@/types/order';
 import { useQuery } from '@tanstack/react-query';
-import { RowSelectionState } from '@tanstack/react-table';
+// import { RowSelectionState } from '@tanstack/react-table';
 import { useTranslations } from 'next-intl';
 import { useEffect, useState } from 'react';
 import { toast } from 'sonner';
@@ -65,9 +65,9 @@ export default function Page({
     OrderType[]
   >([]);
 
-  const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
-  const [rowSelectionIntegration, onRowSelectionIntegrationChange] =
-    useState<RowSelectionState>({});
+  // const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
+  // const [rowSelectionIntegration, onRowSelectionIntegrationChange] =
+  //   useState<RowSelectionState>({});
 
   const { data: courier, isPending } = useQuery({
     queryKey: ['get-courier', courierId],
@@ -119,8 +119,10 @@ export default function Page({
 
   async function handleStartBatch() {
     setLoading(true);
-    const ids = Object.keys(rowSelection) ?? [];
-    const integrationIds = Object.keys(rowSelectionIntegration) ?? [];
+    // const ids = Object.keys(rowSelection) ?? [];
+    const ids = selectedOrders.map((o) => o._id)
+    // const integrationIds = Object.keys(rowSelectionIntegration) ?? [];
+    const integrationIds = selectedIntegrationOrders.map((o) => o._id);
     startBatch({
       courierId,
       orderIds: ids,
@@ -133,8 +135,8 @@ export default function Page({
         });
         setSelectedOrders([]);
         setSelectedIntegrationOrders([]);
-        onRowSelectionChange({});
-        onRowSelectionIntegrationChange({});
+        // onRowSelectionChange({});
+        // onRowSelectionIntegrationChange({});
         refetch();
         refetchOrders();
         refetchIntegrationOrders();
@@ -149,33 +151,33 @@ export default function Page({
       });
   }
 
-  useEffect(() => {
-    if (orders) {
-      const selectedIds = Object.keys(rowSelection);
-      if (selectedIds.length > 0) {
-        const selected = orders.orders.filter((order) =>
-          selectedIds.includes(order._id.toString())
-        );
-        setSelectedOrders(selected);
-      } else {
-        setSelectedOrders([]);
-      }
-    }
-  }, [rowSelection, orders]);
+  // useEffect(() => {
+  //   if (orders) {
+  //     const selectedIds = Object.keys(rowSelection);
+  //     if (selectedIds.length > 0) {
+  //       const selected = orders.orders.filter((order) =>
+  //         selectedIds.includes(order._id.toString())
+  //       );
+  //       setSelectedOrders(selected);
+  //     } else {
+  //       setSelectedOrders([]);
+  //     }
+  //   }
+  // }, [rowSelection, orders]);
 
-  useEffect(() => {
-    if (integrationOrders) {
-      const selectedIds = Object.keys(rowSelectionIntegration);
-      if (selectedIds.length > 0) {
-        const selected = integrationOrders.integrationOrders.filter((order) =>
-          selectedIds.includes(order._id.toString())
-        );
-        setSelectedIntegrationOrders(selected);
-      } else {
-        setSelectedIntegrationOrders([]);
-      }
-    }
-  }, [rowSelectionIntegration, integrationOrders]);
+  // useEffect(() => {
+  //   if (integrationOrders) {
+  //     const selectedIds = Object.keys(rowSelectionIntegration);
+  //     if (selectedIds.length > 0) {
+  //       const selected = integrationOrders.integrationOrders.filter((order) =>
+  //         selectedIds.includes(order._id.toString())
+  //       );
+  //       setSelectedIntegrationOrders(selected);
+  //     } else {
+  //       setSelectedIntegrationOrders([]);
+  //     }
+  //   }
+  // }, [rowSelectionIntegration, integrationOrders]);
 
   useEffect(() => {
     queryClient.prefetchQuery({
@@ -233,17 +235,35 @@ export default function Page({
           const order: OrderType = data.order;
           if (order) {
             if (order?.provider) {
-              setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
-              onRowSelectionIntegrationChange((oldVal) => ({
-                ...oldVal,
-                [order._id]: true,
-              }));
+              const exists = selectedIntegrationOrders.find(
+                (o) => o.OID === order.OID
+              );
+              if (exists) {
+                toast.warning(scanner('orderAlreadySelected'), {
+                  description: order.OID,
+                  style: ToastStyles.warning,
+                });
+              } else {
+                setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
+                // onRowSelectionIntegrationChange((oldVal) => ({
+                //   ...oldVal,
+                //   [order._id]: true,
+                // }));
+              }
             } else {
-              setSelectedOrders((oldVal) => [...oldVal, order]);
-              onRowSelectionChange((oldVal) => ({
-                ...oldVal,
-                [order._id]: true,
-              }));
+              const exists = selectedOrders.find((o) => o.OID === order.OID);
+              if (exists) {
+                toast.warning(scanner('orderAlreadySelected'), {
+                  description: order.OID,
+                  style: ToastStyles.warning,
+                });
+              } else {
+                setSelectedOrders((oldVal) => [...oldVal, order]);
+                // onRowSelectionChange((oldVal) => ({
+                //   ...oldVal,
+                //   [order._id]: true,
+                // }));
+              }
             }
           }
           if (scanning) {
@@ -266,6 +286,17 @@ export default function Page({
       JSON.stringify({ message: 'handover-processing-assigned', courierId })
     );
   };
+
+    function handleRemoveTuruqOrder(id: string) {
+      alert(id);
+      setSelectedOrders(selectedOrders.filter((order) => order._id !== id));
+    }
+
+    function handleRemoveIntegrationOrder(id: string) {
+      setSelectedIntegrationOrders(
+        selectedIntegrationOrders.filter((order) => order._id !== id)
+      );
+    }
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -465,9 +496,9 @@ export default function Page({
                   onPageChange={setTuruqPage}
                   pageSize={turuqPageSize}
                   onPageSizeChange={setTuruqPageSize}
-                  enableRowSelection
-                  rowSelection={rowSelection}
-                  onRowSelectionChange={onRowSelectionChange}
+                  // enableRowSelection
+                  // rowSelection={rowSelection}
+                  // onRowSelectionChange={onRowSelectionChange}
                   totalPages={orders?.totalPages ?? 1}
                 />
               </div>
@@ -484,40 +515,41 @@ export default function Page({
                     and are Out For Delivery
                   </p>
                 </div>
-                {rowSelection && (
+                {selectedOrders.length > 0 && (
                   <p className="text-xs font-bold">
-                    {Object.keys(rowSelection).length} Selected Orders
+                    {selectedOrders.length} {scanner('selectedOrders')}
                   </p>
                 )}
               </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
-                  data={selectedOrders}
-                  locale={locale}
-                />
-                {Object.keys(rowSelection).length > 0 && (
-                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                {selectedOrders.length > 0 && (
+                  <div className="relative top-0 mb-5 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
                     <div className="flex items-center gap-2">
                       {icons.checkbox}
-                      <p className="text-xs font-bold">
-                        {Object.keys(rowSelection).length} Selected Orders
+                      <p className="text-base font-bold">
+                        {selectedOrders.length} {scanner('selectedOrders')}
                       </p>
                     </div>
                     <button
                       className="flex items-center gap-2 text-red-500 group"
                       onClick={() => {
                         setSelectedOrders([]);
-                        onRowSelectionChange({});
+                        // onRowSelectionChange({});
                       }}
                     >
                       <Trash2Icon size={16} />
                       <p className="text-xs font-bold hidden group-hover:flex">
-                        Clear Selection
+                        {scanner('clearSelection')}
                       </p>
                     </button>
                   </div>
                 )}
+                <SelectedOrderTable
+                  columns={unassignedSelectedColumns}
+                  data={selectedOrders}
+                  locale={locale}
+                  handleRemoveOrder={handleRemoveTuruqOrder}
+                />
               </div>
               <div className="flex items-center justify-end w-full">
                 <Button
@@ -525,8 +557,8 @@ export default function Page({
                   className="w-40"
                   onClick={handleStartBatch}
                   disabled={
-                    (Object.keys(rowSelection).length === 0 &&
-                      Object.keys(rowSelectionIntegration).length === 0) ||
+                    (selectedOrders.length === 0 &&
+                      selectedIntegrationOrders.length === 0) ||
                     loading ||
                     hasActive
                   }
@@ -568,9 +600,9 @@ export default function Page({
                   onPageChange={setIntegrationPage}
                   pageSize={integrationPageSize}
                   onPageSizeChange={setIntegrationPageSize}
-                  enableRowSelection
-                  rowSelection={rowSelectionIntegration}
-                  onRowSelectionChange={onRowSelectionIntegrationChange}
+                  // enableRowSelection
+                  // rowSelection={rowSelectionIntegration}
+                  // onRowSelectionChange={onRowSelectionIntegrationChange}
                   totalPages={integrationOrders?.totalPages ?? 1}
                 />
               </div>
@@ -587,42 +619,43 @@ export default function Page({
                     and are Out For Delivery
                   </p>
                 </div>
-                {rowSelectionIntegration && (
+                {selectedIntegrationOrders.length > 0 && (
                   <p className="text-xs font-bold">
-                    {Object.keys(rowSelectionIntegration).length} Selected
+                    {selectedIntegrationOrders.length} Selected
                     Orders
                   </p>
                 )}
               </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
-                  data={selectedIntegrationOrders}
-                  locale={locale}
-                />
-                {Object.keys(rowSelectionIntegration).length > 0 && (
-                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                {selectedIntegrationOrders.length > 0 && (
+                  <div className="relative top-0 mb-5 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
                     <div className="flex items-center gap-2">
                       {icons.checkbox}
-                      <p className="text-xs font-bold">
-                        {Object.keys(rowSelectionIntegration).length} Selected
-                        Orders
+                      <p className="text-base font-bold">
+                        {selectedIntegrationOrders.length}{' '}
+                        {scanner('selectedOrders')}
                       </p>
                     </div>
                     <button
                       className="flex items-center gap-2 text-red-500 group"
                       onClick={() => {
                         setSelectedIntegrationOrders([]);
-                        onRowSelectionIntegrationChange({});
+                        // onRowSelectionIntegrationChange({});
                       }}
                     >
                       <Trash2Icon size={16} />
                       <p className="text-xs font-bold hidden group-hover:flex">
-                        Clear Selection
+                        {scanner('clearSelection')}
                       </p>
                     </button>
                   </div>
                 )}
+                <SelectedOrderTable
+                  columns={unassignedSelectedColumns}
+                  data={selectedIntegrationOrders}
+                  locale={locale}
+                  handleRemoveOrder={handleRemoveIntegrationOrder}
+                />
               </div>
               <div className="flex items-center justify-end w-full">
                 <Button
@@ -630,8 +663,8 @@ export default function Page({
                   className="w-40"
                   onClick={handleStartBatch}
                   disabled={
-                    (Object.keys(rowSelection).length === 0 &&
-                      Object.keys(rowSelectionIntegration).length === 0) ||
+                    (selectedOrders.length === 0 &&
+                      selectedIntegrationOrders.length === 0) ||
                     loading ||
                     hasActive
                   }

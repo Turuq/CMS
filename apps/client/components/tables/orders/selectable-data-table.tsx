@@ -11,8 +11,8 @@ import {
   getCoreRowModel,
   getFilteredRowModel,
   getPaginationRowModel,
-  OnChangeFn,
-  RowSelectionState,
+  // OnChangeFn,
+  // RowSelectionState,
   useReactTable,
 } from '@tanstack/react-table';
 import {
@@ -54,9 +54,9 @@ interface SelectableOrdersDataTableProps<TValue> {
   onPageChange: (page: number) => void;
   onPageSizeChange: (pageSize: number) => void;
   enableServerFilter?: boolean;
-  enableRowSelection?: boolean;
-  rowSelection?: RowSelectionState;
-  onRowSelectionChange?: OnChangeFn<RowSelectionState> | undefined;
+  // enableRowSelection?: boolean;
+  // rowSelection?: RowSelectionState;
+  // onRowSelectionChange?: OnChangeFn<RowSelectionState> | undefined;
 }
 
 // This a generic data table component that can be used to render any table
@@ -72,9 +72,9 @@ export function SelectableOrdersDataTable<TValue>({
   onPageChange,
   onPageSizeChange,
   enableServerFilter,
-  enableRowSelection = false,
-  rowSelection,
-  onRowSelectionChange,
+  // enableRowSelection = false,
+  // rowSelection,
+  // onRowSelectionChange,
 }: SelectableOrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
   const [clientColumnFilters, setClientColumnFilters] =
@@ -95,11 +95,11 @@ export function SelectableOrdersDataTable<TValue>({
     getPaginationRowModel: getPaginationRowModel(),
     state: {
       columnFilters: clientColumnFilters,
-      rowSelection,
+      // rowSelection,
     },
     onColumnFiltersChange: setClientColumnFilters,
-    onRowSelectionChange,
-    enableRowSelection,
+    // onRowSelectionChange,
+    // enableRowSelection,
     getRowId: (row) => row._id,
   });
 

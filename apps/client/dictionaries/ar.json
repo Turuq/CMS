@@ -518,6 +518,9 @@
     "portAlreadyOpen": "المنفذ مفتوح",
     "unexpectedError": "حدث خطأ غير متوقع",
     "scannerNotConnected": "ماسح الباركود غير متصل",
-    "unableToAssign": "لا يمكن تعيين هذا الطلب"
+    "unableToAssign": "لا يمكن تعيين هذا الطلب",
+    "orderAlreadySelected": "هذا الطلب محدد بالفعل",
+    "selectedOrders": "طلبات محددة",
+    "clearSelection": "مسح التحديد"
   }
 }

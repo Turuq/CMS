@@ -36,7 +36,7 @@ import { Button } from '@/components/ui/button';
 import queryClient from '@/lib/query/query-client';
 import { OrderType } from '@/types/order';
 import { ToastStyles } from '@/utils/styles';
-import { RowSelectionState } from '@tanstack/react-table';
+// import { RowSelectionState } from '@tanstack/react-table';
 import {
   CircleCheckIcon,
   CircleIcon,
@@ -74,9 +74,9 @@ export default function Page({
     OrderType[]
   >([]);
 
-  const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
-  const [integrationRowSelection, onIntegrationRowSelectionChange] =
-    useState<RowSelectionState>({});
+  // const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
+  // const [integrationRowSelection, onIntegrationRowSelectionChange] =
+  //   useState<RowSelectionState>({});
 
   const [assigningTuruqLoading, setAssigningTuruqLoading] = useState(false);
   const [assigningIntegrationLoading, setAssigningIntegrationLoading] =
@@ -125,33 +125,33 @@ export default function Page({
     queryFn: () => hasActiveBatch({ id: courierId }),
   });
 
-  useEffect(() => {
-    if (turuqOrders) {
-      const selectedIds = Object.keys(rowSelection);
-      if (selectedIds.length > 0) {
-        const selected = turuqOrders.orders.filter((order) =>
-          selectedIds.includes(order._id.toString())
-        );
-        setSelectedOrders(selected);
-      } else {
-        setSelectedOrders([]);
-      }
-    }
-  }, [rowSelection, turuqOrders]);
+  // useEffect(() => {
+  //   if (turuqOrders) {
+  //     const selectedIds = Object.keys(rowSelection);
+  //     if (selectedIds.length > 0) {
+  //       const selected = turuqOrders.orders.filter((order) =>
+  //         selectedIds.includes(order._id.toString())
+  //       );
+  //       setSelectedOrders(selected);
+  //     } else {
+  //       setSelectedOrders([]);
+  //     }
+  //   }
+  // }, [rowSelection, turuqOrders]);
 
-  useEffect(() => {
-    if (integrationOrders) {
-      const selectedIds = Object.keys(integrationRowSelection);
-      if (selectedIds.length > 0) {
-        const selected = integrationOrders.integrationOrders.filter((order) =>
-          selectedIds.includes(order._id.toString())
-        );
-        setSelectedIntegrationOrders(selected);
-      } else {
-        setSelectedIntegrationOrders([]);
-      }
-    }
-  }, [integrationRowSelection, integrationOrders]);
+  // useEffect(() => {
+  //   if (integrationOrders) {
+  //     const selectedIds = Object.keys(integrationRowSelection);
+  //     if (selectedIds.length > 0) {
+  //       const selected = integrationOrders.integrationOrders.filter((order) =>
+  //         selectedIds.includes(order._id.toString())
+  //       );
+  //       setSelectedIntegrationOrders(selected);
+  //     } else {
+  //       setSelectedIntegrationOrders([]);
+  //     }
+  //   }
+  // }, [integrationRowSelection, integrationOrders]);
 
   useEffect(() => {
     queryClient.prefetchQuery({
@@ -187,7 +187,8 @@ export default function Page({
 
   async function handleAssignOrders() {
     setAssigningTuruqLoading(true);
-    const ids = Object.keys(rowSelection);
+    // const ids = Object.keys(rowSelection);
+    const ids = selectedOrders.map((o) => o._id)
     const res = await assignTuruqOrders({
       id: courierId,
       ids,
@@ -201,7 +202,7 @@ export default function Page({
     } else {
       setAssigningTuruqLoading(false);
       setSelectedOrders([]);
-      onRowSelectionChange({});
+      // onRowSelectionChange({});
       refetchTuruqOrders();
       toast.success(t('assign.courierAssignPage.toast.success.header'), {
         description: t('assign.courierAssignPage.toast.success.description'),
@@ -212,7 +213,8 @@ export default function Page({
 
   async function handleAssignIntegrationOrders() {
     setAssigningIntegrationLoading(true);
-    const ids = Object.keys(integrationRowSelection);
+    // const ids = Object.keys(integrationRowSelection);
+    const ids = selectedIntegrationOrders.map((o) => o._id)
     const res = await assignIntegrationOrders({
       id: courierId,
       ids,
@@ -230,7 +232,7 @@ export default function Page({
     } else {
       setAssigningIntegrationLoading(false);
       setSelectedIntegrationOrders([]);
-      onIntegrationRowSelectionChange({});
+      // onIntegrationRowSelectionChange({});
       refetchIntegrationOrders();
       toast.success(t('assign.courierAssignPage.toast.success.header'), {
         description: t('assign.courierAssignPage.toast.success.description'),
@@ -262,17 +264,35 @@ export default function Page({
           const order: OrderType = data.order;
           if (order) {
             if (order?.provider) {
-              setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
-              onIntegrationRowSelectionChange((oldVal) => ({
-                ...oldVal,
-                [order._id]: true,
-              }));
+              const exists = selectedIntegrationOrders.find(
+                (o) => o.OID === order.OID
+              );
+              if (exists) {
+                toast.warning(scanner('orderAlreadySelected'), {
+                  description: order.OID,
+                  style: ToastStyles.warning,
+                });
+              } else {
+                setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
+                // onIntegrationRowSelectionChange((oldVal) => ({
+                //   ...oldVal,
+                //   [order._id]: true,
+                // }));
+              }
             } else {
-              setSelectedOrders((oldVal) => [...oldVal, order]);
-              onRowSelectionChange((oldVal) => ({
-                ...oldVal,
-                [order._id]: true,
-              }));
+              const exists = selectedOrders.find((o) => o.OID === order.OID);
+              if (exists) {
+                toast.warning(scanner('orderAlreadySelected'), {
+                  description: order.OID,
+                  style: ToastStyles.warning,
+                });
+              } else {
+                setSelectedOrders((oldVal) => [...oldVal, order]);
+                // onRowSelectionChange((oldVal) => ({
+                //   ...oldVal,
+                //   [order._id]: true,
+                // }));
+              }
             }
           }
           if (scanning) {
@@ -290,6 +310,17 @@ export default function Page({
     setScanning(true);
     ws.send(JSON.stringify({ message: 'assign-processing-unassigned' }));
   };
+
+  function handleRemoveTuruqOrder(id: string) {
+    alert(id);
+    setSelectedOrders(selectedOrders.filter((order) => order._id !== id));
+  }
+
+  function handleRemoveIntegrationOrder(id: string) {
+    setSelectedIntegrationOrders(
+      selectedIntegrationOrders.filter((order) => order._id !== id)
+    );
+  }
 
   if (turuqError) {
     return <div>An Error Has Occurred: {turuqError.message}</div>;
@@ -415,9 +446,9 @@ export default function Page({
                   onPageChange={setTuruqPage}
                   pageSize={turuqPageSize}
                   onPageSizeChange={setTuruqPageSize}
-                  enableRowSelection
-                  rowSelection={rowSelection}
-                  onRowSelectionChange={onRowSelectionChange}
+                  // enableRowSelection
+                  // rowSelection={rowSelection}
+                  // onRowSelectionChange={onRowSelectionChange}
                   totalPages={turuqOrders?.totalPages ?? 1}
                 />
               </div>
@@ -429,34 +460,36 @@ export default function Page({
                 </h1>
               </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <SelectedOrderTable
-                  locale={locale}
-                  columns={unassignedSelectedColumns}
-                  data={selectedOrders ?? []}
-                />
-                {/* <pre>{JSON.stringify(selectedOrders, null, 2)}</pre> */}
-                {Object.keys(rowSelection).length > 0 && (
-                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                {selectedOrders.length > 0 && (
+                  <div className="relative top-0 mb-5 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
                     <div className="flex items-center gap-2">
                       {icons.checkbox}
-                      <p className="text-xs font-bold">
-                        {Object.keys(rowSelection).length} Selected Orders
+                      <p className="text-base font-bold">
+                        {selectedOrders.length}{' '}
+                        {scanner('selectedOrders')}
                       </p>
                     </div>
                     <button
                       className="flex items-center gap-2 text-red-500 group"
                       onClick={() => {
                         setSelectedOrders([]);
-                        onRowSelectionChange({});
+                        // onRowSelectionChange({});
                       }}
                     >
                       <Trash2Icon size={16} />
                       <p className="text-xs font-bold hidden group-hover:flex">
-                        Clear Selection
+                        {scanner('clearSelection')}
                       </p>
                     </button>
                   </div>
                 )}
+                <SelectedOrderTable
+                  locale={locale}
+                  columns={unassignedSelectedColumns}
+                  data={selectedOrders ?? []}
+                  handleRemoveOrder={handleRemoveTuruqOrder}
+                />
+                {/* <pre>{JSON.stringify(selectedOrders, null, 2)}</pre> */}
               </div>
               <div className="flex items-center justify-end">
                 <AlertDialog>
@@ -529,9 +562,9 @@ export default function Page({
                   onPageChange={setIntegrationPage}
                   pageSize={integrationPageSize}
                   onPageSizeChange={setIntegrationPageSize}
-                  enableRowSelection
-                  rowSelection={integrationRowSelection}
-                  onRowSelectionChange={onIntegrationRowSelectionChange}
+                  // enableRowSelection
+                  // rowSelection={integrationRowSelection}
+                  // onRowSelectionChange={onIntegrationRowSelectionChange}
                   totalPages={integrationOrders?.totalPages ?? 1}
                 />
               </div>
@@ -543,34 +576,35 @@ export default function Page({
                 </h1>
               </div>
               <div className="p-2 rounded-xl bg-light dark:bg-dark_border">
-                <SelectedOrderTable
-                  locale={locale}
-                  columns={unassignedSelectedColumns}
-                  data={selectedIntegrationOrders ?? []}
-                />
-                {Object.keys(integrationRowSelection).length > 0 && (
-                  <div className="relative bottom-0 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
+                {selectedIntegrationOrders.length > 0 && (
+                  <div className="relative top-0 mb-5 w-[400px] h-10 flex items-center justify-between rounded-xl p-5 dark:bg-light dark:text-dark_border bg-dark_border text-light">
                     <div className="flex items-center gap-2">
                       {icons.checkbox}
-                      <p className="text-xs font-bold">
-                        {Object.keys(integrationRowSelection).length} Selected
-                        Orders
+                      <p className="text-base font-bold">
+                        {selectedIntegrationOrders.length}{' '}
+                        {scanner('selectedOrders')}
                       </p>
                     </div>
                     <button
                       className="flex items-center gap-2 text-red-500 group"
                       onClick={() => {
                         setSelectedIntegrationOrders([]);
-                        onIntegrationRowSelectionChange({});
+                        // onIntegrationRowSelectionChange({});
                       }}
                     >
                       <Trash2Icon size={16} />
                       <p className="text-xs font-bold hidden group-hover:flex">
-                        Clear Selection
+                        {scanner('clearSelection')}
                       </p>
                     </button>
                   </div>
                 )}
+                <SelectedOrderTable
+                  locale={locale}
+                  columns={unassignedSelectedColumns}
+                  data={selectedIntegrationOrders ?? []}
+                  handleRemoveOrder={handleRemoveIntegrationOrder}
+                />
                 {/* <pre>{JSON.stringify(selectedIntegrationOrders, null, 2)}</pre> */}
               </div>
               <div className="flex items-center justify-end">
