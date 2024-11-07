@@ -169,36 +169,43 @@ Bun.serve({
       console.log('WebSocket Connection Opened');
       ws.send(JSON.stringify({ message: 'socketOpened' }));
     },
-    message(ws, msg) {
+    async message(ws, msg) {
       const message: { message: string; [key: string]: string } = JSON.parse(
         msg.toString()
       ); // { message: '', ...props? }
+      console.log(message);
       if (message.message === 'assign-processing-unassigned') {
-        const proc = createIPC(
-          ['node', './src/scanner.js'],
-          ws,
-          async (message, _, ws) =>
-            checkUnassignedProcessingOrder({
-              evt: message,
-              ws,
-              process: proc,
-            })
-        );
+        await checkUnassignedProcessingOrder({ code: message.data, ws });
+        // const proc = createIPC(
+        //   ['node', './src/scanner.js'],
+        //   ws,
+        //   async (message, _, ws) =>
+        //     checkUnassignedProcessingOrder({
+        //       evt: message,
+        //       ws,
+        //       process: proc,
+        //     })
+        // );
       }
       if (message.message === 'handover-processing-assigned') {
         if (message.courierId) {
           const { courierId } = message;
-          const proc = createIPC(
-            ['node', './src/scanner.js'],
+          await checkAssignedProcessingOrder({
+            code: message.data,
+            courierId,
             ws,
-            async (message, _, ws) =>
-              checkAssignedProcessingOrder({
-                evt: message,
-                ws,
-                process: proc,
-                courierId,
-              })
-          );
+          });
+          // const proc = createIPC(
+          //   ['node', './src/scanner.js'],
+          //   ws,
+          //   async (message, _, ws) =>
+          //     checkAssignedProcessingOrder({
+          //       evt: message,
+          //       ws,
+          //       process: proc,
+          //       courierId,
+          //     })
+          // );
         } else {
           ws.send(JSON.stringify({ message: 'No courier ID provided' }));
         }

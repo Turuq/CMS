@@ -515,7 +515,7 @@
     }
   },
   "scanner": {
-    "connectionEstablished": "Connected Established",
+    "connectionEstablished": "Connection Established",
     "portReady": "Port Ready",
     "scannerConnected": "Barcode Scanner Connected",
     "startScanning": "Start Scanning",
