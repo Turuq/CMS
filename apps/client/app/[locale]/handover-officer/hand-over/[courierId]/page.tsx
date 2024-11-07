@@ -38,6 +38,7 @@ import {
   UsbIcon,
 } from 'lucide-react';
 import { ws } from '@/app/actions/api';
+import { scanOrders } from '@/utils/helpers/functions';
 
 export default function Page({
   params: { locale, courierId },
@@ -52,6 +53,9 @@ export default function Page({
   const [message, setMessage] = useState<{ [key: string]: boolean | string }>(
     {}
   );
+
+  const [connectedPort, setConnectedPort] = useState<SerialPort | null>(null);
+
   const [loading, setLoading] = useState<boolean>(false);
 
   const [turuqPage, setTuruqPage] = useState<number>(1);
@@ -120,7 +124,7 @@ export default function Page({
   async function handleStartBatch() {
     setLoading(true);
     // const ids = Object.keys(rowSelection) ?? [];
-    const ids = selectedOrders.map((o) => o._id)
+    const ids = selectedOrders.map((o) => o._id);
     // const integrationIds = Object.keys(rowSelectionIntegration) ?? [];
     const integrationIds = selectedIntegrationOrders.map((o) => o._id);
     startBatch({
@@ -150,34 +154,6 @@ export default function Page({
         console.error(err);
       });
   }
-
-  // useEffect(() => {
-  //   if (orders) {
-  //     const selectedIds = Object.keys(rowSelection);
-  //     if (selectedIds.length > 0) {
-  //       const selected = orders.orders.filter((order) =>
-  //         selectedIds.includes(order._id.toString())
-  //       );
-  //       setSelectedOrders(selected);
-  //     } else {
-  //       setSelectedOrders([]);
-  //     }
-  //   }
-  // }, [rowSelection, orders]);
-
-  // useEffect(() => {
-  //   if (integrationOrders) {
-  //     const selectedIds = Object.keys(rowSelectionIntegration);
-  //     if (selectedIds.length > 0) {
-  //       const selected = integrationOrders.integrationOrders.filter((order) =>
-  //         selectedIds.includes(order._id.toString())
-  //       );
-  //       setSelectedIntegrationOrders(selected);
-  //     } else {
-  //       setSelectedIntegrationOrders([]);
-  //     }
-  //   }
-  // }, [rowSelectionIntegration, integrationOrders]);
 
   useEffect(() => {
     queryClient.prefetchQuery({
@@ -216,15 +192,13 @@ export default function Page({
   }, [integrationPage, integrationPageSize, integrationOrders, courierId]);
 
   useEffect(() => {
+    const scannedOrders: OrderType[] = [];
+    const scannedIntegrationOrders: OrderType[] = [];
+
     ws.onmessage = (evt) => {
-      console.log(evt.data);
       const data = JSON.parse(evt.data);
       if (data) {
-        if (
-          ['openingPort', 'portOpen', 'socketOpened', 'portClosed'].includes(
-            data.message
-          )
-        ) {
+        if (data.message === 'socketOpened') {
           setMessage((oldVal) => ({ ...oldVal, [data.message]: true }));
         } else if (data.error) {
           toast.error(scanner(data.error), {
@@ -235,7 +209,7 @@ export default function Page({
           const order: OrderType = data.order;
           if (order) {
             if (order?.provider) {
-              const exists = selectedIntegrationOrders.find(
+              const exists = scannedIntegrationOrders.find(
                 (o) => o.OID === order.OID
               );
               if (exists) {
@@ -245,13 +219,10 @@ export default function Page({
                 });
               } else {
                 setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
-                // onRowSelectionIntegrationChange((oldVal) => ({
-                //   ...oldVal,
-                //   [order._id]: true,
-                // }));
+                scannedIntegrationOrders.push(order);
               }
             } else {
-              const exists = selectedOrders.find((o) => o.OID === order.OID);
+              const exists = scannedOrders.find((o) => o.OID === order.OID);
               if (exists) {
                 toast.warning(scanner('orderAlreadySelected'), {
                   description: order.OID,
@@ -259,44 +230,57 @@ export default function Page({
                 });
               } else {
                 setSelectedOrders((oldVal) => [...oldVal, order]);
-                // onRowSelectionChange((oldVal) => ({
-                //   ...oldVal,
-                //   [order._id]: true,
-                // }));
+                scannedOrders.push(order);
               }
             }
           }
           if (scanning) {
             setMessage({});
-            ws.send(
-              JSON.stringify({
-                message: 'handover-processing-assigned',
-                courierId,
-              })
-            );
+            scanOrders({
+              endpoint: 'handover-processing-assigned',
+              feedback: setMessage,
+              keepScanning: true,
+              port: connectedPort,
+              courierId,
+            });
           }
         }
       }
     };
-  }, [scanning, courierId]);
+  }, [scanning, courierId, connectedPort, scanner]);
 
   const handleSocket = async () => {
     setScanning(true);
-    ws.send(
-      JSON.stringify({ message: 'handover-processing-assigned', courierId })
-    );
+    const port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+
+    setConnectedPort(port);
+
+    setTimeout(async () => {
+      await port.close();
+      setScanning(false);
+      setConnectedPort(null);
+    }, 600000); // 10 minutes
+
+    await scanOrders({
+      endpoint: 'handover-processing-assigned',
+      feedback: setMessage,
+      keepScanning: true,
+      courierId,
+      port,
+    });
   };
 
-    function handleRemoveTuruqOrder(id: string) {
-      alert(id);
-      setSelectedOrders(selectedOrders.filter((order) => order._id !== id));
-    }
+  function handleRemoveTuruqOrder(id: string) {
+    alert(id);
+    setSelectedOrders(selectedOrders.filter((order) => order._id !== id));
+  }
 
-    function handleRemoveIntegrationOrder(id: string) {
-      setSelectedIntegrationOrders(
-        selectedIntegrationOrders.filter((order) => order._id !== id)
-      );
-    }
+  function handleRemoveIntegrationOrder(id: string) {
+    setSelectedIntegrationOrders(
+      selectedIntegrationOrders.filter((order) => order._id !== id)
+    );
+  }
 
   return (
     <div className="flex flex-col gap-2 w-full">
@@ -621,8 +605,7 @@ export default function Page({
                 </div>
                 {selectedIntegrationOrders.length > 0 && (
                   <p className="text-xs font-bold">
-                    {selectedIntegrationOrders.length} Selected
-                    Orders
+                    {selectedIntegrationOrders.length} Selected Orders
                   </p>
                 )}
               </div>

@@ -48,6 +48,7 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
+import { scanOrders } from '@/utils/helpers/functions';
 
 export default function Page({
   params: { locale, courierId },
@@ -62,7 +63,8 @@ export default function Page({
   const [message, setMessage] = useState<{ [key: string]: boolean | string }>(
     {}
   );
-  // const [stopScanning, setStopScanning] = useState(false);
+
+  const [connectedPort, setConnectedPort] = useState<SerialPort | null>(null);
 
   const [turuqPage, setTuruqPage] = useState<number>(1);
   const [integrationPage, setIntegrationPage] = useState<number>(1);
@@ -188,7 +190,7 @@ export default function Page({
   async function handleAssignOrders() {
     setAssigningTuruqLoading(true);
     // const ids = Object.keys(rowSelection);
-    const ids = selectedOrders.map((o) => o._id)
+    const ids = selectedOrders.map((o) => o._id);
     const res = await assignTuruqOrders({
       id: courierId,
       ids,
@@ -214,7 +216,7 @@ export default function Page({
   async function handleAssignIntegrationOrders() {
     setAssigningIntegrationLoading(true);
     // const ids = Object.keys(integrationRowSelection);
-    const ids = selectedIntegrationOrders.map((o) => o._id)
+    const ids = selectedIntegrationOrders.map((o) => o._id);
     const res = await assignIntegrationOrders({
       id: courierId,
       ids,
@@ -245,15 +247,13 @@ export default function Page({
   }
 
   useEffect(() => {
+    const scannedOrders: OrderType[] = [];
+    const scannedIntegrationOrders: OrderType[] = [];
+
     ws.onmessage = (evt) => {
-      console.log(evt.data);
       const data = JSON.parse(evt.data);
       if (data) {
-        if (
-          ['openingPort', 'portOpen', 'socketOpened', 'portClosed'].includes(
-            data.message
-          )
-        ) {
+        if (data.message === 'socketOpened') {
           setMessage((oldVal) => ({ ...oldVal, [data.message]: true }));
         } else if (data.error) {
           toast.error(scanner(data.error), {
@@ -264,7 +264,7 @@ export default function Page({
           const order: OrderType = data.order;
           if (order) {
             if (order?.provider) {
-              const exists = selectedIntegrationOrders.find(
+              const exists = scannedIntegrationOrders.find(
                 (o) => o.OID === order.OID
               );
               if (exists) {
@@ -274,13 +274,10 @@ export default function Page({
                 });
               } else {
                 setSelectedIntegrationOrders((oldVal) => [...oldVal, order]);
-                // onIntegrationRowSelectionChange((oldVal) => ({
-                //   ...oldVal,
-                //   [order._id]: true,
-                // }));
+                scannedIntegrationOrders.push(order);
               }
             } else {
-              const exists = selectedOrders.find((o) => o.OID === order.OID);
+              const exists = scannedOrders.find((o) => o.OID === order.OID);
               if (exists) {
                 toast.warning(scanner('orderAlreadySelected'), {
                   description: order.OID,
@@ -288,27 +285,43 @@ export default function Page({
                 });
               } else {
                 setSelectedOrders((oldVal) => [...oldVal, order]);
-                // onRowSelectionChange((oldVal) => ({
-                //   ...oldVal,
-                //   [order._id]: true,
-                // }));
+                scannedOrders.push(order);
               }
             }
           }
           if (scanning) {
             setMessage({});
-            ws.send(
-              JSON.stringify({ message: 'assign-processing-unassigned' })
-            );
+            scanOrders({
+              endpoint: 'assign-processing-unassigned',
+              feedback: setMessage,
+              keepScanning: true,
+              port: connectedPort,
+            });
           }
         }
       }
     };
-  }, [scanning]);
+  }, [scanning, connectedPort, scanner]);
 
   const handleSocket = async () => {
     setScanning(true);
-    ws.send(JSON.stringify({ message: 'assign-processing-unassigned' }));
+    const port = await navigator.serial.requestPort();
+    await port.open({ baudRate: 9600 });
+
+    setConnectedPort(port);
+
+    setTimeout(async () => {
+      await port.close();
+      setScanning(false);
+      setConnectedPort(null);
+    }, 600000); // 10 minutes
+
+    await scanOrders({
+      endpoint: 'assign-processing-unassigned',
+      feedback: setMessage,
+      keepScanning: true,
+      port,
+    });
   };
 
   function handleRemoveTuruqOrder(id: string) {
@@ -465,8 +478,7 @@ export default function Page({
                     <div className="flex items-center gap-2">
                       {icons.checkbox}
                       <p className="text-base font-bold">
-                        {selectedOrders.length}{' '}
-                        {scanner('selectedOrders')}
+                        {selectedOrders.length} {scanner('selectedOrders')}
                       </p>
                     </div>
                     <button
