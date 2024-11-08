@@ -51,6 +51,25 @@ export function getStatusTextColor(status: string) {
   return result;
 }
 
+export function getStatusTrackerColor(status: string) {
+  switch (status) {
+    case 'delivered':
+      return 'emerald';
+    case 'outForDelivery':
+      return 'sky';
+    case 'processing':
+    case 'pending':
+      return 'amber';
+    case 'cancelled':
+    case 'postponed':
+    case 'returned':
+    case 'invalidAddress':
+      return 'red';
+    default:
+      return 'gray';
+  }
+}
+
 export function getIndicatorColor(order: OrderType) {
   if (order?.toBeReshipped) return 'text-lime-500';
   if (order?.paymentMethod === 'INSTAPAY') return 'text-violet-500';

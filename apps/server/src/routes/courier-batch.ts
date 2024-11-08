@@ -351,7 +351,8 @@ const courierBatchRouter = new Hono()
         })
         .populate({
           path: 'orders',
-          select: 'OID client customer products status type total createdAt',
+          select:
+            'OID client customer products status type total createdAt reshipped shippingFees courierCOD',
           populate: {
             path: 'client',
             select: 'companyName',
@@ -359,7 +360,8 @@ const courierBatchRouter = new Hono()
         })
         .populate({
           path: 'integrationOrders',
-          select: 'OID client customer products status type total createdAt',
+          select:
+            'OID client customer products status type total createdAt reshipped shippingFees courierCOD',
           populate: {
             path: 'client',
             select: 'companyName',

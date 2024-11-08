@@ -85,7 +85,7 @@ export default function KpiCard({
   return (
     <Card
       className={cn(
-        `rounded-xl drop-shadow-sm relative shadow-accent/10 min-h-20`,
+        `rounded-xl drop-shadow-sm relative shadow-accent/10 min-h-20 max-h-40 h-full`,
         color && CardColors[color]
       )}
     >
@@ -137,21 +137,15 @@ export default function KpiCard({
                 colors={chartConfig.colors}
                 stack
               />
-            ) : chartConfig?.chart === 'line' ? (
-              <SparkLineChart
-                data={chartConfig.data}
-                categories={chartConfig.categories}
-                index={chartConfig.index}
-                colors={chartConfig.colors}
-              />
             ) : (
-              <div className="min-w-40 max-w-40 lg:max-w-80 w-full h-5">
-                <Tracker
-                  dir="ltr"
+              chartConfig?.chart === 'line' && (
+                <SparkLineChart
                   data={chartConfig.data}
-                  className="mt-2 h-5"
+                  categories={chartConfig.categories}
+                  index={chartConfig.index}
+                  colors={chartConfig.colors}
                 />
-              </div>
+              )
             )}
           </>
         )}
@@ -190,8 +184,17 @@ export default function KpiCard({
           </div>
         )}
       </CardHeader>
-      <CardContent className={`px-6 pt-0 pb-1`}>
+      <CardContent className={`px-6 pt-0 pb-1 flex flex-col gap-5`}>
         <p className="text-xs capitalize">{title}</p>
+        {chart && chartConfig && (
+          <div className="min-w-40 max-w-40 lg:max-w-80 w-full h-10">
+            <Tracker
+              dir="ltr"
+              data={chartConfig.data}
+              className="mt-2 h-5 rounded-xl capitalize"
+            />
+          </div>
+        )}
       </CardContent>
       {link && (
         <CardFooter
