@@ -77,7 +77,7 @@ export default function SelectedOrderTable<TValue>({
                 return (
                   <TableHead
                     key={header.id}
-                    className={`text-xs text-center w-auto font-bold ${locale === 'ar' ? 'last:rounded-l-xl' : 'last:rounded-r-xl'} last:border-r-0`}
+                    className={`text-xs text-center w-auto font-bold ${locale === 'ar' ? 'last:rounded-l-xl' : 'last:rounded-r-xl'} ${isStatic && locale === 'ar' ? 'last:rounded-r-xl' : 'first:rounded-l-xl'} last:border-r-0`}
                   >
                     {header.isPlaceholder
                       ? null
