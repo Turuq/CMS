@@ -43,6 +43,7 @@
     "cx": "^24.9.3",
     "framer-motion": "^11.11.10",
     "hono": "^4.6.3",
+    "libphonenumber-js": "^1.11.14",
     "lucide": "^0.429.0",
     "lucide-react": "^0.454.0",
     "moment": "^2.30.1",

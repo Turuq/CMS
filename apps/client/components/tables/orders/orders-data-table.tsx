@@ -23,6 +23,8 @@ import {
 } from '@tanstack/react-table';
 import { Dispatch, SetStateAction, useState } from 'react';
 
+import { FilterObject } from '@/api/utils/validation';
+import DetailedOrderCard from '@/components/cards/detailed-order';
 import CourierFilter from '@/components/filters/courier-filter';
 import StatusFilter from '@/components/filters/status-filter';
 import { icons } from '@/components/icons/icons';
@@ -34,18 +36,15 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { OrderType } from '@/types/order';
+import { padOID } from '@/utils/helpers/functions';
 import { Legend } from '@tremor/react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
-import { Skeleton } from '@/components/ui/skeleton';
-import DetailedOrderCard from '@/components/cards/detailed-order';
-import { FilterObject } from '@/api/utils/validation';
-import { padOID } from '@/utils/helpers/functions';
-import { getStatusTextColor } from '@/utils/helpers/status-modifier';
-import { statusIcons } from '@/components/icons/status-icons';
+import { useTranslations } from 'next-intl';
+import { getStatusColor, getStatusText } from '@/utils/helpers/status-modifier';
 
 interface OrdersDataTableProps<TValue> {
   locale: string;
@@ -80,7 +79,8 @@ export function OrdersDataTable<TValue>({
   loading,
 }: OrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
-  const tStatus = useTranslations('dashboard.statistics.cards');
+  const tOrderType = useTranslations('orderType');
+  // const tStatus = useTranslations('dashboard.statistics.cards');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -136,6 +136,7 @@ export function OrdersDataTable<TValue>({
 
   function handleOIDSearch(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    onPageChange(1);
     setServerColumnFilters((prev) =>
       Object.keys(prev)
         ? { ...prev, OID: padOID(searchValue) }
@@ -260,6 +261,7 @@ export function OrdersDataTable<TValue>({
             )}
           </div>
           <Legend
+            dir="ltr"
             categories={[
               t('legend.reshipped'),
               t('legend.instaPay'),
@@ -378,7 +380,7 @@ export function OrdersDataTable<TValue>({
             <TableBody>
               {loading ? (
                 <>
-                  {Array.from({ length: 5 }).map((_, index) => (
+                  {Array.from({ length: 10 }).map((_, index) => (
                     <TableRow key={index}>
                       {Array.from({ length: columns.length }).map(
                         (_, index) => (
@@ -409,18 +411,40 @@ export function OrdersDataTable<TValue>({
                           {cell.column.columnDef.id === 'createdAt' ? (
                             moment(cell.getValue() as string)
                               .locale(locale)
-                              .format('LL')
+                              .format('L')
                           ) : cell.column.columnDef.id === 'status' ? (
-                            <div className="flex items-center justify-center gap-2 w-auto">
-                              <p
-                                className={`${getStatusTextColor(cell.getValue() as string)} flex items-center gap-2 capitalize text-xs font-semibold`}
+                            <div className="flex flex-col gap-1 items-start justify-center w-auto">
+                              <div
+                                className={`${getStatusColor(cell.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
                               >
-                                <span>
-                                  {statusIcons[cell.getValue() as string]}
-                                </span>
-                                {tStatus(cell.getValue() as string)}
-                              </p>
+                                {locale === 'en'
+                                  ? getStatusText(cell.row.original.status)
+                                  : t(
+                                      `filters.status.values.${cell.row.original.status}`
+                                    )}
+                              </div>
+                              {(() => {
+                                const history = cell.row.original.statusHistory;
+                                const status = cell.row.original
+                                  .status as keyof typeof history;
+                                return (
+                                  <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
+                                    {history &&
+                                    Object.keys(history)?.includes(status)
+                                      ? moment(history[status]).format('L')
+                                      : ''}
+                                  </span>
+                                );
+                              })()}
                             </div>
+                          ) : cell.column.columnDef.id === 'type' ? (
+                            <p>
+                              {cell.getValue()
+                                ? tOrderType(
+                                    String(cell.getValue()).toLowerCase()
+                                  )
+                                : '-'}
+                            </p>
                           ) : (
                             flexRender(
                               cell.column.columnDef.cell,

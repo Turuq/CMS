@@ -59,7 +59,7 @@
             "OID": "رقم الطلب",
             "courier": "مندوب",
             "companyName": "اسم الشركة",
-            "customerName": "اسم العميل",
+            "customerName": "تفاصيل العميل",
             "phoneNumber": "رقم الهاتف",
             "products": "عدد المنتجات",
             "status": "الحالة",
@@ -340,6 +340,7 @@
         },
         "outForDeliveryOrdersStatistics": {
           "header": "الطلبات التي تم شحنها",
+          "description": "عدد الطلبات التي تم شحنها حسب المحافظة",
           "zone": {
             "cairo": "القاهرة",
             "giza": "الجيزة",
@@ -351,6 +352,10 @@
             "beheira": "البحيرة",
             "gharbia": "الغربية"
           }
+        },
+        "deliveredOutForDeliveryCourierStatistics": {
+          "header": "احصئيات الطلبات حسب المندوب",
+          "description": "عدد الطلبات التي تم تسليمها او خرجت للتوصيل حسب المندوب"
         }
       },
       "assign": {
@@ -522,5 +527,13 @@
     "orderAlreadySelected": "هذا الطلب محدد بالفعل",
     "selectedOrders": "طلبات محددة",
     "clearSelection": "مسح التحديد"
+  },
+  "orderType": {
+    "promotional": "ترويجي",
+    "refund": "مرتجع",
+    "exchange": "استبدال",
+    "normal": "عادي",
+    "shopify": "Shopify",
+    "woocommerce": "Woocommerce"
   }
 }

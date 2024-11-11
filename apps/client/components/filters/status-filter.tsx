@@ -47,7 +47,7 @@ export default function StatusFilter({
             value={status.value}
             className="capitalize"
           >
-            <span>{status.label}</span>
+            <span>{t(`values.${status.value}`)}</span>
           </SelectItem>
         ))}
       </SelectContent>

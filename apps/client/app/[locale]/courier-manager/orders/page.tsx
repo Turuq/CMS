@@ -20,6 +20,7 @@ export default function Page({
 }) {
   // Translations
   const t = useTranslations('courierManager.tabs.orders');
+
   const [turuqServerColumnFilters, setTuruqServerColumnFilters] =
     useState<FilterObject>({});
   const [integrationServerColumnFilters, setIntegrationServerColumnFilters] =
@@ -29,6 +30,12 @@ export default function Page({
   const [integrationPage, setIntegrationPage] = useState<number>(1);
   const [turuqPageSize, setTuruqPageSize] = useState<number>(10);
   const [integrationPageSize, setIntegrationPageSize] = useState<number>(10);
+
+  useEffect(() => {
+    setTuruqPage(1);
+    setIntegrationPage(1);
+  }, [turuqServerColumnFilters, integrationServerColumnFilters]);
+  
 
   // Fetch Table Data
   const {

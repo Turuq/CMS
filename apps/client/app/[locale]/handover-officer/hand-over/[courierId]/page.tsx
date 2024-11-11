@@ -471,7 +471,7 @@ export default function Page({
                   </span>
                 </p>
               </div>
-              <div className="w-full">
+              <div className="w-full p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectableOrdersDataTable
                   columns={unassignedColumns}
                   data={orders?.orders ?? []}
@@ -575,7 +575,7 @@ export default function Page({
                   </span>
                 </p>
               </div>
-              <div className="w-full">
+              <div className="w-full p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectableOrdersDataTable
                   columns={unassignedColumns}
                   data={integrationOrders?.integrationOrders ?? []}

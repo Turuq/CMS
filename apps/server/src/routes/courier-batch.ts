@@ -101,11 +101,10 @@ const courierBatchRouter = new Hono()
             },
             totalShippingFees: { $sum: '$allOrders.shippingFees' },
             totalToBeReceived: { $sum: '$allOrders.total' },
+            // activeBatches: if a batch's endDate doesn't exist or is null, then it's an active batch
             activeBatches: {
-              $sum: {
-                $cond: [{ $eq: ['$endDate', null] }, 1, 0],
-              },
-            },
+              $sum: { $eq: ['$endDate', null] }
+            }
           },
         },
         {
@@ -239,7 +238,11 @@ const courierBatchRouter = new Hono()
             _id: 1,
             delivered: 1,
             outForDelivery: 1,
+            total: { $add: ['$delivered', '$outForDelivery'] },
           },
+        },
+        {
+          $sort: { total: -1 },
         },
       ]);
       if (!res) {
@@ -371,6 +374,7 @@ const courierBatchRouter = new Hono()
         c.status(404);
         throw new Error('Batch not found');
       }
+      console.log(batch);
       return c.json(batch, 200);
     } catch (error: any) {
       console.error(error);
@@ -530,6 +534,7 @@ const courierBatchRouter = new Hono()
           c.status(404);
           throw new Error('No Batches Found');
         }
+        console.log(batches)
         return c.json(batches, 200);
       } catch (error: any) {
         console.error(error);
