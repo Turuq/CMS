@@ -19,18 +19,9 @@ import {
 
 export const description = 'A radar chart with dots';
 
-// const chartData = [
-//   { month: 'January', desktop: 186 },
-//   { month: 'February', desktop: 305 },
-//   { month: 'March', desktop: 237 },
-//   { month: 'April', desktop: 273 },
-//   { month: 'May', desktop: 209 },
-//   { month: 'June', desktop: 214 },
-// ];
-
 const chartConfig = {
   count: {
-    label: 'Processing Orders',
+    label: 'Out For Delivery',
     color: 'hsl(var(--accent))',
   },
 } satisfies ChartConfig;
@@ -52,10 +43,10 @@ export function GovernorateRadarChart({
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="pb-0">
+      <CardContent className="flex items-center justify-center pb-0 h-[400px]">
         <ChartContainer
           config={chartConfig}
-          className="aspect-square max-h-[400px]"
+          className="aspect-square max-h-[400px] h-full"
         >
           <RadarChart data={chartData}>
             <ChartTooltip cursor={false} content={<ChartTooltipContent />} />

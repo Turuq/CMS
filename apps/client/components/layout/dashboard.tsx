@@ -99,22 +99,24 @@ export default async function Dashboard({ locale }: { locale: string }) {
           />
         </div>
       </div> */}
-      <div className="grid grid-cols-3 gap-5">
-        <div className="col-span-3 lg:col-span-1 h-full">
+      <div className="grid grid-cols-4 gap-5">
+        <div className="col-span-4 lg:col-span-2">
           {data && (
             <GovernorateRadarChart
               title={tChart('outForDeliveryOrdersStatistics.header')}
-              description="Showing Out For Delivery orders by governorate"
+              description={tChart('outForDeliveryOrdersStatistics.description')}
               chartData={data}
             />
           )}
         </div>
-        <div className="col-span-3 lg:col-span-2">
+        <div className="col-span-4 lg:col-span-2">
           {deliveredCouriers && (
             <StepChart
               chartData={deliveredCouriers}
-              title="Delivered Orders"
-              description="Showing Top 10 couriers with the most delivered orders"
+              title={tChart('deliveredOutForDeliveryCourierStatistics.header')}
+              description={tChart(
+                'deliveredOutForDeliveryCourierStatistics.description'
+              )}
               chartConfig={{
                 delivered: {
                   label: 'Delivered',

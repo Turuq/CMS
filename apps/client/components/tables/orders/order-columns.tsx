@@ -56,7 +56,7 @@ export const columns: ColumnDef<OrderType>[] = [
             <Link
               dir="ltr"
               href={`tel:${row.row.original.customer.phone}`}
-              className="text-sm font-semibold hover:underline"
+              className="text-xs font-semibold hover:underline"
             >
               {parsePhoneNumber(
                 row.row.original.courier.phone,
@@ -85,7 +85,7 @@ export const columns: ColumnDef<OrderType>[] = [
         <Link
           dir="ltr"
           href={`tel:${row.row.original.customer.phone}`}
-          className="text-sm font-semibold hover:underline"
+          className="text-xs font-semibold hover:underline"
         >
           {parsePhoneNumber(
             row.row.original?.customer?.phone ?? '',
@@ -113,20 +113,12 @@ export const columns: ColumnDef<OrderType>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    cell: (row) => (
-      <div className="flex flex-col items-start justify-center w-auto">
-        <div
-          className={`${getStatusColor(row.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
-        >
-          {getStatusText(row.row.original.status)}
-        </div>
-      </div>
-    ),
+    accessorFn: (row) => row.status,
     header: 'Status',
   },
   {
     id: 'type',
-    cell: (row) => row.row.original.type || row.row.original.provider,
+    accessorFn: (row) => row.type || row.provider,
     header: 'Type',
   },
   {
@@ -204,7 +196,7 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
             <Link
               dir="ltr"
               href={`tel:${row.row.original.customer.phone}`}
-              className="text-sm font-semibold hover:underline"
+              className="text-xs font-semibold hover:underline"
             >
               {parsePhoneNumber(
                 row.row.original.courier.phone,
@@ -229,7 +221,7 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
         <Link
           dir="ltr"
           href={`tel:${row.row.original.customer.phone}`}
-          className="text-sm font-semibold hover:underline"
+          className="text-xs font-semibold hover:underline"
         >
           {parsePhoneNumber(
             row.row.original?.customer?.phone ?? '',
@@ -252,15 +244,7 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   {
     id: 'status',
     accessorKey: 'status',
-    cell: (row) => (
-      <div className="flex flex-col items-center justify-center w-auto">
-        <div
-          className={`${getStatusColor(row.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
-        >
-          {getStatusText(row.row.original.status)}
-        </div>
-      </div>
-    ),
+    accessorFn: (row) => row.status,
     header: 'Status',
   },
   {
@@ -324,7 +308,7 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
         <Link
           dir="ltr"
           href={`tel:${row.row.original.customer.phone}`}
-          className="text-sm font-semibold hover:underline"
+          className="text-xs font-semibold hover:underline"
         >
           {parsePhoneNumber(
             row.row.original?.customer?.phone ?? '',

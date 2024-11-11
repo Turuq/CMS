@@ -371,24 +371,40 @@ export default function Page({
   }, [scanning, connectedPort, scanner]);
 
   const handleSocket = async () => {
-    setScanning(true);
-    const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
+    try {
+      const port = await navigator.serial.requestPort();
+      if (port) {
+        await port.open({ baudRate: 9600 });
+        setScanning(true);
+        setConnectedPort(port);
 
-    setConnectedPort(port);
+        setTimeout(async () => {
+          await port.close();
+          setScanning(false);
+          setConnectedPort(null);
+        }, 600000); // 10 minutes
 
-    setTimeout(async () => {
-      await port.close();
+        await scanOrders({
+          endpoint: 'assign-processing-unassigned',
+          feedback: setMessage,
+          keepScanning: true,
+          port,
+        });
+      }
+    } catch (error) {
       setScanning(false);
-      setConnectedPort(null);
-    }, 600000); // 10 minutes
-
-    await scanOrders({
-      endpoint: 'assign-processing-unassigned',
-      feedback: setMessage,
-      keepScanning: true,
-      port,
-    });
+      if (error instanceof Error) {
+        if (error.name === 'NotFoundError') {
+          toast.error(scanner('scannerNotConnected'), {
+            style: ToastStyles.error,
+          });
+        } else {
+          toast.error(scanner('unexpectedError'), {
+            style: ToastStyles.error,
+          });
+        }
+      }
+    }
   };
 
   function handleRemoveTuruqOrder(id: string) {
@@ -430,7 +446,7 @@ export default function Page({
         className="w-full"
         dir={locale === 'ar' ? 'rtl' : 'ltr'}
       >
-        <div className="flex items-center justify-between w-full gap-5">
+        <div className="flex lg:flex-row flex-col lg:items-center items-start justify-between w-full gap-5">
           <TabsList>
             <TabsTrigger className="" value="turuq">
               {t('orders.tabs.turuq')}

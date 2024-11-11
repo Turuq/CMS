@@ -344,6 +344,7 @@
         },
         "outForDeliveryOrdersStatistics": {
           "header": "Out For Delivery Orders",
+          "description": "The number of out for delivery orders in each governorate.",
           "zone": {
             "cairo": "Cairo",
             "giza": "Giza",
@@ -355,6 +356,10 @@
             "beheira": "Beheira",
             "gharbia": "Gharbia"
           }
+        },
+        "deliveredOutForDeliveryCourierStatistics": {
+          "header": "Courier Statistics",
+          "description": "The number of orders delivered and out for delivery for each courier."
         }
       },
       "assign": {
@@ -526,5 +531,13 @@
     "orderAlreadySelected": "Order Already Selected",
     "selectedOrders": "Selected Orders",
     "clearSelection": "Clear Selection"
+  },
+  "orderType": {
+    "promotional": "Promotional",
+    "refund": "Refund",
+    "exchange": "Exchange",
+    "normal": "Normal",
+    "shopify": "Shopify",
+    "woocommerce": "Woocommerce"
   }
 }

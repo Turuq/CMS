@@ -20,6 +20,7 @@ export default function Page({
 }) {
   // Translations
   const t = useTranslations('courierManager.tabs.orders');
+
   const [turuqServerColumnFilters, setTuruqServerColumnFilters] =
     useState<FilterObject>({});
   const [integrationServerColumnFilters, setIntegrationServerColumnFilters] =

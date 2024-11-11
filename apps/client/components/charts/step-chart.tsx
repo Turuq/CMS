@@ -40,8 +40,11 @@ export function StepChart({
         <CardTitle>{title}</CardTitle>
         <CardDescription>{description}</CardDescription>
       </CardHeader>
-      <CardContent className="">
-        <ChartContainer config={chartConfig}>
+      <CardContent className="flex items-center justify-center pb-0 h-[400px]">
+        <ChartContainer
+          config={chartConfig}
+          className="aspect-square max-h-[400px] h-full"
+        >
           <BarChart accessibilityLayer data={chartData}>
             <CartesianGrid vertical={false} />
             <XAxis

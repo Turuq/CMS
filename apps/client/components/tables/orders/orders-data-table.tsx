@@ -44,6 +44,7 @@ import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
 import moment from 'moment';
 import 'moment/locale/ar';
 import { useTranslations } from 'next-intl';
+import { getStatusColor, getStatusText } from '@/utils/helpers/status-modifier';
 
 interface OrdersDataTableProps<TValue> {
   locale: string;
@@ -78,6 +79,7 @@ export function OrdersDataTable<TValue>({
   loading,
 }: OrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
+  const tOrderType = useTranslations('orderType');
   // const tStatus = useTranslations('dashboard.statistics.cards');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
@@ -259,6 +261,7 @@ export function OrdersDataTable<TValue>({
             )}
           </div>
           <Legend
+            dir="ltr"
             categories={[
               t('legend.reshipped'),
               t('legend.instaPay'),
@@ -405,14 +408,49 @@ export function OrdersDataTable<TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-center text-xs">
                         <>
-                          {cell.column.columnDef.id === 'createdAt'
-                            ? moment(cell.getValue() as string)
-                                .locale(locale)
-                                .format('L')
-                            : flexRender(
-                                cell.column.columnDef.cell,
-                                cell.getContext()
-                              )}
+                          {cell.column.columnDef.id === 'createdAt' ? (
+                            moment(cell.getValue() as string)
+                              .locale(locale)
+                              .format('L')
+                          ) : cell.column.columnDef.id === 'status' ? (
+                            <div className="flex flex-col gap-1 items-start justify-center w-auto">
+                              <div
+                                className={`${getStatusColor(cell.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
+                              >
+                                {locale === 'en'
+                                  ? getStatusText(cell.row.original.status)
+                                  : t(
+                                      `filters.status.values.${cell.row.original.status}`
+                                    )}
+                              </div>
+                              {(() => {
+                                const history = cell.row.original.statusHistory;
+                                const status = cell.row.original
+                                  .status as keyof typeof history;
+                                return (
+                                  <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
+                                    {history &&
+                                    Object.keys(history)?.includes(status)
+                                      ? moment(history[status]).format('L')
+                                      : ''}
+                                  </span>
+                                );
+                              })()}
+                            </div>
+                          ) : cell.column.columnDef.id === 'type' ? (
+                            <p>
+                              {cell.getValue()
+                                ? tOrderType(
+                                    String(cell.getValue()).toLowerCase()
+                                  )
+                                : '-'}
+                            </p>
+                          ) : (
+                            flexRender(
+                              cell.column.columnDef.cell,
+                              cell.getContext()
+                            )
+                          )}
                         </>
                       </TableCell>
                     ))}

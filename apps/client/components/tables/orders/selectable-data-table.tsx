@@ -43,6 +43,7 @@ import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
 import { FilterObject } from '@/api/utils/validation';
+import { getStatusColor, getStatusText } from '@/utils/helpers/status-modifier';
 
 interface SelectableOrdersDataTableProps<TValue> {
   locale: string;
@@ -77,6 +78,8 @@ export function SelectableOrdersDataTable<TValue>({
   // onRowSelectionChange,
 }: SelectableOrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
+  const tOrderType = useTranslations('orderType');
+
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -192,6 +195,7 @@ export function SelectableOrdersDataTable<TValue>({
           )}
         </div>
         <Legend
+          dir="ltr"
           categories={[
             t('legend.reshipped'),
             t('legend.instaPay'),
@@ -200,6 +204,7 @@ export function SelectableOrdersDataTable<TValue>({
             t('legend.toBeReshipped'),
           ]}
           colors={['cyan', 'violet', 'red', 'amber', 'lime']}
+          // className="mx-5"
         />
         <div className="flex items-center gap-1">
           <p className="text-xs">{t('pagination.header.showing')}</p>
@@ -282,7 +287,7 @@ export function SelectableOrdersDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`text-xs text-center font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl' : 'first:rounded-l-xl last:rounded-r-xl'} last:border-r-0`}
+                      className={`text-xs text-start font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl' : 'first:rounded-l-xl last:rounded-r-xl'} last:border-r-0`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -308,14 +313,47 @@ export function SelectableOrdersDataTable<TValue>({
                 >
                   {row.getVisibleCells().map((cell) => (
                     <TableCell key={cell.id} className="text-center text-xs">
-                      {cell.column.columnDef.id === 'createdAt'
-                        ? moment(cell.getValue() as string)
-                            .locale(locale)
-                            .format('LL')
-                        : flexRender(
-                            cell.column.columnDef.cell,
-                            cell.getContext()
-                          )}
+                      {cell.column.columnDef.id === 'createdAt' ? (
+                        moment(cell.getValue() as string)
+                          .locale(locale)
+                          .format('LL')
+                      ) : cell.column.columnDef.id === 'type' ? (
+                        <p>
+                          {cell.getValue()
+                            ? tOrderType(String(cell.getValue()).toLowerCase())
+                            : '-'}
+                        </p>
+                      ) : cell.column.columnDef.id === 'status' ? (
+                        <div className="flex flex-col gap-1 items-start justify-center w-auto">
+                          <div
+                            className={`${getStatusColor(cell.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
+                          >
+                            {locale === 'en'
+                              ? getStatusText(cell.row.original.status)
+                              : t(
+                                  `filters.status.values.${cell.row.original.status}`
+                                )}
+                          </div>
+                          {(() => {
+                            const history = cell.row.original.statusHistory;
+                            const status = cell.row.original
+                              .status as keyof typeof history;
+                            return (
+                              <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
+                                {history &&
+                                Object.keys(history)?.includes(status)
+                                  ? moment(history[status]).format('L')
+                                  : ''}
+                              </span>
+                            );
+                          })()}
+                        </div>
+                      ) : (
+                        flexRender(
+                          cell.column.columnDef.cell,
+                          cell.getContext()
+                        )
+                      )}
                     </TableCell>
                   ))}
                 </TableRow>
