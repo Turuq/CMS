@@ -23,6 +23,8 @@ import {
 } from '@tanstack/react-table';
 import { Dispatch, SetStateAction, useState } from 'react';
 
+import { FilterObject } from '@/api/utils/validation';
+import DetailedOrderCard from '@/components/cards/detailed-order';
 import CourierFilter from '@/components/filters/courier-filter';
 import StatusFilter from '@/components/filters/status-filter';
 import { icons } from '@/components/icons/icons';
@@ -34,18 +36,14 @@ import {
   DropdownMenuTrigger,
 } from '@/components/ui/dropdown-menu';
 import { Separator } from '@/components/ui/separator';
+import { Skeleton } from '@/components/ui/skeleton';
 import { OrderType } from '@/types/order';
+import { padOID } from '@/utils/helpers/functions';
 import { Legend } from '@tremor/react';
 import { ChevronLeftIcon, ChevronRightIcon, XIcon } from 'lucide-react';
-import { useTranslations } from 'next-intl';
 import moment from 'moment';
 import 'moment/locale/ar';
-import { Skeleton } from '@/components/ui/skeleton';
-import DetailedOrderCard from '@/components/cards/detailed-order';
-import { FilterObject } from '@/api/utils/validation';
-import { padOID } from '@/utils/helpers/functions';
-import { getStatusTextColor } from '@/utils/helpers/status-modifier';
-import { statusIcons } from '@/components/icons/status-icons';
+import { useTranslations } from 'next-intl';
 
 interface OrdersDataTableProps<TValue> {
   locale: string;
@@ -80,7 +78,7 @@ export function OrdersDataTable<TValue>({
   loading,
 }: OrdersDataTableProps<TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
-  const tStatus = useTranslations('dashboard.statistics.cards');
+  // const tStatus = useTranslations('dashboard.statistics.cards');
   const [clientColumnFilters, setClientColumnFilters] =
     useState<ColumnFiltersState>([]);
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
@@ -136,6 +134,7 @@ export function OrdersDataTable<TValue>({
 
   function handleOIDSearch(e: React.MouseEvent<HTMLButtonElement>) {
     e.preventDefault();
+    onPageChange(1);
     setServerColumnFilters((prev) =>
       Object.keys(prev)
         ? { ...prev, OID: padOID(searchValue) }
@@ -378,7 +377,7 @@ export function OrdersDataTable<TValue>({
             <TableBody>
               {loading ? (
                 <>
-                  {Array.from({ length: 5 }).map((_, index) => (
+                  {Array.from({ length: 10 }).map((_, index) => (
                     <TableRow key={index}>
                       {Array.from({ length: columns.length }).map(
                         (_, index) => (
@@ -406,27 +405,14 @@ export function OrdersDataTable<TValue>({
                     {row.getVisibleCells().map((cell) => (
                       <TableCell key={cell.id} className="text-center text-xs">
                         <>
-                          {cell.column.columnDef.id === 'createdAt' ? (
-                            moment(cell.getValue() as string)
-                              .locale(locale)
-                              .format('LL')
-                          ) : cell.column.columnDef.id === 'status' ? (
-                            <div className="flex items-center justify-center gap-2 w-auto">
-                              <p
-                                className={`${getStatusTextColor(cell.getValue() as string)} flex items-center gap-2 capitalize text-xs font-semibold`}
-                              >
-                                <span>
-                                  {statusIcons[cell.getValue() as string]}
-                                </span>
-                                {tStatus(cell.getValue() as string)}
-                              </p>
-                            </div>
-                          ) : (
-                            flexRender(
-                              cell.column.columnDef.cell,
-                              cell.getContext()
-                            )
-                          )}
+                          {cell.column.columnDef.id === 'createdAt'
+                            ? moment(cell.getValue() as string)
+                                .locale(locale)
+                                .format('L')
+                            : flexRender(
+                                cell.column.columnDef.cell,
+                                cell.getContext()
+                              )}
                         </>
                       </TableCell>
                     ))}

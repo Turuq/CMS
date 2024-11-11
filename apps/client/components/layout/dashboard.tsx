@@ -23,8 +23,8 @@ export default async function Dashboard({ locale }: { locale: string }) {
     <main className="flex min-h-screen flex-col gap-5">
       <h1 className="text-3xl font-bold opacity-80">{tKpi('title')}</h1>
 
-      <div className="grid grid-cols-3 items-center gap-5">
-        <div className="col-span-3 lg:col-span-1">
+      <div className="grid grid-cols-4 lg:grid-cols-3 items-center gap-5">
+        <div className="col-span-4 lg:col-span-1">
           <KpiCard
             locale={locale}
             title={tKpi('cards.totalOrders')}
@@ -33,29 +33,29 @@ export default async function Dashboard({ locale }: { locale: string }) {
             link="courier-manager/orders"
           />
         </div>
-        <div className="col-span-3 lg:col-span-2 grid grid-cols-3 gap-5">
-          <div className="col-span-3 lg:col-span-1">
+        <div className="col-span-4 lg:col-span-2 grid grid-cols-4 lg:grid-cols-3 gap-5">
+          <div className="col-span-2 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.outForDelivery')}
               statistic={dashData[0]?.outForDelivery ?? 0}
             />
           </div>
-          <div className="col-span-3 lg:col-span-1">
-            <KpiCard
-              locale={locale}
-              title={tKpi('cards.toBeReshipped')}
-              statistic={dashData[0]?.toBeReshipped ?? 0}
-            />
-          </div>
-          <div className="col-span-3 lg:col-span-1">
+          <div className="col-span-2 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.delivered')}
               statistic={dashData[0]?.delivered ?? 0}
             />
           </div>
-          <div className="col-span-3 lg:col-span-1">
+          <div className="col-span-4 lg:col-span-1">
+            <KpiCard
+              locale={locale}
+              title={tKpi('cards.toBeReshipped')}
+              statistic={dashData[0]?.toBeReshipped ?? 0}
+            />
+          </div>
+          <div className="col-span-4 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.totalShippingFees')}
@@ -63,7 +63,7 @@ export default async function Dashboard({ locale }: { locale: string }) {
               financial
             />
           </div>
-          <div className="col-span-3 lg:col-span-1">
+          <div className="col-span-4 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.totalToBeReceived')}
@@ -71,7 +71,7 @@ export default async function Dashboard({ locale }: { locale: string }) {
               financial
             />
           </div>
-          <div className="col-span-3 lg:col-span-1">
+          <div className="col-span-4 lg:col-span-1">
             <KpiCard
               locale={locale}
               title={tKpi('cards.numberOfCouriers')}
@@ -100,14 +100,16 @@ export default async function Dashboard({ locale }: { locale: string }) {
         </div>
       </div> */}
       <div className="grid grid-cols-3 gap-5">
-        {data && (
-          <GovernorateRadarChart
-            title={tChart('outForDeliveryOrdersStatistics.header')}
-            description="Showing Out For Delivery orders by governorate"
-            chartData={data}
-          />
-        )}
-        <div className="col-span-2">
+        <div className="col-span-3 lg:col-span-1 h-full">
+          {data && (
+            <GovernorateRadarChart
+              title={tChart('outForDeliveryOrdersStatistics.header')}
+              description="Showing Out For Delivery orders by governorate"
+              chartData={data}
+            />
+          )}
+        </div>
+        <div className="col-span-3 lg:col-span-2">
           {deliveredCouriers && (
             <StepChart
               chartData={deliveredCouriers}

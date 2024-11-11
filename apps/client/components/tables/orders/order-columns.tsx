@@ -1,19 +1,16 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 // This file is used to define the columns of the table
-
-import { statusIcons } from '@/components/icons/status-icons';
-import { Badge } from '@/components/ui/badge';
-// import { Checkbox } from '@/components/ui/checkbox';
+import parsePhoneNumber from 'libphonenumber-js';
 import { OrderType } from '@/types/order';
 import {
   getIndicatorColor,
   getStatusColor,
   getStatusText,
-  getStatusTextColor,
 } from '@/utils/helpers/status-modifier';
 import { Staff } from '@/utils/validation/staff';
 import { ColumnDef } from '@tanstack/react-table';
 import { AlertOctagonIcon } from 'lucide-react';
+import Link from 'next/link';
 
 // There are two way to populate the table with data
 // 1. By providing the accessorKey and the table will automatically populate the data
@@ -54,7 +51,25 @@ export const columns: ColumnDef<OrderType>[] = [
       <span
         className={`capitalize ${!row.row.original.courier && 'text-gray-500'}`}
       >
-        {row.row.original.courier ? row.row.original.courier.name : '-'}
+        {row.row.original.courier ? (
+          <div className="flex flex-col items-start gap-1">
+            <Link
+              dir="ltr"
+              href={`tel:${row.row.original.customer.phone}`}
+              className="text-sm font-semibold hover:underline"
+            >
+              {parsePhoneNumber(
+                row.row.original.courier.phone,
+                'EG'
+              )?.formatInternational()}
+            </Link>
+            <p className="text-xs text-dark_border/50 dark:text-light/50">
+              {row.row.original.courier.name}
+            </p>
+          </div>
+        ) : (
+          '-'
+        )}
       </span>
     ),
   },
@@ -65,16 +80,31 @@ export const columns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    cell: (row) =>
-      row.row.original.customer.name ||
-      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
+    cell: (row) => (
+      <div className="flex flex-col items-start gap-1">
+        <Link
+          dir="ltr"
+          href={`tel:${row.row.original.customer.phone}`}
+          className="text-sm font-semibold hover:underline"
+        >
+          {parsePhoneNumber(
+            row.row.original?.customer?.phone ?? '',
+            'EG'
+          )?.formatInternational()}
+        </Link>
+        <p className="text-xs text-dark_border/50 dark:text-light/50">
+          {row.row.original.customer.name ||
+            `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`}
+        </p>
+      </div>
+    ),
     header: 'Customer Name',
   },
-  {
-    id: 'phoneNumber',
-    accessorKey: 'customer.phone',
-    header: 'Phone Number',
-  },
+  // {
+  //   id: 'phoneNumber',
+  //   accessorKey: 'customer.phone',
+  //   header: 'Phone Number',
+  // },
   {
     id: 'products',
     header: '# Products',
@@ -84,19 +114,13 @@ export const columns: ColumnDef<OrderType>[] = [
     id: 'status',
     accessorKey: 'status',
     cell: (row) => (
-      <div className="flex items-center justify-center gap-2 w-auto">
-        <p
-          className={`${getStatusTextColor(row.row.original.status)} flex items-center capitalize text-xs font-semibold`}
+      <div className="flex flex-col items-start justify-center w-auto">
+        <div
+          className={`${getStatusColor(row.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
         >
-          <span className="mr-2">{statusIcons[row.row.original.status]}</span>
           {getStatusText(row.row.original.status)}
-        </p>
+        </div>
       </div>
-      // <Badge
-      //   className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
-      // >
-      //   {getStatusText(row.row.original.status)}
-      // </Badge>
     ),
     header: 'Status',
   },
@@ -108,16 +132,31 @@ export const columns: ColumnDef<OrderType>[] = [
   {
     id: 'subtotal',
     accessorKey: 'subtotal',
+    accessorFn: (row) =>
+      row?.subtotal.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+      }),
     header: 'Subtotal',
   },
   {
     id: 'shippingFees',
     accessorKey: 'shippingFees',
+    accessorFn: (row) =>
+      row?.shippingFees.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+      }),
     header: 'Shipping Fees',
   },
   {
     id: 'total',
     accessorKey: 'total',
+    accessorFn: (row) =>
+      row?.total.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+      }),
     header: 'Total',
   },
   {
@@ -128,28 +167,6 @@ export const columns: ColumnDef<OrderType>[] = [
 ];
 
 export const unassignedColumns: ColumnDef<OrderType>[] = [
-  // {
-  //   id: 'select',
-  //   header: ({ table }) => (
-  //     <Checkbox
-  //       checked={
-  //         table.getIsAllPageRowsSelected() ||
-  //         (table.getIsSomePageRowsSelected() && 'indeterminate')
-  //       }
-  //       onCheckedChange={(value) => table.toggleAllPageRowsSelected(!!value)}
-  //       onClick={(event) => event.stopPropagation()}
-  //       aria-label="Select all"
-  //     />
-  //   ),
-  //   cell: ({ row }) => (
-  //     <Checkbox
-  //       checked={row.getIsSelected()}
-  //       onCheckedChange={(value) => row.toggleSelected(!!value)}
-  //       onClick={(event) => event.stopPropagation()}
-  //       aria-label="Select row"
-  //     />
-  //   ),
-  // },
   {
     id: 'statusIndicator',
     cell: (row) => (
@@ -178,20 +195,54 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'companyName',
-    accessorKey: 'client.companyName',
+    cell: (row) => (
+      <span
+        className={`capitalize ${!row.row.original.courier && 'text-gray-500'}`}
+      >
+        {row.row.original.courier ? (
+          <div className="flex flex-col items-start gap-1">
+            <Link
+              dir="ltr"
+              href={`tel:${row.row.original.customer.phone}`}
+              className="text-sm font-semibold hover:underline"
+            >
+              {parsePhoneNumber(
+                row.row.original.courier.phone,
+                'EG'
+              )?.formatInternational()}
+            </Link>
+            <p className="text-xs text-dark_border/50 dark:text-light/50">
+              {row.row.original.courier.name}
+            </p>
+          </div>
+        ) : (
+          '-'
+        )}
+      </span>
+    ),
     header: 'Company Name',
   },
   {
     id: 'customerName',
-    cell: (row) =>
-      row.row.original.customer.name ||
-      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
+    cell: (row) => (
+      <div className="flex flex-col items-start gap-1">
+        <Link
+          dir="ltr"
+          href={`tel:${row.row.original.customer.phone}`}
+          className="text-sm font-semibold hover:underline"
+        >
+          {parsePhoneNumber(
+            row.row.original?.customer?.phone ?? '',
+            'EG'
+          )?.formatInternational()}
+        </Link>
+        <p className="text-xs text-dark_border/50 dark:text-light/50">
+          {row.row.original.customer.name ||
+            `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`}
+        </p>
+      </div>
+    ),
     header: 'Customer Name',
-  },
-  {
-    id: 'phoneNumber',
-    accessorKey: 'customer.phone',
-    header: 'Phone Number',
   },
   {
     id: 'products',
@@ -202,24 +253,29 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
     id: 'status',
     accessorKey: 'status',
     cell: (row) => (
-      <div className="flex items-center justify-center w-auto">
-        <Badge
-          className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
+      <div className="flex flex-col items-center justify-center w-auto">
+        <div
+          className={`${getStatusColor(row.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
         >
           {getStatusText(row.row.original.status)}
-        </Badge>
+        </div>
       </div>
     ),
     header: 'Status',
   },
   {
     id: 'type',
-    accessorKey: 'type',
+    accessorFn: (row) => row.type || row.provider,
     header: 'Type',
   },
   {
     id: 'total',
     accessorKey: 'total',
+    accessorFn: (row) =>
+      row?.total.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+      }),
     header: 'Total',
   },
   {
@@ -263,16 +319,25 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'customerName',
-    cell: (row) =>
-      row.row.original.customer.name ||
-      `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`,
-
+    cell: (row) => (
+      <div className="flex flex-col items-start gap-1">
+        <Link
+          dir="ltr"
+          href={`tel:${row.row.original.customer.phone}`}
+          className="text-sm font-semibold hover:underline"
+        >
+          {parsePhoneNumber(
+            row.row.original?.customer?.phone ?? '',
+            'EG'
+          )?.formatInternational()}
+        </Link>
+        <p className="text-xs text-dark_border/50 dark:text-light/50">
+          {row.row.original.customer.name ||
+            `${row.row.original.customer.first_name} ${row.row.original.customer.last_name}`}
+        </p>
+      </div>
+    ),
     header: 'Customer Name',
-  },
-  {
-    id: 'phoneNumber',
-    accessorKey: 'customer.phone',
-    header: 'Phone Number',
   },
   {
     id: 'products',
@@ -284,12 +349,12 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
     id: 'status',
     accessorKey: 'status',
     cell: (row) => (
-      <div className="flex items-center justify-center w-auto">
-        <Badge
-          className={`${getStatusColor(row.row.original.status)} capitalize rounded-xl text-xs w-32 flex items-center justify-center`}
+      <div className="flex flex-col items-center justify-center w-auto">
+        <div
+          className={`${getStatusColor(row.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
         >
           {getStatusText(row.row.original.status)}
-        </Badge>
+        </div>
       </div>
     ),
     header: 'Status',
@@ -297,11 +362,17 @@ export const unassignedSelectedColumns: ColumnDef<OrderType>[] = [
   {
     id: 'type',
     accessorKey: 'type',
+    accessorFn: (row) => row.type || row.provider,
     header: 'Type',
   },
   {
     id: 'total',
     accessorKey: 'total',
+    accessorFn: (row) =>
+      row?.total.toLocaleString('en-US', {
+        style: 'currency',
+        currency: 'EGP',
+      }),
     header: 'Total',
   },
   {

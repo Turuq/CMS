@@ -30,6 +30,12 @@ export default function Page({
   const [turuqPageSize, setTuruqPageSize] = useState<number>(10);
   const [integrationPageSize, setIntegrationPageSize] = useState<number>(10);
 
+  useEffect(() => {
+    setTuruqPage(1);
+    setIntegrationPage(1);
+  }, [turuqServerColumnFilters, integrationServerColumnFilters]);
+  
+
   // Fetch Table Data
   const {
     data: turuqOrders,

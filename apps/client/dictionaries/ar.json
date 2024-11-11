@@ -59,7 +59,7 @@
             "OID": "رقم الطلب",
             "courier": "مندوب",
             "companyName": "اسم الشركة",
-            "customerName": "اسم العميل",
+            "customerName": "تفاصيل العميل",
             "phoneNumber": "رقم الهاتف",
             "products": "عدد المنتجات",
             "status": "الحالة",

@@ -4,22 +4,22 @@ export function getStatusColor(status: string) {
   let result = '';
   switch (status) {
     case 'delivered':
-      result = 'bg-emerald-200 text-emerald-800';
+      result = 'border-emerald-200 bg-emerald-200 text-emerald-200';
       break;
     case 'outForDelivery':
-      result = 'bg-sky-200 text-sky-800';
+      result = 'border-sky-200 bg-sky-200 text-sky-200';
       break;
     case 'processing':
     case 'pending':
-      result = 'bg-amber-200 text-amber-800';
+      result = 'border-amber-200 bg-amber-200 text-amber-200';
       break;
     case 'cancelled':
     case 'postponed':
     case 'returned':
-      result = 'bg-red-200 text-red-800';
+      result = 'border-red-200 bg-red-200 text-red-200';
       break;
     default:
-      result = 'bg-gray-200 text-gray-800';
+      result = 'border-gray-200 bg-gray-200 text-gray-200';
       break;
   }
   return result;
