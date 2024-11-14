@@ -6,12 +6,15 @@ import { getCouriersOptions } from '@/utils/query-options/courier-options';
 import { useQuery } from '@tanstack/react-query';
 import { courierManagerIcons } from '../../courier-manager/components/icons/courier-manager-icons';
 import { CourierStatisticsIcons } from '../components/icons/courier-statistics-icons';
+import { useTranslations } from 'next-intl';
 
 export default function HandIn({
   params: { locale },
 }: {
   params: { locale: string };
 }) {
+  const t = useTranslations('handoverOfficer.tabs.handIn');
+
   const { data, error, isPending } = useQuery({
     ...getCouriersOptions,
   });
@@ -22,11 +25,9 @@ export default function HandIn({
 
   return (
     <div className="lg:p-2 w-full">
-      <h1 className="font-bold text-lg text-foreground">Hand In</h1>
+      <h1 className="font-bold text-lg text-foreground">{t('header')}</h1>
       <p className="text-sm font-semibold text-foreground/50">
-        {
-          'Please select a courier to inspect and receive reshipped & returned orders.'
-        }
+        {t('description')}
       </p>
       {/* <div className="flex items-center justify-end w-full">
         <Link

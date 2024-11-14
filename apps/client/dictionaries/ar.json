@@ -33,6 +33,7 @@
         "outOfStock": "بضائع غير متوفرة",
         "invalidAddress": "عنوان خاطئ",
         "toBeReshipped": "يجب إعادة شحنها",
+        "paidShippingOnly": "تم دفع رسوم الشحن فقط",
         "totalToBeReceived": "إجمالي المبالغ المستحقة",
         "totalShippingFees": "إجمالي رسوم الشحن",
         "numberOfCouriers": "عدد الرواد في رحله",
@@ -87,7 +88,8 @@
                 "returned": "مرتجع",
                 "unreachable": "تعثر تسليمها",
                 "outOfStock": "بضائع غير متوفرة",
-                "invalidAddress": "عنوان خاطئ"
+                "invalidAddress": "عنوان خاطئ",
+                "collected": "تم تحصيلها"
               }
             },
             "type": {
@@ -373,6 +375,18 @@
       },
       "hand in": {
         "header": "تسلم"
+      },
+      "handOver": {
+        "header": "تسليم",
+        "description": "أختر مندوب لتسليم الطلبات",
+        "tabs": {
+          "active": "نشط",
+          "inactive": "غير نشط"
+        }
+      },
+      "handIn": {
+        "header": "تسلم",
+        "description": "أختر مندوب لمراقبة الرحلات"
       }
     }
   },
@@ -512,7 +526,38 @@
       "description": "المندوب خرج لتوصيل الطلبات. يمكنك تعيين طلبات جديدة ولكن لن يتم تسليمها حتي يعود المندوب وينهي الرحلة الحالية!"
     },
     "buttons": {
-      "start": "بدء التسليم"
+      "start": "بدء التسليم",
+      "end": "انهاء الرحلة"
+    },
+    "titles": {
+      "finished": "تم الانتهاء من التسليم",
+      "inProgress": "جاري التسليم",
+      "batches": "رحلات",
+      "courierBatches": "رحلات {name}"
+    },
+    "details": {
+      "header": "رحلة {name} - رقم {id}",
+      "current": "حاليا",
+      "batchStillInProgress": "الرحلة لا تزال جارية",
+      "inspect": "مراقبة",
+      "batchNum": "رحلة رقم {id}"
+    },
+    "statistics": {
+      "totalOrders": "إجمالي الطلبات",
+      "reshippedRate": "نسبة إعادة الي المخزن",
+      "completedDeliveries": "التسليمات المكتملة",
+      "totalShippingCollected": "إجمالي الشحن المحصل",
+      "courierCollectedAmount": "المبلغ المحصل من المندوب",
+      "toBeReceivedTotal": "إجمالي المبالغ المستحقة",
+      "outOf": "من",
+      "charts": {
+        "tooltip": {
+          "delivered": "تم تسليمها",
+          "reshipped": "إعادة للمخزن",
+          "outForDelivery": "يتم شحنها",
+          "other": "حالات أخري"
+        }
+      }
     }
   },
   "scanner": {

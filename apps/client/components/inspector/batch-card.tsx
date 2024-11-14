@@ -20,7 +20,9 @@ import {
 import { getBatchProgress } from '@/utils/helpers/functions';
 import { ProgressBar } from '@tremor/react';
 import moment from 'moment';
+import 'moment/locale/ar';
 import Link from 'next/link';
+import { useTranslations } from 'next-intl';
 
 // interface BatchCardProps {
 //   title: string;
@@ -36,11 +38,14 @@ import Link from 'next/link';
 
 export default function BatchCard({
   batch,
-  href
+  href,
+  locale,
 }: {
   batch: CourierBatchSummary;
   href?: string;
+  locale?: string;
 }) {
+  const t = useTranslations('batch');
   return (
     <Card className="rounded-xl border-muted w-full">
       <CardHeader className="space-y-0.5 px-6 py-4">
@@ -66,21 +71,34 @@ export default function BatchCard({
               className="w-20"
             />
             <CardTitle className="text-lg font-bold uppercase">
-              {`${batch.courier?.name}'s Batch-${batch.BID.toString().padStart(3, '0')}`}
+              {/* {`${batch.courier?.name}'s Batch-${batch.BID.toString().padStart(3, '0')}`} */}
+              {t('details.header', {
+                name: batch.courier?.name,
+                id: batch.BID.toLocaleString(locale ? locale : 'en').padStart(
+                  3,
+                  '0'
+                ),
+              })}
             </CardTitle>
             <CardDescription className="text-xs font-semibold">
-              {moment(batch.startDate).format('MMM DD')} -{' '}
+              {moment(batch.startDate)
+                .locale(locale ? locale : 'en')
+                .format('LL')}{' '}
+              -{' '}
               {batch.endDate
-                ? moment(batch.endDate).format('MMM DD')
-                : 'Current'}
+                ? moment(batch.endDate)
+                    .locale(locale ? locale : 'en')
+                    .format('LL')
+                : t('details.current')}
             </CardDescription>
           </div>
           <Link
-            href={href ?? `inspector/${batch._id}`}
-            className="flex items-center justify-center font-semibold text-dark bg-accent hover:bg-accent/80 rounded-xl w-auto h-8 p-2"
+            dir={locale === 'ar' ? 'rtl' : 'ltr'}
+            href={href ?? `inspector/batch/${batch._id}`}
+            className="flex items-center justify-center gap-2 font-semibold text-dark bg-accent hover:bg-accent/80 rounded-xl w-auto h-8 p-2"
           >
             {courierManagerIcons['inspect']}
-            <span className="ml-2">Inspect</span>
+            <span className="">{t('details.inspect')}</span>
           </Link>
         </div>
       </CardHeader>
@@ -112,7 +130,7 @@ export default function BatchCard({
           <p className="text-sm font-semibold text-dark_border/80 dark:text-light/80 italic">
             {batch.endDate
               ? `Batch ended on: ${moment(batch.endDate).format('dddd DD, MMMM YYYY')}`
-              : 'Batch is still in progress'}
+              : t('details.batchStillInProgress')}
           </p>
 
           <TooltipProvider>

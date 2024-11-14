@@ -1,40 +1,43 @@
 'use client';
 
+import SelectedOrderTable from '@/app/[locale]/courier-manager/assign/[courierId]/selected-orders-table';
 import {
   checkHasOutstanding,
   endBatch,
   getBatchById,
 } from '@/app/actions/batch-actions';
-import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { useQuery } from '@tanstack/react-query';
-import { useTranslations } from 'next-intl';
-import { unassignedSelectedColumns } from '@/components/tables/orders/order-columns';
-import { Button } from '@/components/ui/button';
 import CourierCard from '@/components/cards/courier-card';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
-import { icons } from '@/components/icons/icons';
 import KpiCard from '@/components/cards/kpi-card';
-import moment from 'moment';
-import { toast } from 'sonner';
-import { ToastStyles } from '@/utils/styles';
-import { useEffect, useState } from 'react';
-import { Loader2Icon } from 'lucide-react';
-import BatchPageSkeleton from '@/components/feedback/batch-page-skeleton';
-import SelectedOrderTable from '@/app/[locale]/courier-manager/assign/[courierId]/selected-orders-table';
 import { RadialChart } from '@/components/charts/radial-chart';
 import { RadialChartStacked } from '@/components/charts/radial-chart-stacked';
+import BatchPageSkeleton from '@/components/feedback/batch-page-skeleton';
+import { icons } from '@/components/icons/icons';
+import { getUnassignedSelectedColumns } from '@/components/tables/orders/order-columns';
+import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
+import { Button } from '@/components/ui/button';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import {
   getStatusText,
   getStatusTrackerColor,
 } from '@/utils/helpers/status-modifier';
+import { ToastStyles } from '@/utils/styles';
+import { useQuery } from '@tanstack/react-query';
+import { Loader2Icon } from 'lucide-react';
+import moment from 'moment';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
-export default function Page({
-  params: { batchId, locale },
+export default function Batch({
+  batchId,
+  locale,
 }: {
-  params: { batchId: string; locale: string };
+  batchId: string;
+  locale: string;
 }) {
   const tabs = useTranslations('navigation.orders.tabs');
   const t = useTranslations('batch');
+  const tStatus = useTranslations('dashboard.statistics.cards');
 
   const [loading, setLoading] = useState<boolean>(false);
   const [trackerData, setTrackerData] = useState<
@@ -119,7 +122,7 @@ export default function Page({
       const tracker = statuses.map((status) => {
         return {
           color: getStatusTrackerColor(status),
-          tooltip: getStatusText(status),
+          tooltip: locale === 'en' ? getStatusText(status) : tStatus(status),
         };
       });
       setTrackerData(tracker);
@@ -175,7 +178,7 @@ export default function Page({
       );
       setOrderStatistics(statistics);
     }
-  }, [batch]);
+  }, [batch, locale, tStatus]);
 
   if (error) {
     return <p>Error: {error.message}</p>;
@@ -191,7 +194,9 @@ export default function Page({
         <div className="flex flex-col gap-5">
           <div className="flex flex-col lg:flex-row lg:items-center justify-between">
             <h1 className="uppercase font-black text-3xl text-opacity-80">
-              Batch-{batch.BID.toString().padStart(3, '0')}
+              {t('details.batchNum', {
+                id: batch.BID.toString().padStart(3, '0'),
+              })}
             </h1>
             <div className="flex items-center gap-3 text-base lg:text-3xl font-black text-opacity-80">
               <h1>{moment(batch.startDate).locale(locale).format('LL')}</h1>
@@ -199,7 +204,7 @@ export default function Page({
               <h1>
                 {batch.endDate
                   ? moment(batch.endDate).locale(locale).format('LL')
-                  : 'Current'}
+                  : t('details.current')}
               </h1>
             </div>
           </div>
@@ -208,15 +213,43 @@ export default function Page({
               <CourierCard courier={batch.courier} locale={locale} />
             </div>
             <div className="col-span-1 flex items-center justify-center w-full">
-              <RadialChartStacked data={{ chartData: totalDeliveredChart }} />
+              <RadialChartStacked
+                chartData={totalDeliveredChart}
+                title={t('statistics.completedDeliveries')}
+                locale={locale}
+                chartConfig={{
+                  delivered: {
+                    label: t('statistics.charts.tooltip.delivered'),
+                    color: 'hsl(var(--accent))',
+                  },
+                  other: {
+                    label: t('statistics.charts.tooltip.other'),
+                    color: 'hsl(var(--muted))',
+                  },
+                }}
+              />
             </div>
             <div className="col-span-1 flex items-center justify-center w-full">
-              <RadialChart data={{ chartData: totalReshippedChart }} />
+              <RadialChart
+                chartData={totalReshippedChart}
+                title={t('statistics.reshippedRate')}
+                locale={locale}
+                chartConfig={{
+                  reshipped: {
+                    label: t('statistics.charts.tooltip.reshipped'),
+                    color: 'hsl(var(--accent))',
+                  },
+                  other: {
+                    label: t('statistics.charts.tooltip.other'),
+                    color: 'hsl(var(--muted))',
+                  },
+                }}
+              />
             </div>
             <div className="col-span-1 lg:col-span-2">
               <KpiCard
                 locale={locale}
-                title="Total Orders"
+                title={t('statistics.totalOrders')}
                 statistic={batch.orders.length + batch.integrationOrders.length}
                 chart
                 chartConfig={{
@@ -231,39 +264,39 @@ export default function Page({
             <div className="col-span-1 lg:col-span-5 grid grid-cols-1 lg:grid-cols-6 gap-5">
               <KpiCard
                 locale={locale}
-                title="Out For Delivery"
+                title={tStatus('outForDelivery')}
                 statistic={orderStatistics.outForDelivery}
               />
               <KpiCard
                 locale={locale}
-                title="Delivered"
+                title={tStatus('delivered')}
                 statistic={orderStatistics.delivered}
               />
               <KpiCard
                 locale={locale}
-                title="To Be Reshipped"
+                title={tStatus('toBeReshipped')}
                 statistic={orderStatistics.toBeReshipped}
               />
               <KpiCard
                 locale={locale}
-                title="Cancelled"
+                title={tStatus('cancelled')}
                 statistic={orderStatistics.cancelled}
                 color="error"
               />
               <KpiCard
                 locale={locale}
-                title="Paid Shipping Only"
+                title={tStatus('paidShippingOnly')}
                 statistic={orderStatistics.paidShippingOnly}
               />
               <KpiCard
                 locale={locale}
-                title="Unreachable"
+                title={tStatus('unreachable')}
                 statistic={orderStatistics.unreachable}
               />
               <div className="col-span-1 lg:col-span-2">
                 <KpiCard
                   locale={locale}
-                  title="to be received total"
+                  title={t('statistics.toBeReceivedTotal')}
                   financial
                   statistic={financeStatistics.toBeReceived}
                 />
@@ -271,7 +304,7 @@ export default function Page({
               <div className="col-span-1 lg:col-span-2">
                 <KpiCard
                   locale={locale}
-                  title="courier collected amount"
+                  title={t('statistics.courierCollectedAmount')}
                   financial
                   statistic={financeStatistics.courierCollected}
                 />
@@ -279,7 +312,7 @@ export default function Page({
               <div className="col-span-1 lg:col-span-2">
                 <KpiCard
                   locale={locale}
-                  title="total shipping fee collected"
+                  title={t('statistics.totalShippingCollected')}
                   financial
                   statistic={financeStatistics.totalShipping}
                 />
@@ -322,7 +355,7 @@ export default function Page({
                   {loading ? (
                     <Loader2Icon size={16} className="animate-spin" />
                   ) : (
-                    'End Batch'
+                    <span>{t('buttons.end')}</span>
                   )}
                 </Button>
               )}
@@ -330,7 +363,7 @@ export default function Page({
             <TabsContent value="turuq">
               <div className="w-full bg-light dark:bg-dark_border rounded-xl p-5">
                 <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={batch.orders}
                   locale={locale}
                   isStatic={true}
@@ -341,7 +374,7 @@ export default function Page({
             <TabsContent value="integrations">
               <div className="w-full bg-light dark:bg-dark_border rounded-xl p-5">
                 <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={batch.integrationOrders}
                   locale={locale}
                   isStatic={true}

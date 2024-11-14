@@ -11,26 +11,16 @@ import {
 } from '@/components/ui/chart';
 interface Props {
   chartData: { reshipped: number; other: number; totalOrders: number };
+  title: string;
+  locale: string;
+  chartConfig: ChartConfig;
 }
 
-export const description = 'A radial chart with stacked sections';
-
-const chartConfig = {
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--muted))',
-  },
-  reshipped: {
-    label: 'Reshipped',
-    color: 'hsl(var(--accent))',
-  },
-} satisfies ChartConfig;
-
-export function RadialChart({ data }: { data: Props }) {
+export function RadialChart({ chartData, chartConfig, title, locale }: Props) {
   return (
     <Card className="flex flex-col gap-5 w-full h-40 rounded-xl">
       <CardHeader className="items-start pb-0">
-        <p className="text-xs capitalize">Reshipped Rate</p>
+        <p className="text-xs capitalize">{title}</p>
       </CardHeader>
       <CardContent className="flex items-center  p-0">
         <ChartContainer
@@ -38,7 +28,7 @@ export function RadialChart({ data }: { data: Props }) {
           className="w-full h-auto flex items-center justify-center"
         >
           <RadialBarChart
-            data={[data.chartData]}
+            data={[chartData]}
             endAngle={180}
             innerRadius={60}
             outerRadius={97.5}
@@ -58,7 +48,7 @@ export function RadialChart({ data }: { data: Props }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-lg font-bold"
                         >
-                          {data.chartData.reshipped}%
+                          {chartData.reshipped.toLocaleString(`${locale}-EG`)}%
                         </tspan>
                       </text>
                     );

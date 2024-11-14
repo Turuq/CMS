@@ -7,6 +7,7 @@ import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { getCouriersOptions } from '@/utils/query-options/courier-options';
 import { useQuery } from '@tanstack/react-query';
 import { CourierStatisticsIcons } from '../icons/courier-statistics-icons';
+import { useTranslations } from 'next-intl';
 
 export default function CourierCardLayout({
   locale,
@@ -18,6 +19,8 @@ export default function CourierCardLayout({
     inactive: CourierWithStatistics[];
   };
 }) {
+  const t = useTranslations('handoverOfficer.tabs.handOver');
+
   const { error, data, isPending } = useQuery({
     ...getCouriersOptions,
     initialData: initial,
@@ -41,10 +44,14 @@ export default function CourierCardLayout({
 
   return (
     <div className="mt-5">
-      <Tabs defaultValue="active" className={`w-full`}>
+      <Tabs
+        dir={locale === 'ar' ? 'rtl' : 'ltr'}
+        defaultValue="active"
+        className={`w-full`}
+      >
         <TabsList>
-          <TabsTrigger value="active">Active</TabsTrigger>
-          <TabsTrigger value="inactive">Inactive</TabsTrigger>
+          <TabsTrigger value="active">{t('tabs.active')}</TabsTrigger>
+          <TabsTrigger value="inactive">{t('tabs.inactive')}</TabsTrigger>
         </TabsList>
         <TabsContent value="active" className="w-full">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-5 mt-5 w-full">
@@ -103,11 +110,6 @@ export default function CourierCardLayout({
                 key={courier._id.toString()}
                 courier={courier}
                 locale={locale}
-                href={`hand-over/${courier._id}`}
-                hrefOptions={{
-                  tooltip: 'Hand Over',
-                  label: 'handover',
-                }}
               />
             ))}
           </div>

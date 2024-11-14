@@ -32,6 +32,7 @@
         "unreachable": "Unreachable",
         "outOfStock": "Out Of Stock",
         "invalidAddress": "Invalid Address",
+        "paidShippingOnly": "Paid Shipping Only",
         "toBeReshipped": "To Be Reshipped",
         "totalToBeReceived": "Total To Be Received",
         "totalShippingFees": "Total Shipping Fees",
@@ -87,7 +88,8 @@
                 "returned": "Returned",
                 "unreachable": "Unreachable",
                 "outOfStock": "Out Of Stock",
-                "invalidAddress": "Invalid Address"
+                "invalidAddress": "Invalid Address",
+                "collected": "Collected"
               }
             },
             "type": {
@@ -377,6 +379,18 @@
       },
       "hand in": {
         "header": "Hand In"
+      },
+      "handOver": {
+        "header": "Hand Over",
+        "description": "Please Select a Courier to Hand Over Orders to.",
+        "tabs": {
+          "active": "Active",
+          "inactive": "Inactive"
+        }
+      },
+      "handIn": {
+        "header": "Hand In",
+        "description": "Please Select a Courier to Inspect & Manage Their Batches."
       }
     }
   },
@@ -516,7 +530,38 @@
       "description": "This courier is currently delivering a batch. You can assign new orders to them, but they will not be able to deliver them until they finish their current batch."
     },
     "buttons": {
-      "start": "Start Batch"
+      "start": "Start Batch",
+      "end": "End Batch"
+    },
+    "titles": {
+      "finished": "finished",
+      "inProgress": "in progress",
+      "batches": "batches",
+      "courierBatch": "{name}'s Batches"
+    },
+    "details": {
+      "header": "{name}'s Batch-{id}",
+      "current": "Current",
+      "batchStillInProgress": "Batch Still In Progress",
+      "inspect": "Inspect",
+      "batchNum": "Batch-{id}"
+    },
+    "statistics": {
+      "totalOrders": "Total Orders",
+      "reshippedRate": "Reshipped Rate",
+      "completedDeliveries": "Completed Deliveries",
+      "totalShippingCollected": "Total Collected Shipping",
+      "courierCollectedAmount": "Courier Collected Amount",
+      "toBeReceivedTotal": "To Be Received Total",
+      "outOf": "out of",
+      "charts": {
+        "tooltip": {
+          "delivered": "Delivered",
+          "reshipped": "Reshipped",
+          "outForDelivery": "Out For Delivery",
+          "other": "Other"
+        }
+      }
     }
   },
   "scanner": {

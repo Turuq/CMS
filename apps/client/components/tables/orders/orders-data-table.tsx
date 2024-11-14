@@ -411,7 +411,7 @@ export function OrdersDataTable<TValue>({
                           {cell.column.columnDef.id === 'createdAt' ? (
                             moment(cell.getValue() as string)
                               .locale(locale)
-                              .format('L')
+                              .format('LL')
                           ) : cell.column.columnDef.id === 'status' ? (
                             <div className="flex flex-col gap-1 items-start justify-center w-auto">
                               <div
@@ -431,7 +431,9 @@ export function OrdersDataTable<TValue>({
                                   <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
                                     {history &&
                                     Object.keys(history)?.includes(status)
-                                      ? moment(history[status]).format('L')
+                                      ? moment(history[status])
+                                          .locale(locale)
+                                          .format('LL')
                                       : ''}
                                   </span>
                                 );

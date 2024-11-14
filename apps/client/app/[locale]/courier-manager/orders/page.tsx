@@ -5,7 +5,7 @@ import {
   getIntegrationOrders,
   getTuruqOrders,
 } from '@/app/actions/order-actions';
-import { columns } from '@/components/tables/orders/order-columns';
+import { getColumns } from '@/components/tables/orders/order-columns';
 import { OrdersDataTable } from '@/components/tables/orders/orders-data-table';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import queryClient from '@/lib/query/query-client';
@@ -35,7 +35,6 @@ export default function Page({
     setTuruqPage(1);
     setIntegrationPage(1);
   }, [turuqServerColumnFilters, integrationServerColumnFilters]);
-  
 
   // Fetch Table Data
   const {
@@ -148,7 +147,7 @@ export default function Page({
           <div className="p-5 rounded-xl bg-light dark:bg-dark_border">
             <OrdersDataTable
               locale={locale}
-              columns={columns}
+              columns={getColumns(locale)}
               data={turuqOrders?.orders ?? []}
               page={turuqPage}
               pageSize={turuqPageSize}
@@ -166,7 +165,7 @@ export default function Page({
           <div className="p-5 rounded-xl bg-light dark:bg-dark_border">
             <OrdersDataTable
               locale={locale}
-              columns={columns}
+              columns={getColumns(locale)}
               data={integrationOrders?.integrationOrders ?? []}
               page={integrationPage}
               pageSize={integrationPageSize}
