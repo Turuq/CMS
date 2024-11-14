@@ -9,31 +9,28 @@ import {
   ChartTooltip,
   ChartTooltipContent,
 } from '@/components/ui/chart';
+import { useTranslations } from 'next-intl';
 
 interface Props {
   chartData: { delivered: number; other: number };
+  title: string;
+  locale: string;
+  chartConfig: ChartConfig;
 }
 
-export const description = 'A radial chart with stacked sections';
-
-const chartConfig = {
-  delivered: {
-    label: 'Delivered',
-    color: 'hsl(var(--accent))',
-  },
-  other: {
-    label: 'Other',
-    color: 'hsl(var(--muted))',
-  },
-} satisfies ChartConfig;
-
-export function RadialChartStacked({ data }: { data: Props }) {
-  const totalOrders = data.chartData.delivered + data.chartData.other;
+export function RadialChartStacked({
+  chartData,
+  title,
+  locale,
+  chartConfig,
+}: Props) {
+  const t = useTranslations('batch.statistics');
+  const totalOrders = chartData.delivered + chartData.other;
 
   return (
     <Card className="flex flex-col gap-5 w-full h-40 rounded-xl">
       <CardHeader className="items-start pb-0">
-        <p className="text-xs capitalize">Completed Deliveries</p>
+        <p className="text-xs capitalize">{title}</p>
       </CardHeader>
       <CardContent className="flex items-center  p-0">
         <ChartContainer
@@ -41,7 +38,7 @@ export function RadialChartStacked({ data }: { data: Props }) {
           className="w-full h-auto flex items-center justify-center"
         >
           <RadialBarChart
-            data={[data.chartData]}
+            data={[chartData]}
             endAngle={180}
             innerRadius={60}
             outerRadius={97.5}
@@ -61,14 +58,15 @@ export function RadialChartStacked({ data }: { data: Props }) {
                           y={(viewBox.cy || 0) - 16}
                           className="fill-foreground text-lg font-bold"
                         >
-                          {data.chartData.delivered}
+                          {chartData.delivered.toLocaleString(`${locale}-EG`)}
                         </tspan>
                         <tspan
                           x={viewBox.cx}
                           y={(viewBox.cy || 0) + 4}
                           className="fill-muted-foreground"
                         >
-                          out of {totalOrders}
+                          {t('outOf')}{' '}
+                          {totalOrders.toLocaleString(`${locale}-EG`)}
                         </tspan>
                       </text>
                     );

@@ -10,7 +10,9 @@ import {
   TableHeader,
   TableRow,
 } from '@/components/ui/table';
+import { cn } from '@/lib/utils';
 import { OrderType } from '@/types/order';
+import { getStatusColor, getStatusText } from '@/utils/helpers/status-modifier';
 import {
   ColumnDef,
   flexRender,
@@ -20,8 +22,16 @@ import {
 } from '@tanstack/react-table';
 import { ChevronLeftIcon, ChevronRightIcon } from 'lucide-react';
 import moment from 'moment';
+import 'moment/locale/ar';
 import { useTranslations } from 'next-intl';
 import { useState } from 'react';
+
+const borderRadius = {
+  arStatic: 'first:rounded-r-xl last:rounded-l-xl',
+  enStatic: 'first:rounded-l-xl last:rounded-r-xl',
+  ar: 'last:rounded-l-xl',
+  en: 'last:rounded-r-xl',
+};
 
 interface SelectedOrderTableProps<TData, TValue> {
   locale: string;
@@ -39,6 +49,8 @@ export default function SelectedOrderTable<TValue>({
   isStatic = false,
 }: SelectedOrderTableProps<OrderType, TValue>) {
   const t = useTranslations('courierManager.tabs.orders.ordersTable');
+  const tOrderType = useTranslations('orderType');
+
   const [pagination, setPagination] = useState<{
     pageIndex: number;
     pageSize: number;
@@ -56,6 +68,14 @@ export default function SelectedOrderTable<TValue>({
     getRowId: (row) => row._id,
   });
 
+  function getBorderRadius() {
+    if (isStatic) {
+      return locale === 'ar' ? borderRadius.arStatic : borderRadius.enStatic;
+    }
+
+    return locale === 'ar' ? borderRadius.ar : borderRadius.en;
+  }
+
   return (
     <>
       <Table>
@@ -63,7 +83,7 @@ export default function SelectedOrderTable<TValue>({
           {table.getHeaderGroups().map((headerGroup) => (
             <TableRow
               key={headerGroup.id}
-              className="border-none bg-light_border dark:bg-[#202122] rounded-md"
+              className="border-none bg-light_border dark:bg-[#202122] rounded-xl"
             >
               {!isStatic && (
                 <TableHead
@@ -77,7 +97,10 @@ export default function SelectedOrderTable<TValue>({
                 return (
                   <TableHead
                     key={header.id}
-                    className={`text-xs text-center w-auto font-bold ${locale === 'ar' ? 'last:rounded-l-xl' : 'last:rounded-r-xl'} ${isStatic && locale === 'ar' ? 'last:rounded-r-xl' : 'first:rounded-l-xl'} last:border-r-0`}
+                    className={cn(
+                      `text-xs text-center w-auto font-bold last:border-r-0 ${locale === 'ar' ? (!isStatic ? 'last:rounded-l-xl' : 'first:rounded-r-xl last:rounded-l-xl') : !isStatic ? 'last:rounded-r-xl' : 'first:rounded-l-xl last:rounded-r-xl'}`,
+                      getBorderRadius
+                    )}
                   >
                     {header.isPlaceholder
                       ? null
@@ -112,14 +135,45 @@ export default function SelectedOrderTable<TValue>({
                 )}
                 {row.getVisibleCells().map((cell) => (
                   <TableCell key={cell.id} className="text-center text-xs">
-                    {cell.column.columnDef.id === 'createdAt'
-                      ? moment(cell.getValue() as string)
-                          .locale(locale)
-                          .format('LL')
-                      : flexRender(
-                          cell.column.columnDef.cell,
-                          cell.getContext()
-                        )}
+                    {cell.column.columnDef.id === 'createdAt' ? (
+                      moment(cell.getValue() as string)
+                        .locale(locale)
+                        .format('LL')
+                    ) : cell.column.columnDef.id === 'type' ? (
+                      <p>
+                        {cell.getValue()
+                          ? tOrderType(String(cell.getValue()).toLowerCase())
+                          : '-'}
+                      </p>
+                    ) : cell.column.columnDef.id === 'status' ? (
+                      <div className="flex flex-col gap-1 items-start justify-center w-auto">
+                        <div
+                          className={`${getStatusColor(cell.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
+                        >
+                          {locale === 'en'
+                            ? getStatusText(cell.row.original.status)
+                            : t(
+                                `filters.status.values.${cell.row.original.status}`
+                              )}
+                        </div>
+                        {(() => {
+                          const history = cell.row.original.statusHistory;
+                          const status = cell.row.original
+                            .status as keyof typeof history;
+                          return (
+                            <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
+                              {history && Object.keys(history)?.includes(status)
+                                ? moment(history[status])
+                                    .locale(locale)
+                                    .format('LL')
+                                : ''}
+                            </span>
+                          );
+                        })()}
+                      </div>
+                    ) : (
+                      flexRender(cell.column.columnDef.cell, cell.getContext())
+                    )}
                   </TableCell>
                 ))}
               </TableRow>

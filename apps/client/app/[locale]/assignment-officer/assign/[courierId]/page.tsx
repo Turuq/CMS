@@ -2,8 +2,8 @@
 
 import { ws } from '@/app/actions/api';
 import {
+  getUnassignedSelectedColumns,
   unassignedColumns,
-  unassignedSelectedColumns,
 } from '@/components/tables/orders/order-columns';
 import {
   AlertDialog,
@@ -37,6 +37,7 @@ import queryClient from '@/lib/query/query-client';
 import { OrderType } from '@/types/order';
 import { ToastStyles } from '@/utils/styles';
 // import { RowSelectionState } from '@tanstack/react-table';
+import { scanOrders } from '@/utils/helpers/functions';
 import {
   CircleCheckIcon,
   CircleIcon,
@@ -48,7 +49,6 @@ import {
 } from 'lucide-react';
 import { useTranslations } from 'next-intl';
 import { toast } from 'sonner';
-import { scanOrders } from '@/utils/helpers/functions';
 
 export default function Page({
   params: { locale, courierId },
@@ -497,7 +497,7 @@ export default function Page({
                 )}
                 <SelectedOrderTable
                   locale={locale}
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={selectedOrders ?? []}
                   handleRemoveOrder={handleRemoveTuruqOrder}
                 />
@@ -613,7 +613,7 @@ export default function Page({
                 )}
                 <SelectedOrderTable
                   locale={locale}
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={selectedIntegrationOrders ?? []}
                   handleRemoveOrder={handleRemoveIntegrationOrder}
                 />

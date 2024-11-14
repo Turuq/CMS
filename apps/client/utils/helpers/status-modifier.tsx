@@ -4,6 +4,7 @@ export function getStatusColor(status: string) {
   let result = '';
   switch (status) {
     case 'delivered':
+    case 'collected':
       result = 'border-emerald-200 bg-emerald-200 text-emerald-200';
       break;
     case 'outForDelivery':

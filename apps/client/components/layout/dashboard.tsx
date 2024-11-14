@@ -9,6 +9,7 @@ import { StepChart } from '../charts/step-chart';
 export default async function Dashboard({ locale }: { locale: string }) {
   const tKpi = await getTranslations('dashboard.statistics');
   const tChart = await getTranslations('assignmentOfficer.tabs.home');
+  const tTooltip = await getTranslations('batch.statistics.charts.tooltip');
 
   const res = await api.batch.dashboard.governorate.$get();
   const data = await res.json();
@@ -119,11 +120,11 @@ export default async function Dashboard({ locale }: { locale: string }) {
               )}
               chartConfig={{
                 delivered: {
-                  label: 'Delivered',
+                  label: tTooltip('delivered'),
                   color: 'hsl(var(--accent))',
                 },
                 outForDelivery: {
-                  label: 'Out For Delivery',
+                  label: tTooltip('outForDelivery'),
                   color: 'hsl(var(--chart-4))',
                 },
               }}

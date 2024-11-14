@@ -13,21 +13,20 @@ import CourierCardSkeleton from '@/components/feedback/courier-card-skeleton';
 import TableSkeleton from '@/components/feedback/table-skeleton';
 import { icons } from '@/components/icons/icons';
 import {
+  getUnassignedSelectedColumns,
   unassignedColumns,
-  unassignedSelectedColumns,
 } from '@/components/tables/orders/order-columns';
 import { SelectableOrdersDataTable } from '@/components/tables/orders/selectable-data-table';
 import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { ToastStyles } from '@/utils/styles';
 import { OrderType } from '@/types/order';
+import { ToastStyles } from '@/utils/styles';
 import { useQuery } from '@tanstack/react-query';
 // import { RowSelectionState } from '@tanstack/react-table';
-import { useTranslations } from 'next-intl';
-import { useEffect, useState } from 'react';
-import { toast } from 'sonner';
+import { ws } from '@/app/actions/api';
 import queryClient from '@/lib/query/query-client';
+import { scanOrders } from '@/utils/helpers/functions';
 import {
   CircleCheckIcon,
   CircleIcon,
@@ -37,8 +36,9 @@ import {
   Trash2Icon,
   UsbIcon,
 } from 'lucide-react';
-import { ws } from '@/app/actions/api';
-import { scanOrders } from '@/utils/helpers/functions';
+import { useTranslations } from 'next-intl';
+import { useEffect, useState } from 'react';
+import { toast } from 'sonner';
 
 export default function Page({
   params: { locale, courierId },
@@ -529,7 +529,7 @@ export default function Page({
                   </div>
                 )}
                 <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={selectedOrders}
                   locale={locale}
                   handleRemoveOrder={handleRemoveTuruqOrder}
@@ -634,7 +634,7 @@ export default function Page({
                   </div>
                 )}
                 <SelectedOrderTable
-                  columns={unassignedSelectedColumns}
+                  columns={getUnassignedSelectedColumns(locale)}
                   data={selectedIntegrationOrders}
                   locale={locale}
                   handleRemoveOrder={handleRemoveIntegrationOrder}

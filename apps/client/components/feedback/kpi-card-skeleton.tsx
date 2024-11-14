@@ -9,12 +9,12 @@ export default function KpiCardSkeleton() {
       <CardHeader
         className={`px-6 pt-3 pb-1 flex flex-row items-center justify-between gap-2`}
       >
-        <CardTitle className={"flex items-center gap-5"}>
-          <Skeleton className="w-60 h-10" />
+        <CardTitle className={'flex items-center gap-5'}>
+          <Skeleton className="w-48 h-10" />
         </CardTitle>
       </CardHeader>
       <CardContent className={`px-6 pt-0 pb-1`}>
-        <Skeleton className="w-40 h-6" />
+        <Skeleton className="w-36 h-6" />
       </CardContent>
     </Card>
   );
