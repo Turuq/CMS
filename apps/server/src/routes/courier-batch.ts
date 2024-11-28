@@ -7,7 +7,7 @@ import { integrationOrderModel } from '../models/integration-order';
 import { orderModel } from '../models/order';
 import { authorizeUser } from '../utils/authorization';
 import { getNextSequence } from '../utils/functions/helpers';
-import { validateObjectId } from '../utils/validation';
+import { validateJourney, validateObjectId } from '../utils/validation';
 import {
   EndCourierBatchSchema,
   NewCourierBatchSchema,
@@ -103,8 +103,8 @@ const courierBatchRouter = new Hono()
             totalToBeReceived: { $sum: '$allOrders.total' },
             // activeBatches: if a batch's endDate doesn't exist or is null, then it's an active batch
             activeBatches: {
-              $sum: { $eq: ['$endDate', null] }
-            }
+              $sum: { $eq: ['$endDate', null] },
+            },
           },
         },
         {
@@ -448,7 +448,10 @@ const courierBatchRouter = new Hono()
     getUser,
     zValidator('param', validateObjectId),
     async (c) => {
-      authorizeUser({ c, level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'] });
+      authorizeUser({
+        c,
+        level: ['HANDOVER_OFFICER', 'COURIER_MANAGER', 'ASSIGNMENT_OFFICER'],
+      });
       try {
         const { id } = c.req.valid('param');
         const batches = await CourierBatchModel.aggregate([
@@ -534,7 +537,7 @@ const courierBatchRouter = new Hono()
           c.status(404);
           throw new Error('No Batches Found');
         }
-        console.log(batches)
+        console.log(batches);
         return c.json(batches, 200);
       } catch (error: any) {
         console.error(error);
@@ -585,6 +588,233 @@ const courierBatchRouter = new Hono()
           outstandingOrders || outstandingIntegrationOrders;
 
         return c.json({ hasOutstanding }, 200);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        throw new Error('Internal Server Error: ', error.message);
+      }
+    }
+  )
+  .get('/current/:id', zValidator('param', validateObjectId), async (c) => {
+    try {
+      const { id } = c.req.valid('param');
+      const batch = await CourierBatchModel.aggregate([
+        {
+          $match: {
+            courier: new ObjectId(id),
+            $or: [{ endDate: null }, { endDate: { $exists: false } }],
+          },
+        },
+        {
+          $lookup: {
+            from: 'orders',
+            localField: 'orders',
+            foreignField: '_id',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'clients',
+                  localField: 'client',
+                  foreignField: '_id',
+                  as: 'client',
+                },
+              },
+              {
+                $unwind: '$client',
+              },
+            ],
+            as: 'orders',
+          },
+        },
+        {
+          $lookup: {
+            from: 'shopifyorders',
+            localField: 'integrationOrders',
+            foreignField: '_id',
+            pipeline: [
+              {
+                $lookup: {
+                  from: 'clients',
+                  localField: 'client',
+                  foreignField: '_id',
+                  as: 'client',
+                },
+              },
+              {
+                $unwind: '$client',
+              },
+            ],
+            as: 'integrationOrders',
+          },
+        },
+        {
+          $addFields: {
+            combinedOrders: {
+              $concatArrays: ['$orders', '$integrationOrders'],
+            },
+          },
+        },
+        { $project: { orders: 0, integrationOrders: 0 } },
+        // { $unwind: '$combinedOrders' },
+        // {
+        //   $lookup: {
+        //     from: 'clients',
+        //     localField: 'combinedOrders.client',
+        //     foreignField: '_id',
+        //     as: 'combinedOrders.client',
+        //   },
+        // },
+        // { $unwind: '$combinedOrders.client' },
+        // {
+        //   $project: {
+        //     _id: 1,
+        //     courier: 1,
+        //     startDate: 1,
+        //     endDate: 1,
+        //     BID: 1,
+        //     combinedOrders: 1,
+        //   },
+        // },
+      ]);
+
+      if (!batch) {
+        c.status(404);
+        throw new Error('Batch not found');
+      }
+      return c.json({ batch: batch[0] }, 200);
+    } catch (error: any) {
+      console.error(error);
+      c.status(500);
+      throw new Error('Internal Server Error: ', error.message);
+    }
+  })
+  .get(
+    '/statistics/:type/:id',
+    zValidator('param', validateJourney),
+    async (c) => {
+      try {
+        const { id, type } = c.req.valid('param');
+        let condition = {};
+        switch (type) {
+          case 'current':
+            condition = {
+              $or: [{ endDate: null }, { endDate: { $exists: false } }],
+            };
+            break;
+          case 'previous':
+            {
+              const currentMonth = moment().format('YYYY-MM');
+              const previousMonth = moment()
+                .subtract(1, 'months')
+                .format('YYYY-MM');
+              condition = {
+                endDate: {
+                  $gte: new Date(`${previousMonth}-01`),
+                  $lt: new Date(`${currentMonth}-01`),
+                },
+              };
+            }
+            break;
+          default:
+            break;
+        }
+        const batch = await CourierBatchModel.aggregate([
+          {
+            $match: {
+              courier: new ObjectId(id),
+              ...condition,
+            },
+          },
+          {
+            $lookup: {
+              from: 'orders',
+              localField: 'orders',
+              foreignField: '_id',
+              as: 'orders',
+            },
+          },
+          {
+            $lookup: {
+              from: 'shopifyorders',
+              localField: 'integrationOrders',
+              foreignField: '_id',
+              as: 'integrationOrders',
+            },
+          },
+          {
+            $addFields: {
+              combinedOrders: {
+                $concatArrays: ['$orders', '$integrationOrders'],
+              },
+            },
+          },
+          { $project: { orders: 0, integrationOrders: 0 } },
+          { $unwind: '$combinedOrders' },
+          {
+            $group: {
+              _id: '$combinedOrders.status',
+              count: { $sum: 1 },
+              toBeReshippedCount: {
+                $sum: {
+                  $cond: [
+                    { $eq: ['$combinedOrders.toBeReshipped', true] },
+                    1,
+                    0,
+                  ],
+                },
+              },
+              gotGhostedCount: {
+                $sum: {
+                  $cond: [{ $eq: ['$combinedOrders.gotGhosted', true] }, 1, 0],
+                },
+              },
+              totalShippingFees: { $sum: '$combinedOrders.shippingFees' },
+              totalToBeReceived: { $sum: '$combinedOrders.total' },
+              totalDelivered: {
+                $sum: {
+                  $cond: [
+                    { $eq: ['$combinedOrders.status', 'delivered'] },
+                    '$combinedOrders.total',
+                    0,
+                  ],
+                },
+              },
+              totalCollected: {
+                $sum: '$combinedOrders.courierCOD',
+              },
+            },
+          },
+          {
+            $group: {
+              _id: null,
+              statusCounts: { $push: { k: '$_id', v: '$count' } },
+              totalToBeReshipped: { $sum: '$toBeReshippedCount' },
+              totalGotGhosted: { $sum: '$gotGhostedCount' },
+              totalShippingFees: { $sum: '$totalShippingFees' },
+              totalToBeReceived: { $sum: '$totalToBeReceived' },
+              totalDelivered: { $sum: '$totalDelivered' },
+              totalCollected: { $sum: '$totalCollected' },
+            },
+          },
+          {
+            $replaceRoot: {
+              newRoot: {
+                statusCounts: { $arrayToObject: '$statusCounts' },
+                totalToBeReshipped: '$totalToBeReshipped',
+                totalGotGhosted: '$totalGotGhosted',
+                totalShippingFees: '$totalShippingFees',
+                totalToBeReceived: '$totalToBeReceived',
+                totalDelivered: '$totalDelivered',
+                totalCollected: '$totalCollected',
+              },
+            },
+          },
+        ]);
+        if (!batch) {
+          c.status(404);
+          throw new Error('Batch not found');
+        }
+        return c.json({ daily: batch[0] }, 200);
       } catch (error: any) {
         console.error(error);
         c.status(500);

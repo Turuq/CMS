@@ -151,9 +151,7 @@ app.get('/api/check', getUser, (c) => {
 app.get(
   '/ws',
   upgradeWebSocket((c) => {
-    return {
-      
-    }
+    return {};
   })
 );
 

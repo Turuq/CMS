@@ -1,4 +1,5 @@
 import { model, Schema } from 'mongoose';
+import { defaultOrderStatistics } from '../utils/defaults';
 
 const woocommerceKeysSchema = new Schema({
   apiConsumerKey: {
@@ -12,6 +13,65 @@ const woocommerceKeysSchema = new Schema({
   },
   updateWebhookSecret: {
     type: String,
+  },
+});
+
+const statusCounts = new Schema({
+  delivered: {
+    type: Number,
+    default: 0,
+  },
+  outForDelivery: {
+    type: Number,
+    default: 0,
+  },
+  pending: {
+    type: Number,
+    default: 0,
+  },
+  unreachable: {
+    type: Number,
+    default: 0,
+  },
+  postponed: {
+    type: Number,
+    default: 0,
+  },
+  cancelled: {
+    type: Number,
+    default: 0,
+  },
+  invalidAddress: {
+    type: Number,
+    default: 0,
+  },
+  returned: {
+    type: Number,
+    default: 0,
+  },
+  collected: {
+    type: Number,
+    default: 0,
+  },
+  outOfStock: {
+    type: Number,
+    default: 0,
+  },
+  processing: {
+    type: Number,
+    default: 0,
+  },
+  total: {
+    type: Number,
+    default: 0,
+  },
+});
+
+const orderStatisticsSchema = new Schema({
+  turuqOrders: statusCounts,
+  integrationOrders: {
+    shopify: statusCounts,
+    woocommerce: statusCounts,
   },
 });
 
@@ -71,6 +131,10 @@ const clientSchema = new Schema(
       default: true,
     },
     woocommerceKeys: woocommerceKeysSchema,
+    orderStatistics: {
+      type: orderStatisticsSchema,
+      default: defaultOrderStatistics,
+    },
   },
   { timestamps: true }
 );

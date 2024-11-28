@@ -13,6 +13,8 @@ import {
   validatePagination,
 } from '../utils/validation';
 import { authorizeUser } from '../utils/authorization';
+import { orderUpdateSchema } from '../validation/orders';
+import FinanceModel from '../models/finance';
 
 const orderRouter = new Hono()
   // GET ALL ORDERS, PAGINATED, & FILTERED
@@ -524,7 +526,7 @@ const orderRouter = new Hono()
         // Handover Orders
         const updateResult = await orderModel.updateMany(
           { _id: { $in: data.ids } },
-          { status: 'outForDelivery' }
+          { status: 'outForDelivery', toBeReshipped: false }
         );
         if (!updateResult) {
           c.status(400);
@@ -573,7 +575,7 @@ const orderRouter = new Hono()
         // Handover Orders
         const updateResult = await integrationOrderModel.updateMany(
           { _id: { $in: data.ids } },
-          { status: 'outForDelivery' }
+          { status: 'outForDelivery', toBeReshipped: false }
         );
         if (!updateResult) {
           c.status(400);
@@ -598,8 +600,151 @@ const orderRouter = new Hono()
         });
       }
     }
-  );
+  )
+  .patch(
+    '/turuq/update/:id',
+    zValidator('param', validateObjectId),
+    zValidator('json', orderUpdateSchema),
+    async (c) => {
+      try {
+        const { id } = c.req.valid('param');
+        const updater = c.req.valid('json');
+        const order = await orderModel
+          .findById(id)
+          .select('_id statusHistory status client subtotal shippingFees');
+        if (!order) {
+          c.status(404);
+          throw new Error('Order not found');
+        }
 
-  
+        // update status history
+        let statusHistory = order.statusHistory;
+        if (updater.status && statusHistory) {
+          statusHistory[updater.status as keyof typeof statusHistory] =
+            new Date();
+        }
+
+        // update order
+        const result = await orderModel.updateOne(
+          { _id: id },
+          { ...updater, statusHistory, isOutstanding: false }
+        );
+        if (result.modifiedCount === 0) {
+          c.status(400);
+          return c.json({ message: 'Failed to update order' }, 400);
+        } else {
+          if (updater.status !== order.status) {
+            await ClientModel.findByIdAndUpdate(order.client, {
+              $inc: {
+                [`orderStatistics.turuqOrders.${updater.status}`]: 1,
+                [`orderStatistics.turuqOrders.${order.status}`]: -1,
+              },
+            });
+          }
+
+          if (updater.status === 'delivered') {
+            await FinanceModel.findOneAndUpdate(
+              { client: order.client },
+              {
+                $inc: {
+                  balance: order.subtotal,
+                  shipping: order.shippingFees,
+                },
+              }
+            );
+          }
+        }
+
+        return c.json({ message: 'Order updated successfully' }, 200);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        return c.json({
+          message: `Failed to update order: ${error.message}`,
+        });
+      }
+    }
+  )
+  .patch(
+    '/integration/update/:id',
+    zValidator('param', validateObjectId),
+    zValidator('json', orderUpdateSchema),
+    async (c) => {
+      try {
+        const { id } = c.req.valid('param');
+        const updater = c.req.valid('json');
+        const order = await integrationOrderModel
+          .findById(id)
+          .select(
+            '_id statusHistory status client subtotal shippingFees provider'
+          );
+        if (!order) {
+          c.status(404);
+          throw new Error('Order not found');
+        }
+
+        // update status history
+        let statusHistory = order.statusHistory;
+        if (updater.status && statusHistory) {
+          statusHistory[updater.status as keyof typeof statusHistory] =
+            new Date();
+        }
+
+        // update order
+        const result = await integrationOrderModel.updateOne(
+          { _id: id },
+          { ...updater, statusHistory, isOutstanding: false }
+        );
+        if (result.modifiedCount === 0) {
+          c.status(400);
+          throw new Error('Failed to update order');
+        } else {
+          if (updater.status !== order.status) {
+            const clientResponse = await ClientModel.findByIdAndUpdate(
+              order.client,
+              {
+                $inc: {
+                  [`orderStatistics.integrationOrders.${order.provider?.toLowerCase()}.${updater.status}`]: 1,
+                  [`orderStatistics.integrationOrders.${order.provider?.toLowerCase()}.${order.status}`]:
+                    -1,
+                },
+              }
+            );
+            if (!clientResponse) {
+              console.log('Failed to update client statistics');
+              c.status(400);
+              throw new Error('Failed to update client statistics');
+            }
+          }
+
+          if (updater.status === 'delivered') {
+            const financeResponse = await FinanceModel.findOneAndUpdate(
+              { client: order.client },
+              {
+                $inc: {
+                  balance: order.subtotal,
+                  shipping: order.shippingFees,
+                },
+              }
+            );
+
+            if (!financeResponse) {
+              console.log('Failed to update finance');
+              c.status(400);
+              throw new Error('Failed to update finance');
+            }
+          }
+        }
+
+        return c.json({ message: 'Order updated successfully' }, 200);
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        return c.json({
+          message: `Failed to update order: ${error.message}`,
+        });
+      }
+    }
+  );
 
 export default orderRouter;
