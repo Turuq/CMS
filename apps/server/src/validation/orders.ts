@@ -25,6 +25,14 @@ const imageSchema = z.object({
   proofOfUnreachable: z.string(),
 });
 
+const updateImageSchema = z.object({
+  instapayReceipt: z.string().optional(),
+  proofOfContact: z.string().optional(),
+  proofOfGhosting: z.string().optional(),
+  proofOfPostponement: z.string().optional(),
+  proofOfUnreachable: z.string().optional(),
+});
+
 const productSchema = z.object({
   UID: z.string(),
   _id: z.string(),
@@ -65,6 +73,23 @@ export const orderSchema = z.object({
   total: z.number(),
   type: z.string().optional(),
   updatedAt: z.string(),
+});
+
+export const orderUpdateSchema = z.object({
+  status: z.string().optional(),
+  cancellationReason: z.string().optional(),
+  courierCOD: z.number().optional(),
+  courierNotes: z.string().optional(),
+  gotGhosted: z.boolean().optional(),
+  hasReturnedItems: z.boolean().optional(),
+  isOutstanding: z.boolean().optional(),
+  missedOpportunity: z.boolean().optional(),
+  orderImages: updateImageSchema.optional(),
+  paidShippingOnly: z.boolean().optional(),
+  paymentMethod: z.string().optional(),
+  postponedDate: z.string().datetime().optional(),
+  reshipped: z.boolean().optional(),
+  toBeReshipped: z.boolean().optional(),
 });
 
 export const detailedOrderSchema = orderSchema.extend({
