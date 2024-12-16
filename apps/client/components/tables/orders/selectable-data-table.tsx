@@ -287,7 +287,7 @@ export function SelectableOrdersDataTable<TValue>({
                   return (
                     <TableHead
                       key={header.id}
-                      className={`text-xs text-start font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl' : 'first:rounded-l-xl last:rounded-r-xl'} last:border-r-0`}
+                      className={`text-xs text-center font-bold ${locale === 'ar' ? 'first:rounded-r-xl last:rounded-l-xl' : 'first:rounded-l-xl last:rounded-r-xl'} last:border-r-0`}
                     >
                       {header.isPlaceholder
                         ? null
@@ -324,7 +324,7 @@ export function SelectableOrdersDataTable<TValue>({
                             : '-'}
                         </p>
                       ) : cell.column.columnDef.id === 'status' ? (
-                        <div className="flex flex-col gap-1 items-start justify-center w-auto">
+                        <div className="flex flex-col gap-1 items-center justify-center w-auto">
                           <div
                             className={`${getStatusColor(cell.row.original.status)} font-semibold border bg-opacity-15 capitalize rounded-md text-xs w-auto p-1 flex items-center justify-center`}
                           >
@@ -342,7 +342,7 @@ export function SelectableOrdersDataTable<TValue>({
                               <span className="text-xs font-semibold text-dark_border/50 dark:text-light/50">
                                 {history &&
                                 Object.keys(history)?.includes(status)
-                                  ? moment(history[status]).format('L')
+                                  ? moment(history[status]).locale(locale).format(locale === "en" ? "LL" : "L")
                                   : ''}
                               </span>
                             );

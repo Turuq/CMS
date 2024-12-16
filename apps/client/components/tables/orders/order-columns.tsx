@@ -181,31 +181,7 @@ export const unassignedColumns: ColumnDef<OrderType>[] = [
   },
   {
     id: 'companyName',
-    cell: (row) => (
-      <span
-        className={`capitalize ${!row.row.original.courier && 'text-gray-500'}`}
-      >
-        {row.row.original.courier ? (
-          <div className="flex flex-col items-start gap-1">
-            <Link
-              dir="ltr"
-              href={`tel:${row.row.original.customer.phone}`}
-              className="text-xs font-semibold hover:underline"
-            >
-              {parsePhoneNumber(
-                row.row.original.courier.phone,
-                'EG'
-              )?.formatInternational()}
-            </Link>
-            <p className="text-xs text-dark_border/50 dark:text-light/50">
-              {row.row.original.courier.name}
-            </p>
-          </div>
-        ) : (
-          '-'
-        )}
-      </span>
-    ),
+    accessorKey: 'client.companyName',
     header: 'Company Name',
   },
   {

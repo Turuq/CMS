@@ -28,7 +28,10 @@ export async function scanOrders({
   port,
   courierId,
 }: {
-  endpoint: 'assign-processing-unassigned' | 'handover-processing-assigned';
+  endpoint:
+    | 'assign-processing-unassigned'
+    | 'handover-processing-assigned'
+    | 'reship-toBeReshipped-orders';
   feedback: Dispatch<
     SetStateAction<{
       [key: string]: string | boolean;
@@ -50,44 +53,36 @@ export async function scanOrders({
       await port?.open({ baudRate: 9600 });
     }
     if (port && keepScanning) {
+      console.log('port open');
       feedback((oldValue) => ({ ...oldValue, portOpen: true }));
-      const textDecoder = new TextDecoderStream();
       while (port.readable) {
-        const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
-        const reader = textDecoder.readable.getReader();
+        const reader = port.readable.getReader();
+        let currentBarcode = '';
         try {
-          let currentBarcode = '';
           while (true) {
-            try {
-              const { value, done } = await reader.read();
-              if (done) {
-                // Allow the serial port to be closed later.
-                console.log('done');
-                reader.releaseLock();
-                break;
-              }
-              currentBarcode += value;
-              if (currentBarcode.endsWith('\r')) {
-                const scannedBarcode = currentBarcode.trim();
-                reader.releaseLock();
-                currentBarcode = '';
-                ws.send(
-                  JSON.stringify({
-                    message: endpoint,
-                    data: scannedBarcode,
-                    courierId:
-                      endpoint === 'handover-processing-assigned'
-                        ? courierId
-                        : undefined,
-                  })
-                );
-                break;
-              }
-            } catch (error) {
-              console.error('Error reading:', error);
-              readableStreamClosed.catch((e) => {
-                console.error('Stream Close Error: ', e);
-              });
+            const { value, done } = await reader.read();
+            const textDecoder = new TextDecoder();
+            const decodedValue = textDecoder.decode(value);
+            if (done) {
+              // |reader| has been canceled.
+              break;
+            }
+            currentBarcode += decodedValue;
+            if (currentBarcode.endsWith('\r')) {
+              const scannedBarcode = currentBarcode.trim();
+              reader.releaseLock();
+              currentBarcode = '';
+              ws.send(
+                JSON.stringify({
+                  message: endpoint,
+                  data: scannedBarcode,
+                  courierId:
+                    endpoint !== 'assign-processing-unassigned'
+                      ? courierId
+                      : undefined,
+                })
+              );
+              break;
             }
           }
         } catch (error) {
@@ -96,6 +91,50 @@ export async function scanOrders({
           reader.releaseLock();
         }
       }
+      // while (port.readable) {
+      //   // const readableStreamClosed = port.readable.pipeTo(textDecoder.writable);
+      //   const reader = textDecoder.readable.getReader();
+      //   try {
+      //     let currentBarcode = '';
+      //     while (true) {
+      //       try {
+      //         const { value, done } = await reader.read();
+      //         if (done) {
+      //           // Allow the serial port to be closed later.
+      //           console.log('done');
+      //           reader.releaseLock();
+      //           break;
+      //         }
+      //         currentBarcode += value;
+      //         if (currentBarcode.endsWith('\r')) {
+      //           const scannedBarcode = currentBarcode.trim();
+      //           reader.releaseLock();
+      //           currentBarcode = '';
+      //           ws.send(
+      //             JSON.stringify({
+      //               message: endpoint,
+      //               data: scannedBarcode,
+      //               courierId:
+      //                 endpoint !== 'assign-processing-unassigned'
+      //                   ? courierId
+      //                   : undefined,
+      //             })
+      //           );
+      //           break;
+      //         }
+      //       } catch (error) {
+      //         console.error('Error reading:', error);
+      //         // readableStreamClosed.catch((e) => {
+      //         //   console.error('Stream Close Error: ', e);
+      //         // });
+      //       }
+      //     }
+      //   } catch (error) {
+      //     console.error('Error reading:', error);
+      //   } finally {
+      //     reader.releaseLock();
+      //   }
+      // }
     }
   } else {
     return Promise.reject('Web Serial API not supported.');

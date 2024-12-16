@@ -36,6 +36,8 @@
         "paidShippingOnly": "تم دفع رسوم الشحن فقط",
         "totalToBeReceived": "إجمالي المبالغ المستحقة",
         "totalShippingFees": "إجمالي رسوم الشحن",
+        "totalShippingCollected": "إجمالي الشحن المحصل",
+        "courierCollectedAmount": "المبلغ المحصل من المندوب",
         "numberOfCouriers": "عدد الرواد في رحله",
         "viewMore": "عرض المزيد",
         "processingAssigned": "تم تعينها للتوصيل",
@@ -319,6 +321,21 @@
           "confirm": "تأكيد",
           "cancel": "إلغاء"
         }
+      },
+      "reshipped": {
+        "header": "إعادة الشحن",
+        "description": "قم بإعادة شحن الطلبات التي تم إعادتها",
+        "tabs": {
+          "active": "نشط",
+          "inactive": "غير نشط"
+        },
+        "courier": {
+          "toBeReshipped": "الطلبات التي سيتم إعادة شحنها",
+          "scannedOrders": "الطلبات التي تم مسحها بالباركود",
+          "buttons": {
+            "reship": "إعد الي المخزن"
+          }
+        }
       }
     }
   },
@@ -375,6 +392,21 @@
       },
       "hand in": {
         "header": "تسلم"
+      },
+      "reshipped": {
+        "header": "إعادة الشحن",
+        "description": "قم بإعادة شحن الطلبات التي تم إعادتها",
+        "tabs": {
+          "active": "نشط",
+          "inactive": "غير نشط"
+        },
+        "courier": {
+          "toBeReshipped": "الطلبات التي سيتم إعادة شحنها",
+          "scannedOrders": "الطلبات التي تم مسحها بالباركود",
+          "buttons": {
+            "reship": "إعد الي المخزن"
+          }
+        }
       },
       "handOver": {
         "header": "تسليم",
@@ -509,7 +541,8 @@
     "href": {
       "handover": "تسليم",
       "assign": "تعيين",
-      "inspect": "مراقبة"
+      "inspect": "مراقبة",
+      "reship": "إعد الي المخزن"
     }
   },
   "batch": {

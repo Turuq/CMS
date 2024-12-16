@@ -68,7 +68,9 @@ export default function CourierCard({
         </CardTitle>
       </CardHeader>
       <CardContent className="grid grid-cols-1 lg:grid-cols-2 lg:items-center justify-between gap-5">
-        <div className="col-span-1 flex flex-col lg:flex-row lg:items-center gap-5">
+        <div
+          className={`col-span-1 ${!children && 'lg:col-span-2'} flex flex-col lg:flex-row lg:items-center gap-5 w-full`}
+        >
           <div className="flex items-center gap-2 group">
             <div className="group-hover:text-accent flex items-center justify-center">
               <div className="group-hover:hidden flex">{icons.phone}</div>
@@ -81,7 +83,7 @@ export default function CourierCard({
               {courier.phone}
             </Link>
           </div>
-          <div className="flex items-center gap-2 group">
+          <div className="flex items-center gap-2 group w-auto">
             <div className="group-hover:text-accent flex items-center justify-center">
               <div className="group-hover:hidden flex">
                 {icons.emptyLocation}
@@ -91,7 +93,7 @@ export default function CourierCard({
             <p className="text-sm font-semibold capitalize">{courier.zone}</p>
           </div>
         </div>
-        <div className="col-span-1">{children}</div>
+        {children && <div className="col-span-1">{children}</div>}
       </CardContent>
     </Card>
   );

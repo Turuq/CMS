@@ -1,11 +1,12 @@
 'use client';
 
 import SelectedOrderTable from '@/app/[locale]/courier-manager/assign/[courierId]/selected-orders-table';
-import { hasActiveBatch, startBatch } from '@/app/actions/batch-actions';
 import { getCourierById } from '@/app/actions/courier-actions';
 import {
-  getCourierAssignedIntegrationOrders,
-  getCourierAssignedOrders,
+  getCourierToBeReshippedIntegrationOrders,
+  getCourierToBeReshippedOrders,
+  reshipIntegrationOrders,
+  reshipTuruqOrders,
 } from '@/app/actions/order-actions';
 import CourierCard from '@/components/cards/courier-card';
 import KpiCard from '@/components/cards/kpi-card';
@@ -17,7 +18,6 @@ import {
   unassignedColumns,
 } from '@/components/tables/orders/order-columns';
 import { SelectableOrdersDataTable } from '@/components/tables/orders/selectable-data-table';
-import { Alert, AlertDescription, AlertTitle } from '@/components/ui/alert';
 import { Button } from '@/components/ui/button';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
 import { OrderType } from '@/types/order';
@@ -45,8 +45,8 @@ export default function Page({
 }: {
   params: { locale: string; courierId: string };
 }) {
-  const t = useTranslations('batch');
   const tabs = useTranslations('navigation.orders.tabs');
+  const tReshipped = useTranslations('handoverOfficer.tabs.reshipped.courier');
   const scanner = useTranslations('scanner');
   const tKpi = useTranslations('dashboard.statistics.cards');
 
@@ -70,6 +70,8 @@ export default function Page({
     OrderType[]
   >([]);
 
+  //   http://localhost:3000/en/handover-officer/reshipped/66c25a4b8c80a6b33db1d884
+
   // const [rowSelection, onRowSelectionChange] = useState<RowSelectionState>({});
   // const [rowSelectionIntegration, onRowSelectionIntegrationChange] =
   //   useState<RowSelectionState>({});
@@ -79,24 +81,19 @@ export default function Page({
     queryFn: () => getCourierById({ id: courierId }),
   });
 
-  const { data: hasActive, refetch } = useQuery({
-    queryKey: ['has-active-batch', courierId],
-    queryFn: () => hasActiveBatch({ id: courierId }),
-  });
-
   const {
     data: orders,
     isPending: isOrdersPending,
     refetch: refetchOrders,
   } = useQuery({
     queryKey: [
-      'get-courier-assigned-orders',
+      'get-courier-toBeReshipped-orders',
       courierId,
       turuqPage,
       turuqPageSize,
     ],
     queryFn: () =>
-      getCourierAssignedOrders({
+      getCourierToBeReshippedOrders({
         id: courierId,
         page: turuqPage.toString(),
         pageSize: turuqPageSize.toString(),
@@ -109,51 +106,50 @@ export default function Page({
     refetch: refetchIntegrationOrders,
   } = useQuery({
     queryKey: [
-      'get-courier-assigned-integration-orders',
+      'get-courier-toBeReshipped-integration-orders',
       courierId,
       integrationPage,
       integrationPageSize,
     ],
     queryFn: () =>
-      getCourierAssignedIntegrationOrders({
+      getCourierToBeReshippedIntegrationOrders({
         id: courierId,
         page: integrationPage.toString(),
         pageSize: integrationPageSize.toString(),
       }),
   });
 
-  async function handleStartBatch() {
+  async function handleSetAsReshipped(variant: 'turuq' | 'integration') {
     setLoading(true);
-    // const ids = Object.keys(rowSelection) ?? [];
-    const ids = selectedOrders.map((o) => o._id);
-    // const integrationIds = Object.keys(rowSelectionIntegration) ?? [];
-    const integrationIds = selectedIntegrationOrders.map((o) => o._id);
-    startBatch({
-      courierId,
-      orderIds: ids,
-      integrationIds,
-      outsourced: courier?.outSourced ?? false,
-    })
-      .then(() => {
-        toast.success('Batch Started Successfully', {
+    if (variant === 'turuq') {
+      const ids = selectedOrders.map((o) => o._id);
+      reshipTuruqOrders({ courierId, ids }).then(() => {
+        toast.success('Reshipped orders successfully', {
           style: ToastStyles.success,
         });
         setSelectedOrders([]);
-        setSelectedIntegrationOrders([]);
-        // onRowSelectionChange({});
-        // onRowSelectionIntegrationChange({});
-        refetch();
         refetchOrders();
-        refetchIntegrationOrders();
         setLoading(false);
-      })
-      .catch((err) => {
-        toast.error("Couldn't Start Batch", {
-          style: ToastStyles.error,
-        });
-        setLoading(false);
-        console.error(err);
       });
+    } else {
+      const ids = selectedIntegrationOrders.map((o) => o._id);
+      reshipIntegrationOrders({ courierId, ids })
+        .then(() => {
+          toast.success('Reshipped orders successfully', {
+            style: ToastStyles.success,
+          });
+          setSelectedIntegrationOrders([]);
+          refetchIntegrationOrders();
+          setLoading(false);
+        })
+        .catch((err) => {
+          toast.error("Couldn't Reship Orders", {
+            style: ToastStyles.error,
+          });
+          setLoading(false);
+          console.error(err);
+        });
+    }
   }
 
   useEffect(() => {
@@ -165,7 +161,7 @@ export default function Page({
         turuqPageSize,
       ],
       queryFn: () =>
-        getCourierAssignedOrders({
+        getCourierToBeReshippedOrders({
           id: courierId,
           page: turuqPage.toString(),
           pageSize: turuqPageSize.toString(),
@@ -183,7 +179,7 @@ export default function Page({
         integrationPageSize,
       ],
       queryFn: () =>
-        getCourierAssignedIntegrationOrders({
+        getCourierToBeReshippedIntegrationOrders({
           id: courierId,
           page: integrationPage.toString(),
           pageSize: integrationPageSize.toString(),
@@ -238,7 +234,7 @@ export default function Page({
           if (scanning) {
             setMessage({});
             scanOrders({
-              endpoint: 'handover-processing-assigned',
+              endpoint: 'reship-toBeReshipped-orders',
               feedback: setMessage,
               keepScanning: true,
               port: connectedPort,
@@ -253,23 +249,25 @@ export default function Page({
   const handleSocket = async () => {
     setScanning(true);
     const port = await navigator.serial.requestPort();
-    await port.open({ baudRate: 9600 });
 
-    setConnectedPort(port);
+    if (port) {
+      await port.open({ baudRate: 9600 });
+      setScanning(true);
+      setConnectedPort(port);
 
-    setTimeout(async () => {
-      await port.close();
-      setScanning(false);
-      setConnectedPort(null);
-    }, 600000); // 10 minutes
-
-    await scanOrders({
-      endpoint: 'handover-processing-assigned',
-      feedback: setMessage,
-      keepScanning: true,
-      courierId,
-      port,
-    });
+      setTimeout(async () => {
+        await port.close();
+        setScanning(false);
+        setConnectedPort(null);
+      }, 600000); // 10 minutes
+      await scanOrders({
+        endpoint: 'reship-toBeReshipped-orders',
+        feedback: setMessage,
+        keepScanning: true,
+        courierId,
+        port,
+      });
+    }
   };
 
   function handleRemoveTuruqOrder(id: string) {
@@ -285,21 +283,6 @@ export default function Page({
 
   return (
     <div className="flex flex-col gap-2 w-full">
-      {hasActive && (
-        <Alert className="bg-red-500 dark:bg-red-300 text-light dark:text-dark">
-          <div className="flex items-start gap-2">
-            <div className="text-inherit">{icons.warning}</div>
-            <div className="flex flex-col gap-1">
-              <AlertTitle className="font-bold">
-                {t('warning.title')}
-              </AlertTitle>
-              <AlertDescription className="">
-                {t('warning.description')}
-              </AlertDescription>
-            </div>
-          </div>
-        </Alert>
-      )}
       {courier && (
         <div className="grid grid-cols-3 gap-2 w-full">
           <div className="col-span-3 lg:col-span-1 w-full flex items-center">
@@ -463,14 +446,8 @@ export default function Page({
             <div className="flex flex-col gap-2 w-full">
               <div className="flex flex-col gap-1">
                 <h1 className="font-bold text-lg text-foreground">
-                  Assigned Orders
+                  {tReshipped('toBeReshipped')}
                 </h1>
-                <p className="text-sm font-semibold text-foreground/50 text-balance">
-                  Processing Orders Assigned to{' '}
-                  <span className="capitalize font-bold text-accent">
-                    {courier?.name}
-                  </span>
-                </p>
               </div>
               <div className="w-full p-2 rounded-xl bg-light dark:bg-dark_border">
                 <SelectableOrdersDataTable
@@ -490,15 +467,8 @@ export default function Page({
               <div className="flex items-center justify-between gap-5">
                 <div className="w-full flex flex-col gap-1">
                   <h1 className="font-bold text-lg text-foreground">
-                    Handed Orders
+                    {tReshipped('scannedOrders')}
                   </h1>
-                  <p className="text-sm font-semibold text-foreground/50 text-balance">
-                    Orders Handed to{' '}
-                    <span className="capitalize font-bold text-accent">
-                      {courier?.name}{' '}
-                    </span>
-                    and are Out For Delivery
-                  </p>
                 </div>
                 {selectedOrders.length > 0 && (
                   <p className="text-xs font-bold">
@@ -540,18 +510,17 @@ export default function Page({
                 <Button
                   variant="default"
                   className="w-40"
-                  onClick={handleStartBatch}
+                  onClick={() => handleSetAsReshipped('turuq')}
                   disabled={
                     (selectedOrders.length === 0 &&
                       selectedIntegrationOrders.length === 0) ||
-                    loading ||
-                    hasActive
+                    loading
                   }
                 >
                   {loading ? (
                     <Loader2Icon size={16} className="animate-spin" />
                   ) : (
-                    t('buttons.start')
+                    tReshipped('buttons.reship')
                   )}
                 </Button>
               </div>
@@ -645,18 +614,17 @@ export default function Page({
                 <Button
                   variant="default"
                   className="w-40"
-                  onClick={handleStartBatch}
+                  onClick={() => handleSetAsReshipped('integration')}
                   disabled={
                     (selectedOrders.length === 0 &&
                       selectedIntegrationOrders.length === 0) ||
-                    loading ||
-                    hasActive
+                    loading
                   }
                 >
                   {loading ? (
                     <Loader2Icon size={16} className="animate-spin" />
                   ) : (
-                    t('buttons.start')
+                    tReshipped('buttons.reship')
                   )}
                 </Button>
               </div>

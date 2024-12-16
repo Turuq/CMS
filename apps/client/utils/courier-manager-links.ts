@@ -12,6 +12,12 @@ export const courierManagerLinks = [
     icon: 'assign',
   },
   {
+    title: 'reshipped',
+    href: '/courier-manager/reshipped',
+    path: '/reshipped',
+    icon: 'reshipped',
+  },
+  {
     title: 'inspect',
     href: '/courier-manager/inspector',
     path: '/inspector',

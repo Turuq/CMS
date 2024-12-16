@@ -36,6 +36,8 @@
         "toBeReshipped": "To Be Reshipped",
         "totalToBeReceived": "Total To Be Received",
         "totalShippingFees": "Total Shipping Fees",
+        "totalShippingCollected": "Total Collected Shipping",
+        "courierCollectedAmount": "Courier Collected Amount",
         "numberOfCouriers": "Couriers in a batch",
         "viewMore": "View More",
         "processingAssigned": "Processing Assigned",
@@ -323,6 +325,21 @@
           "confirm": "Confirm",
           "cancel": "Cancel"
         }
+      },
+      "reshipped": {
+        "header": "Reshipped",
+        "description": "Please Select a Courier to Handle their Reshipped Orders.",
+        "tabs": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "courier": {
+          "toBeReshipped": "To Be Reshipped Orders",
+          "scannedOrders": "Scanned Orders",
+          "buttons": {
+            "reship": "Reship Orders"
+          }
+        }
       }
     }
   },
@@ -379,6 +396,21 @@
       },
       "hand in": {
         "header": "Hand In"
+      },
+      "reshipped": {
+        "header": "Reshipped",
+        "description": "Please Select a Courier to Handle their Reshipped Orders.",
+        "tabs": {
+          "active": "Active",
+          "inactive": "Inactive"
+        },
+        "courier": {
+          "toBeReshipped": "To Be Reshipped Orders",
+          "scannedOrders": "Scanned Orders",
+          "buttons": {
+            "reship": "Reship Orders"
+          }
+        }
       },
       "handOver": {
         "header": "Hand Over",
@@ -513,7 +545,8 @@
     "href": {
       "handover": "Handover",
       "assign": "Assign",
-      "inspect": "Inspect"
+      "inspect": "Inspect",
+      "reship": "Reship"
     }
   },
   "batch": {

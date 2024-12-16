@@ -11,4 +11,10 @@ export const handoverOfficerLinks = [
     path: '/hand-in',
     icon: 'handIn',
   },
+  {
+    title: 'reshipped',
+    href: '/handover-officer/reshipped',
+    path: '/reshipped',
+    icon: 'reshipped',
+  },
 ];

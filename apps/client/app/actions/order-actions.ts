@@ -136,7 +136,10 @@ export async function getCourierAssignedOrders({
   if (!res.ok) {
     throw new Error('Failed to get orders');
   }
-  const data: { orders: OrderType[]; totalPages: number } = await res.json();
+  const data = (await res.json()) as {
+    orders: OrderType[];
+    totalPages: number;
+  };
   return data;
 }
 
@@ -151,6 +154,64 @@ export async function getCourierAssignedIntegrationOrders({
 }) {
   const token = await verifyToken();
   const res = await api.order.integration.assigned[':id'][':page'][
+    ':pageSize'
+  ].$get(
+    { param: { id, page, pageSize } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get orders');
+  }
+  const data: { integrationOrders: OrderType[]; totalPages: number } =
+    await res.json();
+  return data;
+}
+
+export async function getCourierToBeReshippedOrders({
+  id,
+  page,
+  pageSize,
+}: {
+  id: string;
+  page: string;
+  pageSize: string;
+}) {
+  const token = await verifyToken();
+  const res = await api.order.turuq.assigned.reshipped[':id'][':page'][
+    ':pageSize'
+  ].$get(
+    { param: { id, page, pageSize } },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to get orders');
+  }
+  const data = (await res.json()) as {
+    orders: OrderType[];
+    totalPages: number;
+  };
+  return data;
+}
+
+export async function getCourierToBeReshippedIntegrationOrders({
+  id,
+  page,
+  pageSize,
+}: {
+  id: string;
+  page: string;
+  pageSize: string;
+}) {
+  const token = await verifyToken();
+  const res = await api.order.integration.assigned.reshipped[':id'][':page'][
     ':pageSize'
   ].$get(
     { param: { id, page, pageSize } },
@@ -202,4 +263,56 @@ export async function assignIntegrationOrders({
   }
   const data = await res.json();
   return { data };
+}
+
+export async function reshipTuruqOrders({
+  courierId,
+  ids,
+}: {
+  courierId: string;
+  ids: string[];
+}) {
+  const token = await verifyToken();
+  const res = await api.order.turuq.reship[':id'].$put(
+    {
+      param: { id: courierId },
+      json: { ids },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to reship orders');
+  }
+  const data = await res.json();
+  return data;
+}
+
+export async function reshipIntegrationOrders({
+  courierId,
+  ids,
+}: {
+  courierId: string;
+  ids: string[];
+}) {
+  const token = await verifyToken();
+  const res = await api.order.integration.reship[':id'].$put(
+    {
+      param: { id: courierId },
+      json: { ids },
+    },
+    {
+      headers: {
+        Authorization: `Bearer ${token}`,
+      },
+    }
+  );
+  if (!res.ok) {
+    throw new Error('Failed to reship orders');
+  }
+  const data = await res.json();
+  return data;
 }

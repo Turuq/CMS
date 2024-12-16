@@ -12,11 +12,18 @@ import { useTranslations } from 'next-intl';
 export default function CourierCardLayout({
   locale,
   initial,
+  href,
+  hrefOptions,
 }: {
   locale: string;
   initial: {
     active: CourierWithStatistics[];
     inactive: CourierWithStatistics[];
+  };
+  href?: string;
+  hrefOptions?: {
+    tooltip: string;
+    label: string;
   };
 }) {
   const t = useTranslations('handoverOfficer.tabs.handOver');
@@ -60,11 +67,13 @@ export default function CourierCardLayout({
                 key={courier._id.toString()}
                 courier={courier}
                 locale={locale}
-                href={`hand-over/${courier._id}`}
-                hrefOptions={{
-                  tooltip: 'Hand Over',
-                  label: 'handover',
-                }}
+                href={`${href ?? 'hand-over'}/${courier._id}`}
+                hrefOptions={
+                  hrefOptions ?? {
+                    tooltip: 'Hand Over',
+                    label: 'handover',
+                  }
+                }
               >
                 <div className="flex flex-col lg:flex-row lg:items-center justify-between gap-5 w-full">
                   <div className="grid grid-cols-4 w-full h-auto px-5 py-2 rounded-xl bg-muted items-center justify-between">
