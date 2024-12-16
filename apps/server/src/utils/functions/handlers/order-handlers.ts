@@ -177,6 +177,63 @@ export async function checkAssignedProcessingOrder({
   }
 }
 
+export async function checkToBeReshippedOrder({
+  code,
+  courierId,
+  ws,
+}: {
+  code: string;
+  courierId: string;
+  ws: ServerWebSocket<unknown>;
+}) {
+  const order = await orderModel
+    .findOne({
+      $and: [
+        { OID: code },
+        { toBeReshipped: true },
+        {
+          isOutstanding: false,
+        },
+        {
+          courier: courierId,
+        },
+      ],
+    })
+    .populate({
+      path: 'client',
+      select: 'companyName',
+    })
+    .select('_id OID client customer products status type total createdAt');
+
+  const integrationOrder = await integrationOrderModel
+    .findOne({
+      $and: [
+        { OID: code },
+        { toBeReshipped: true },
+        {
+          isOutstanding: false,
+        },
+        {
+          courier: courierId,
+        },
+      ],
+    })
+    .populate({
+      path: 'client',
+      select: 'companyName',
+    })
+    .select(
+      '_id OID client customer products status type total createdAt provider'
+    );
+  if (!integrationOrder && !order) {
+    console.log('Order Not Found');
+    ws.send(JSON.stringify({ message: 'unableToAssign' }));
+  } else {
+    console.log('Order Matched');
+    ws.send(JSON.stringify({ order: order || integrationOrder }));
+  }
+}
+
 // export async function checkAssignedProcessingOrder({
 //   evt,
 //   ws,

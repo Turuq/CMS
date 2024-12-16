@@ -23,6 +23,7 @@ import { createBunWebSocket } from 'hono/bun';
 import { createIPC } from './utils/functions/child-process';
 import {
   checkAssignedProcessingOrder,
+  checkToBeReshippedOrder,
   checkUnassignedProcessingOrder,
 } from './utils/functions/handlers/order-handlers';
 import { authorizeUser } from './utils/authorization';
@@ -174,16 +175,6 @@ Bun.serve({
       console.log(message);
       if (message.message === 'assign-processing-unassigned') {
         await checkUnassignedProcessingOrder({ code: message.data, ws });
-        // const proc = createIPC(
-        //   ['node', './src/scanner.js'],
-        //   ws,
-        //   async (message, _, ws) =>
-        //     checkUnassignedProcessingOrder({
-        //       evt: message,
-        //       ws,
-        //       process: proc,
-        //     })
-        // );
       }
       if (message.message === 'handover-processing-assigned') {
         if (message.courierId) {
@@ -193,17 +184,18 @@ Bun.serve({
             courierId,
             ws,
           });
-          // const proc = createIPC(
-          //   ['node', './src/scanner.js'],
-          //   ws,
-          //   async (message, _, ws) =>
-          //     checkAssignedProcessingOrder({
-          //       evt: message,
-          //       ws,
-          //       process: proc,
-          //       courierId,
-          //     })
-          // );
+        } else {
+          ws.send(JSON.stringify({ message: 'No courier ID provided' }));
+        }
+      }
+      if (message.message === 'reship-toBeReshipped-orders') {
+        if (message.courierId) {
+          const { courierId } = message;
+          await checkToBeReshippedOrder({
+            code: message.data,
+            courierId,
+            ws,
+          });
         } else {
           ws.send(JSON.stringify({ message: 'No courier ID provided' }));
         }

@@ -131,6 +131,10 @@ const orderRouter = new Hono()
           .populate({
             path: 'client',
             select: 'companyName name',
+          })
+          .populate({
+            path: 'courier',
+            select: 'name phone username',
           });
 
         const totalPages = await orderModel.countDocuments({
@@ -176,11 +180,103 @@ const orderRouter = new Hono()
           .populate({
             path: 'client',
             select: 'companyName name',
+          })
+          .populate({
+            path: 'courier',
+            select: 'name phone username',
           });
 
         const totalPages = await integrationOrderModel.countDocuments({
           courier: id,
           status: 'processing',
+        });
+
+        if (!integrationOrders) {
+          c.status(404);
+          throw new Error('No orders found');
+        }
+
+        c.status(200);
+        return c.json({
+          integrationOrders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        throw new Error(`Failed to get orders: ${error.message}`);
+      }
+    }
+  )
+  .get(
+    '/turuq/assigned/reshipped/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
+    async (c) => {
+      const { id, page, pageSize } = c.req.valid('param');
+      try {
+        const courier = await CourierModel.findById(id).select('_id');
+        if (!courier) {
+          return c.notFound();
+        }
+
+        // Find To Be Reshipped Orders Assigned to the Courier
+        const orders = await orderModel
+          .find({ courier: id, toBeReshipped: true, isOutstanding: false })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await orderModel.countDocuments({
+          courier: id,
+          toBeReshipped: true,
+          isOutstanding: false,
+        });
+
+        if (!orders) {
+          return c.notFound();
+        }
+
+        c.status(200);
+        return c.json({
+          orders,
+          totalPages: Math.ceil(totalPages / Number(pageSize)),
+        });
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        throw new Error(`Failed to get orders: ${error.message}`);
+      }
+    }
+  )
+  .get(
+    '/integration/assigned/reshipped/:id/:page/:pageSize',
+    zValidator('param', validateCourierOrdersPagination),
+    async (c) => {
+      const { id, page, pageSize } = c.req.valid('param');
+      try {
+        const courier = await CourierModel.findById(id).select('_id');
+        if (!courier) {
+          c.status(404);
+          throw new Error('Courier not found');
+        }
+
+        // Find Processing Integration Orders Assigned to Courier
+        const integrationOrders = await integrationOrderModel
+          .find({ courier: id, toBeReshipped: true, isOutstanding: false })
+          .skip((Number(page) - 1) * Number(pageSize))
+          .limit(Number(pageSize))
+          .populate({
+            path: 'client',
+            select: 'companyName name',
+          });
+
+        const totalPages = await integrationOrderModel.countDocuments({
+          courier: id,
+          toBeReshipped: true,
+          isOutstanding: false,
         });
 
         if (!integrationOrders) {
@@ -547,7 +643,7 @@ const orderRouter = new Hono()
         console.error(error);
         c.status(500);
         return c.json({
-          message: 'Failed to handover orders: ${error.message}',
+          message: `Failed to handover orders: ${error.message}`,
         });
       }
     }
@@ -596,7 +692,109 @@ const orderRouter = new Hono()
         console.error(error);
         c.status(500);
         return c.json({
-          message: 'Failed to handover orders: ${error.message}',
+          message: `Failed to handover orders: ${error.message}`,
+        });
+      }
+    }
+  )
+  .put(
+    '/turuq/reship/:id',
+    zValidator('param', validateObjectId),
+    zValidator('json', validateObjectIdArray),
+    async (c) => {
+      const { id } = c.req.valid('param');
+      const data = c.req.valid('json');
+      try {
+        // Check if order courier is assigned to all provided orders
+        const orders = await orderModel.find({
+          courier: id,
+          _id: { $in: data.ids },
+        });
+        if (orders.length !== data.ids.length) {
+          c.status(412);
+          return c.json({
+            message: 'Courier is not assigned to all provided orders',
+          });
+        }
+        // Reship Orders
+        const updateResult = await orderModel.updateMany(
+          { _id: { $in: data.ids } },
+          {
+            reshipped: true,
+            toBeReshipped: false,
+            courier: null,
+            courierAssignedAt: null,
+          }
+        );
+        if (!updateResult) {
+          c.status(400);
+          return c.json({
+            message: 'Failed to reship orders',
+          });
+        }
+        if (
+          updateResult.acknowledged &&
+          updateResult.modifiedCount === data.ids.length
+        ) {
+          c.status(201);
+          return c.json({
+            message: `Reshipped ${updateResult.modifiedCount} Orders Successfully`,
+          });
+        }
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        return c.json({
+          message: `Failed to reship orders: ${error.message}`,
+        });
+      }
+    }
+  )
+  .put(
+    '/integration/reship/:id',
+    zValidator('param', validateObjectId),
+    zValidator('json', validateObjectIdArray),
+    async (c) => {
+      // Validate request params
+      const { id } = c.req.valid('param');
+      const data = c.req.valid('json');
+      try {
+        // Check if order courier is assigned to all provided orders
+        const orders = await integrationOrderModel.find({
+          courier: id,
+          _id: { $in: data.ids },
+        });
+        if (orders.length !== data.ids.length) {
+          c.status(412);
+          return c.json({
+            message: 'Courier is not assigned to all provided orders',
+          });
+        }
+        // Handover Orders
+        const updateResult = await integrationOrderModel.updateMany(
+          { _id: { $in: data.ids } },
+          { reshipped: true, toBeReshipped: false, courier: null, courierAssignedAt: null }
+        );
+        if (!updateResult) {
+          c.status(400);
+          return c.json({
+            message: 'Failed to reship orders',
+          });
+        }
+        if (
+          updateResult.acknowledged &&
+          updateResult.modifiedCount === data.ids.length
+        ) {
+          c.status(201);
+          return c.json({
+            message: `Reshipped ${updateResult.modifiedCount} Orders Successfully`,
+          });
+        }
+      } catch (error: any) {
+        console.error(error);
+        c.status(500);
+        return c.json({
+          message: `Failed to reship orders: ${error.message}`,
         });
       }
     }
